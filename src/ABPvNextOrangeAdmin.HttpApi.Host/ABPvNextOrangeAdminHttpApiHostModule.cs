@@ -18,6 +18,7 @@ using StackExchange.Redis;
 using Microsoft.OpenApi.Models;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.AspNetCore.Mvc.Conventions;
 using Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
@@ -91,6 +92,11 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
         Configure<AbpAspNetCoreMvcOptions>(options =>
         {
             options.ConventionalControllers.Create(typeof(ABPvNextOrangeAdminApplicationModule).Assembly);
+        });
+
+        Configure<AbpConventionalControllerOptions>(options =>
+        {
+            options.UseV3UrlStyle = false;
         });
     }
 
