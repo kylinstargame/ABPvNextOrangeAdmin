@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -38,7 +37,7 @@ public class Program
             await app.RunAsync();
             return 0;
         }
-        catch (Exception ex)
+        catch (global::System.Exception ex)
         {
             Log.Fatal(ex, "Host terminated unexpectedly!");
             return 1;

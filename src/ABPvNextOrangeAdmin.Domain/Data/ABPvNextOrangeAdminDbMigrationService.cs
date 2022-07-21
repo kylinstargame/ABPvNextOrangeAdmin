@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -116,7 +115,7 @@ public class ABPvNextOrangeAdminDbMigrationService : ITransientDependency
                 return false;
             }
         }
-        catch (Exception)
+        catch (global::System.Exception)
         {
             return false;
         }
@@ -133,7 +132,7 @@ public class ABPvNextOrangeAdminDbMigrationService : ITransientDependency
                 return false;
             }
         }
-        catch (Exception e)
+        catch (global::System.Exception e)
         {
             Logger.LogWarning("Couldn't determinate if any migrations exist : " + e.Message);
             return false;
@@ -190,9 +189,9 @@ public class ABPvNextOrangeAdminDbMigrationService : ITransientDependency
           // }
           await process.WaitForExitAsync();
         }
-        catch (Exception)
+        catch (global::System.Exception)
         {
-            throw new Exception("Couldn't run ABP CLI...");
+            throw new global::System.Exception("Couldn't run ABP CLI...");
         }
     }
 
@@ -202,7 +201,7 @@ public class ABPvNextOrangeAdminDbMigrationService : ITransientDependency
 
         if (slnDirectoryPath == null)
         {
-            throw new Exception("Solution folder not found!");
+            throw new global::System.Exception("Solution folder not found!");
         }
 
         var srcDirectoryPath = Path.Combine(slnDirectoryPath, "src");

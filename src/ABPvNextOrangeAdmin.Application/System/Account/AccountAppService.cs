@@ -1,23 +1,43 @@
 using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
+using ABPvNextOrangeAdmin.Constans;
+using ABPvNextOrangeAdmin.CustomException;
+using ABPvNextOrangeAdmin.Exception;
+using ABPvNextOrangeAdmin.Options;
 using ABPvNextOrangeAdmin.System.Account.Dto;
+using ABPvNextOrangeAdmin.System.Config;
 using ABPvNextOrangeAdmin.Utils;
 using ABPvNextOrangeAdmin.Utils.ImageProducer;
+using IdentityModel;
+using IdentityServer4;
+using IdentityServer4.Models;
+using IdentityServer4.Services;
+using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Emailing;
 using Volo.Abp.Account.Settings;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Caching;
 using Volo.Abp.Identity;
 using Volo.Abp.IdentityServer.AspNetIdentity;
 using Volo.Abp.ObjectExtending;
+using Volo.Abp.Security.Claims;
 using Volo.Abp.Settings;
 using Volo.Abp.Validation;
 using IdentityUser = Volo.Abp.Identity.IdentityUser;
+
 // ReSharper disable StringLastIndexOfIsCultureSpecific.1
 
 namespace ABPvNextOrangeAdmin.System.Account;
@@ -25,6 +45,7 @@ namespace ABPvNextOrangeAdmin.System.Account;
 [Route("api/sys/account/[action]")]
 public class AccountAppService : ApplicationService, IAccountAppService
 {
+    private JwtOptions JwtOptions { get; }
     protected SignInManager<IdentityUser> SignInManager { get; }
 
     private IIdentityRoleRepository RoleRepository { get; }
@@ -37,18 +58,34 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
     private IOptions<IdentityOptions> IdentityOptions { get; }
 
-    protected DefaultKaptcha DefaultKaptcha { get; }
+    private DefaultCaptcha DefaultCaptcha { get; }
+
+    private ConfigDomainService ConfigDomainService { get; }
+
+    private IDistributedCache<String> DistributedCache { get; }
+
+    private ITokenService TokenService { get; }
+
+    private IRefreshTokenService RefreshTokenService { get; }
+
 
     public AccountAppService(IIdentityRoleRepository roleRepository, IdentityUserManager userManager,
-        IAccountEmailer accountEmailer, IOptions<IdentitySecurityLogManager> identitySecurityLogManager,
-        IOptions<IdentityOptions> identityOptions, DefaultKaptcha defaultKaptcha)
+        IAccountEmailer accountEmailer,IdentitySecurityLogManager identitySecurityLogManager,
+        IOptions<IdentityOptions> identityOptions, DefaultCaptcha defaultCaptcha,
+        ConfigDomainService configDomainService, IDistributedCache<String> distributedCache, ITokenService tokenService,
+        IRefreshTokenService refreshTokenService, IOptions<JwtOptions> jwtOptions)
     {
         RoleRepository = roleRepository;
         UserManager = userManager;
         AccountEmailer = accountEmailer;
-        IdentitySecurityLogManager = identitySecurityLogManager.Value;
+        IdentitySecurityLogManager = identitySecurityLogManager;
         IdentityOptions = identityOptions;
-        DefaultKaptcha = defaultKaptcha;
+        DefaultCaptcha = defaultCaptcha;
+        ConfigDomainService = configDomainService;
+        DistributedCache = distributedCache;
+        TokenService = tokenService;
+        RefreshTokenService = refreshTokenService;
+        JwtOptions = jwtOptions.Value;
     }
 
     /// <summary>
@@ -86,6 +123,14 @@ public class AccountAppService : ApplicationService, IAccountAppService
     [ActionName("login")]
     public async Task<CommonResult<String>> LoginAsync(LoginInput input)
     {
+        Boolean captchaOnOff = await ConfigDomainService.SelectCaptchaOnOff();
+
+        // 验证码开关
+        if (captchaOnOff)
+        {
+            await ValidateCaptcha(input.UserNameOrEmailAddress, input.Code, input.Uuid);
+        }
+
         await CheckLocalLoginAsync();
 
         ValidateLoginInfo(input);
@@ -98,6 +143,13 @@ public class AccountAppService : ApplicationService, IAccountAppService
             true
         );
 
+        var token = "";
+        //生成AccessToken
+        if (signInResult.Succeeded)
+        { 
+            token = GenerateAccessToken(await  UserManager.FindByNameAsync(input.UserNameOrEmailAddress));
+        }
+
         //登录日志
         await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()
         {
@@ -105,26 +157,8 @@ public class AccountAppService : ApplicationService, IAccountAppService
             Action = signInResult.ToIdentitySecurityLogAction(),
             UserName = input.UserNameOrEmailAddress
         });
-
-        return CommonResult<String>.Success(signInResult.ToIdentitySecurityLogAction(), "账户登录完成");
-    }
-
-    /// <summary>
-    /// 获取验证码 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    [HttpPost]
-    [ActionName("captchaImage")]
-    public async Task<CommonResult<CaptchaCodeOutput>> GetCaptchaImageAsync()
-    {
-        var guid = GuidGenerator.Create();
-        String capText = DefaultKaptcha.createText();
         
-        byte[] image = DefaultKaptcha.createImage(capText);
-        return CommonResult<CaptchaCodeOutput>.Success(
-            CaptchaCodeOutput.CreateInstance(guid.ToString(), capText),"生成验证码成功");
-
+        return CommonResult<String>.Success(signInResult.ToIdentitySecurityLogAction(), token);
     }
 
     /// <summary>
@@ -182,6 +216,50 @@ public class AccountAppService : ApplicationService, IAccountAppService
         });
     }
 
+    /// <summary>
+    /// 生成验证码 
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    [HttpPost]
+    [ActionName("captchaImage")]
+    public async Task<CommonResult<CaptchaCodeOutput>> GetCaptchaImageAsync()
+    {
+        var guid = GuidGenerator.Create();
+        String capText = DefaultCaptcha.createText();
+
+        byte[] image = DefaultCaptcha.createImage(capText);
+        var uuid = GuidGenerator.Create();
+        String verifyKey = CommonConstants.CAPTCHA_CODE_KEY + uuid;
+        await DistributedCache.SetAsync(verifyKey, capText,
+            new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(120) });
+        return CommonResult<CaptchaCodeOutput>.Success(
+            CaptchaCodeOutput.CreateInstance(guid.ToString(), capText), "生成验证码成功");
+    }
+
+
+    /// <summary>
+    /// 校验验证码
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="code"></param>
+    /// <param name="uuid"></param>
+    /// <exception cref="CaptchaExpireException"></exception>
+    private async Task ValidateCaptcha(String username, String code, String uuid)
+    {
+        String verifyKey = CommonConstants.CAPTCHA_CODE_KEY + StringUtils.Nvl(uuid, "");
+        String captcha = (await DistributedCache.GetAsync(verifyKey)).ToString();
+        await DistributedCache.RemoveAsync(verifyKey);
+        if (captcha == null)
+        {
+            throw new CaptchaExpireException();
+        }
+
+        if (!code.Equals(captcha))
+        {
+            throw new CaptchaException();
+        }
+    }
 
     /// <summary>
     /// 检查用户是否启用本地注册
@@ -206,7 +284,6 @@ public class AccountAppService : ApplicationService, IAccountAppService
             throw new UserFriendlyException(L["LocalLoginDisabledMessage"]);
         }
     }
-
 
     /// <summary>
     /// 检验用户信息
@@ -274,5 +351,39 @@ public class AccountAppService : ApplicationService, IAccountAppService
         }
 
         return user;
+    }
+
+    /// <summary>
+    /// 生成IdentityUser AccessToken
+    /// </summary>
+    /// <param name="identityUser"></param>
+    /// <returns></returns>
+    private string GenerateAccessToken(IdentityUser identityUser)
+    {
+        var dateNow = DateTime.Now;
+        var expirationTime = dateNow + TimeSpan.FromHours(JwtOptions.ExpirationTime);
+        var key = Encoding.ASCII.GetBytes(JwtOptions.SecurityKey);
+        
+        var claims = new List<Claim>
+        {
+            new Claim(JwtClaimTypes.Audience, JwtOptions.Audience),
+            new Claim(JwtClaimTypes.Issuer, JwtOptions.Issuer),
+            new Claim(AbpClaimTypes.UserId, identityUser.Id.ToString()),
+            new Claim(AbpClaimTypes.Name,  identityUser.Name),
+            new Claim(AbpClaimTypes.UserName,  identityUser.UserName),
+            new Claim(AbpClaimTypes.Email, identityUser.Email),
+            new Claim(AbpClaimTypes.TenantId, identityUser.TenantId.ToString())
+        };
+
+        var tokenDescriptor = new SecurityTokenDescriptor()
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = expirationTime,
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature)
+        };
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.CreateToken(tokenDescriptor);
+        return handler.WriteToken(token);
     }
 }

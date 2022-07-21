@@ -7,12 +7,12 @@ using Volo.Abp.DependencyInjection;
 
 namespace ABPvNextOrangeAdmin.Utils.ImageProducer;
 
-public class DefaultKaptcha : IProducer, ITransientDependency
+public class DefaultCaptcha : IProducer, ITransientDependency
 {
     private int width = 200;
     private int height = 50;
 
-    public DefaultKaptcha()
+    public DefaultCaptcha()
     {
     }
 

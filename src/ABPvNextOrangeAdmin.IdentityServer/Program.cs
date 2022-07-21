@@ -40,7 +40,7 @@ public class Program
             await app.RunAsync();
             return 0;
         }
-        catch (Exception ex)
+        catch (global::System.Exception ex)
         {
             Log.Fatal(ex, "ABPvNextOrangeAdmin.IdentityServer terminated unexpectedly!");
             return 1;

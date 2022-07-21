@@ -14,6 +14,17 @@ public class LoginInput
     [DataType(DataType.Password)]
     [DisableAuditing]
     public string Password { get; set; }
+    
+    /// <summary>
+    /// 校验码
+    /// </summary>
+    public string Code { get; set; }
+    
+    /// <summary>
+    /// 校验码
+    /// </summary>
+    public string Uuid { get; set; }
+
 
     public bool RememberMe { get; set; } 
 }

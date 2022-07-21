@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ABPvNextOrangeAdmin.EntityFrameworkCore;
 using ABPvNextOrangeAdmin.MultiTenancy;
+using ABPvNextOrangeAdmin.Options;
 using IdentityServer4;
 using Microsoft.AspNetCore.Http;
 using StackExchange.Redis;
@@ -56,6 +57,7 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
         ConfigureDataProtection(context, configuration, hostingEnvironment);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
+        ConfigureJwtOption(context, configuration);
     }
 
     private void ConfigureCache(IConfiguration configuration)
@@ -86,6 +88,7 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
             });
         }
     }
+
     private void ConfigureConventionalControllers()
     {
         // IdentityServerUser
@@ -187,6 +190,12 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
                     .AllowCredentials();
             });
         });
+    }
+
+    private void ConfigureJwtOption(ServiceConfigurationContext context, IConfiguration configuration)
+    {
+        context.Services.Configure<JwtOptions>(context.Services.GetConfiguration()
+            .GetSection("Jwt"));
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
