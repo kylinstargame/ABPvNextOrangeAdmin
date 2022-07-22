@@ -6,8 +6,7 @@ namespace ABPvNextOrangeAdmin.Config;
 public static class CaptchaExtensions
 {
     public static IConfigurationBuilder ConfigCaptcha(
-         this IConfigurationBuilder builder,
-        Action<CaptchaConfigSource> optionsAction)
+         this IConfigurationBuilder builder)
     {
         return builder.Add(new CaptchaConfigSource());
     } 

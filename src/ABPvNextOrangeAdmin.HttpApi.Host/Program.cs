@@ -34,11 +34,7 @@ public class Program
                 .UseAutofac()
                 .UseSerilog();
             await builder.AddApplicationAsync<ABPvNextOrangeAdminHttpApiHostModule>();
-
-            builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.Sources.Add(new CaptchaConfigSource());
-            });
+            builder.Configuration.ConfigCaptcha();
             var app = builder.Build();
             await app.InitializeApplicationAsync();
             await app.RunAsync();

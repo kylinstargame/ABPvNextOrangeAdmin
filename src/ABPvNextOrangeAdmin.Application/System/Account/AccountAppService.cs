@@ -46,7 +46,8 @@ namespace ABPvNextOrangeAdmin.System.Account;
 public class AccountAppService : ApplicationService, IAccountAppService
 {
     private JwtOptions JwtOptions { get; }
-    protected SignInManager<IdentityUser> SignInManager { get; }
+
+    private SignInManager<IdentityUser> SignInManager { get; }
 
     private IIdentityRoleRepository RoleRepository { get; }
 
@@ -68,12 +69,11 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
     private IRefreshTokenService RefreshTokenService { get; }
 
-
     public AccountAppService(IIdentityRoleRepository roleRepository, IdentityUserManager userManager,
         IAccountEmailer accountEmailer,IdentitySecurityLogManager identitySecurityLogManager,
         IOptions<IdentityOptions> identityOptions, DefaultCaptcha defaultCaptcha,
         ConfigDomainService configDomainService, IDistributedCache<String> distributedCache, ITokenService tokenService,
-        IRefreshTokenService refreshTokenService, IOptions<JwtOptions> jwtOptions)
+        IRefreshTokenService refreshTokenService, IOptions<JwtOptions> jwtOptions, SignInManager<IdentityUser> signInManager)
     {
         RoleRepository = roleRepository;
         UserManager = userManager;
@@ -85,6 +85,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
         DistributedCache = distributedCache;
         TokenService = tokenService;
         RefreshTokenService = refreshTokenService;
+        SignInManager = signInManager;
         JwtOptions = jwtOptions.Value;
     }
 
