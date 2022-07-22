@@ -19,6 +19,7 @@ using StackExchange.Redis;
 using Microsoft.OpenApi.Models;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.AspNetCore.Mvc.AntiForgery;
 using Volo.Abp.AspNetCore.Mvc.Conventions;
 using Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy;
 using Volo.Abp.AspNetCore.Serilog;
@@ -58,6 +59,15 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
         ConfigureJwtOption(context, configuration);
+        
+        Configure<AbpAntiForgeryOptions>(options =>
+        {
+            options.TokenCookie.Expiration = TimeSpan.Zero;
+            options.AutoValidate = false; //表示不验证防伪令牌
+            //options.AutoValidateIgnoredHttpMethods.Remove("GET");
+            //options.AutoValidateFilter =
+            //    type => !type.Namespace.StartsWith("MyProject.MyIgnoredNamespace");
+        });
     }
 
     private void ConfigureCache(IConfiguration configuration)

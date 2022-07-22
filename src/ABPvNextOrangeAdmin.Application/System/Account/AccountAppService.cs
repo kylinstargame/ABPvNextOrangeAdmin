@@ -19,6 +19,7 @@ using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -73,7 +74,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
         IAccountEmailer accountEmailer,IdentitySecurityLogManager identitySecurityLogManager,
         IOptions<IdentityOptions> identityOptions, DefaultCaptcha defaultCaptcha,
         ConfigDomainService configDomainService, IDistributedCache<String> distributedCache, ITokenService tokenService,
-        IRefreshTokenService refreshTokenService, IOptions<JwtOptions> jwtOptions, SignInManager<IdentityUser> signInManager)
+        IRefreshTokenService refreshTokenService, IOptions<JwtOptions> jwtOptions/*, SignInManager<IdentityUser> signInManager*/)
     {
         RoleRepository = roleRepository;
         UserManager = userManager;
@@ -85,7 +86,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
         DistributedCache = distributedCache;
         TokenService = tokenService;
         RefreshTokenService = refreshTokenService;
-        SignInManager = signInManager;
+        // SignInManager = signInManager;
         JwtOptions = jwtOptions.Value;
     }
 
@@ -122,6 +123,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
     /// <returns></returns>
     [HttpPost]
     [ActionName("login")]
+    [AllowAnonymous]
     public async Task<CommonResult<String>> LoginAsync(LoginInput input)
     {
         Boolean captchaOnOff = await ConfigDomainService.SelectCaptchaOnOff();
@@ -224,6 +226,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
     /// <exception cref="NotImplementedException"></exception>
     [HttpPost]
     [ActionName("captchaImage")]
+    [AllowAnonymous]
     public async Task<CommonResult<CaptchaCodeOutput>> GetCaptchaImageAsync()
     {
         var guid = GuidGenerator.Create();
