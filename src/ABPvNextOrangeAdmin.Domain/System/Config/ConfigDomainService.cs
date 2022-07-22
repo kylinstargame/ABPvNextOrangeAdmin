@@ -12,11 +12,11 @@ namespace ABPvNextOrangeAdmin.System.Config;
 
 public class ConfigDomainService : DomainService
 {
-    private readonly IRepository<Config, Guid> _configRepository;
+    private readonly IRepository<SysConfig, Guid> _configRepository;
 
     private readonly IDistributedCache<String> _distributedCache;
 
-    public ConfigDomainService(IRepository<Config, Guid> configRepository, IDistributedCache<String> distributedCache)
+    public ConfigDomainService(IRepository<SysConfig, Guid> configRepository, IDistributedCache<String> distributedCache)
     {
         _configRepository = configRepository;
         _distributedCache = distributedCache;
@@ -25,8 +25,8 @@ public class ConfigDomainService : DomainService
     //加载所有配置哦
     public async Task LoadingConfigCache(CancellationToken cancellationToken = default)
     {
-        List<Config> configs = await _configRepository.GetListAsync();
-        foreach (Config config in configs)
+        List<SysConfig> configs = await _configRepository.GetListAsync();
+        foreach (SysConfig config in configs)
         {
             _distributedCache.GetOrAdd(config.ConfigKey, () => { return config.ConfigValue; });
         }
@@ -37,7 +37,7 @@ public class ConfigDomainService : DomainService
     /// </summary>
     /// <param name="configId"></param>
     /// <returns></returns>
-    public async Task<Config> SelectConfigById(Guid configId)
+    public async Task<SysConfig> SelectConfigById(Guid configId)
     {
         var config = await _configRepository.GetAsync(x => x.Id == configId);
         return config;

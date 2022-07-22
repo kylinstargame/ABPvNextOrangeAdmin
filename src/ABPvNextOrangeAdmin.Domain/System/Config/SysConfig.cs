@@ -1,11 +1,13 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using IdentityServer4.Models;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.System.Config;
 
-public class Config: FullAuditedEntity<Guid>
+[Table("Config")]
+public class SysConfig: FullAuditedEntity<Guid>
 {
     /// <summary>
     /// 参数名称
@@ -30,12 +32,12 @@ public class Config: FullAuditedEntity<Guid>
     /// </summary>
     public string ConfigType { get; set; }
 
-    public Config()
+    public SysConfig()
     {
         
     }
 
-    public Config(string configKey)
+    public SysConfig(string configKey)
     {
         this.ConfigKey = configKey;
     }

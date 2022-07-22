@@ -2,18 +2,23 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using ABPvNextOrangeAdmin.Config;
 using ABPvNextOrangeAdmin.Utils.TextProducer;
+using JetBrains.Annotations;
+using Microsoft.Extensions.Configuration;
 using Volo.Abp.DependencyInjection;
 
 namespace ABPvNextOrangeAdmin.Utils.ImageProducer;
 
-public class DefaultCaptcha : IProducer, ITransientDependency
+public class DefaultCaptcha : IImageProducer, ITransientDependency
 {
     private int width = 200;
     private int height = 50;
+    private CaptchaConfig _captchaConfig;
 
-    public DefaultCaptcha()
+    public DefaultCaptcha(CaptchaConfig captchaConfig)
     {
+        _captchaConfig = captchaConfig;
     }
 
     public byte[] createImage(String text)
@@ -56,6 +61,6 @@ public class DefaultCaptcha : IProducer, ITransientDependency
 
     public String createText()
     {
-        return new DefaultTextCreator().getText();
+        return ((ITextProducer)(new DefaultTextCreator().SetConfig(_captchaConfig))).getText();
     }
 }

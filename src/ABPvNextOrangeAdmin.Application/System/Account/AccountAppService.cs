@@ -147,7 +147,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
         //生成AccessToken
         if (signInResult.Succeeded)
         { 
-            token = GenerateAccessToken(await  UserManager.FindByNameAsync(input.UserNameOrEmailAddress));
+            token = GenerateAccessToken(await UserManager.FindByNameAsync(input.UserNameOrEmailAddress));
         }
 
         //登录日志
@@ -158,7 +158,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
             UserName = input.UserNameOrEmailAddress
         });
         
-        return CommonResult<String>.Success(signInResult.ToIdentitySecurityLogAction(), token);
+        return CommonResult<String>.Success(signInResult.Succeeded?token:"","");
     }
 
     /// <summary>

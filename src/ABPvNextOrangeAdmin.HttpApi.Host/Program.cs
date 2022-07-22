@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using ABPvNextOrangeAdmin.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +34,11 @@ public class Program
                 .UseAutofac()
                 .UseSerilog();
             await builder.AddApplicationAsync<ABPvNextOrangeAdminHttpApiHostModule>();
+
+            builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                config.Sources.Add(new CaptchaConfigSource());
+            });
             var app = builder.Build();
             await app.InitializeApplicationAsync();
             await app.RunAsync();
