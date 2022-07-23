@@ -51,7 +51,7 @@ public class ABPvNextOrangeAdminDbContext :
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
     
-    // SysTewm
+    // SysConfig
     public DbSet<System.Config.SysConfig> Configs { get; set; }
     #endregion
 

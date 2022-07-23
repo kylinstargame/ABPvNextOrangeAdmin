@@ -6,7 +6,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.System.Config;
 
-[Table("Config")]
+[Table("SysConfig")]
 public class SysConfig: FullAuditedEntity<Guid>
 {
     /// <summary>

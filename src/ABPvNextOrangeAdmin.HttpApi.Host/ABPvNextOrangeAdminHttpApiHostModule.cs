@@ -118,7 +118,7 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
         context.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = configuration["AuthServer:Authority"];
+                // options.Authority = configuration["AuthServer:Authority"];
                 options.RequireHttpsMetadata = Convert.ToBoolean(configuration["AuthServer:RequireHttpsMetadata"]);
                 options.Audience = "ABPvNextOrangeAdmin";
             });

@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Volo.Abp;
@@ -70,11 +71,17 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
     private IRefreshTokenService RefreshTokenService { get; }
 
+    // public AccountAppService(SignInManager<IdentityUser> signInManager)
+    // {
+    //     SignInManager = signInManager;
+    // }
+
     public AccountAppService(IIdentityRoleRepository roleRepository, IdentityUserManager userManager,
-        IAccountEmailer accountEmailer,IdentitySecurityLogManager identitySecurityLogManager,
+        IAccountEmailer accountEmailer, IdentitySecurityLogManager identitySecurityLogManager,
         IOptions<IdentityOptions> identityOptions, DefaultCaptcha defaultCaptcha,
         ConfigDomainService configDomainService, IDistributedCache<String> distributedCache, ITokenService tokenService,
-        IRefreshTokenService refreshTokenService, IOptions<JwtOptions> jwtOptions/*, SignInManager<IdentityUser> signInManager*/)
+        IRefreshTokenService refreshTokenService, IOptions<JwtOptions> jwtOptions,
+        SignInManager<IdentityUser> signInManager /*, SignInManager<IdentityUser> signInManager*/)
     {
         RoleRepository = roleRepository;
         UserManager = userManager;
@@ -86,6 +93,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
         DistributedCache = distributedCache;
         TokenService = tokenService;
         RefreshTokenService = refreshTokenService;
+        SignInManager = signInManager;
         // SignInManager = signInManager;
         JwtOptions = jwtOptions.Value;
     }
@@ -117,7 +125,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
     }
 
     /// <summary>
-    /// 用户注册
+    /// 用户登录
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
@@ -147,12 +155,14 @@ public class AccountAppService : ApplicationService, IAccountAppService
         );
 
         var token = "";
-        //生成AccessToken
-        if (signInResult.Succeeded)
-        { 
-            token = GenerateAccessToken(await UserManager.FindByNameAsync(input.UserNameOrEmailAddress));
+
+        if (!signInResult.Succeeded)
+        {
+            return CommonResult<String>.Failed("账号或密码错误");
         }
 
+        //生成AccessToken 
+        token = GenerateAccessToken(await UserManager.FindByNameAsync(input.UserNameOrEmailAddress));
         //登录日志
         await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()
         {
@@ -160,15 +170,15 @@ public class AccountAppService : ApplicationService, IAccountAppService
             Action = signInResult.ToIdentitySecurityLogAction(),
             UserName = input.UserNameOrEmailAddress
         });
-        
-        return CommonResult<String>.Success(signInResult.Succeeded?token:"","");
+
+        return CommonResult<String>.Success(signInResult.Succeeded ? token : "", "");
     }
 
     /// <summary>
     /// 用户注销
     /// </summary>
     /// <returns></returns>
-    [HttpGet]
+    [HttpPost]
     [ActionName("logout")]
     public async Task<CommonResult<string>> LogoutAsync()
     {
@@ -224,12 +234,11 @@ public class AccountAppService : ApplicationService, IAccountAppService
     /// </summary>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    [HttpPost]
+    [HttpGet]
     [ActionName("captchaImage")]
     [AllowAnonymous]
     public async Task<CommonResult<CaptchaCodeOutput>> GetCaptchaImageAsync()
     {
-        var guid = GuidGenerator.Create();
         String capText = DefaultCaptcha.createText();
 
         byte[] image = DefaultCaptcha.createImage(capText);
@@ -237,8 +246,10 @@ public class AccountAppService : ApplicationService, IAccountAppService
         String verifyKey = CommonConstants.CAPTCHA_CODE_KEY + uuid;
         await DistributedCache.SetAsync(verifyKey, capText,
             new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(120) });
+        Logger.LogInformation("Redis Cache Add CaptchaCode, Key:{VerifyKey}, Value:{CapText}, Expiration:{FromSeconds}",
+            verifyKey, capText, TimeSpan.FromSeconds(120));
         return CommonResult<CaptchaCodeOutput>.Success(
-            CaptchaCodeOutput.CreateInstance(guid.ToString(), capText), "生成验证码成功");
+            CaptchaCodeOutput.CreateInstance(uuid.ToString(), image), "生成验证码成功");
     }
 
 
@@ -251,17 +262,25 @@ public class AccountAppService : ApplicationService, IAccountAppService
     /// <exception cref="CaptchaExpireException"></exception>
     private async Task ValidateCaptcha(String username, String code, String uuid)
     {
-        String verifyKey = CommonConstants.CAPTCHA_CODE_KEY + StringUtils.Nvl(uuid, "");
-        String captcha = (await DistributedCache.GetAsync(verifyKey)).ToString();
-        await DistributedCache.RemoveAsync(verifyKey);
-        if (captcha == null)
+        try
         {
-            throw new CaptchaExpireException();
-        }
+            String verifyKey = CommonConstants.CAPTCHA_CODE_KEY + StringUtils.Nvl(uuid, "");
+            String captcha = (await DistributedCache.GetAsync(verifyKey)).ToString();
+            await DistributedCache.RemoveAsync(verifyKey);
+            if (captcha == null)
+            {
+                throw new CaptchaExpireException();
+            }
 
-        if (!code.Equals(captcha))
+            if (!code.Equals(captcha))
+            {
+                throw new CaptchaException();
+            }
+        }
+        catch (global::System.Exception e)
         {
-            throw new CaptchaException();
+            Console.WriteLine(e);
+            throw;
         }
     }
 
@@ -367,16 +386,16 @@ public class AccountAppService : ApplicationService, IAccountAppService
         var dateNow = DateTime.Now;
         var expirationTime = dateNow + TimeSpan.FromHours(JwtOptions.ExpirationTime);
         var key = Encoding.ASCII.GetBytes(JwtOptions.SecurityKey);
-        
+
         var claims = new List<Claim>
         {
             new Claim(JwtClaimTypes.Audience, JwtOptions.Audience),
             new Claim(JwtClaimTypes.Issuer, JwtOptions.Issuer),
             new Claim(AbpClaimTypes.UserId, identityUser.Id.ToString()),
-            new Claim(AbpClaimTypes.Name,  identityUser.Name),
-            new Claim(AbpClaimTypes.UserName,  identityUser.UserName),
+            new Claim(AbpClaimTypes.Name, String.IsNullOrEmpty(identityUser.Name) ? "" : identityUser.Name) ,
+            new Claim(AbpClaimTypes.UserName, identityUser.UserName),
             new Claim(AbpClaimTypes.Email, identityUser.Email),
-            new Claim(AbpClaimTypes.TenantId, identityUser.TenantId.ToString())
+            new Claim(AbpClaimTypes.TenantId, identityUser.TenantId.HasValue?identityUser.TenantId.ToString():"")
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor()

@@ -20,6 +20,6 @@ public sealed class AccountAppServiceTest : ABPvNextOrangeAdminApplicationTestBa
     {
         var result = await _accountAppService.GetCaptchaImageAsync();
         result.Code.ShouldBe<long>((long) HttpStatusCode.OK);
-        result.Data.Code.ShouldNotBeNullOrEmpty();
+        result.Data.ImgBytes.ShouldNotBeNull();
     }
 }
