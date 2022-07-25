@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.Account;
+// using Volo.Abp.Account;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
@@ -12,7 +12,7 @@ namespace ABPvNextOrangeAdmin;
 
 [DependsOn(
     typeof(ABPvNextOrangeAdminApplicationContractsModule),
-    typeof(AbpAccountHttpApiClientModule),
+    // typeof(AbpAccountHttpApiClientModule),
     typeof(AbpIdentityHttpApiClientModule),
     typeof(AbpPermissionManagementHttpApiClientModule),
     typeof(AbpTenantManagementHttpApiClientModule),

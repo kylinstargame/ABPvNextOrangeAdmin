@@ -26,9 +26,9 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Volo.Abp;
-using Volo.Abp.Account;
-using Volo.Abp.Account.Emailing;
-using Volo.Abp.Account.Settings;
+// using Volo.Abp.Account;
+// using Volo.Abp.Account.Emailing;
+// using Volo.Abp.Account.Settings;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Identity;
@@ -54,7 +54,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
     private IdentityUserManager UserManager { get; }
 
-    private IAccountEmailer AccountEmailer { get; }
+    // private IAccountEmailer AccountEmailer { get; }
 
     private IdentitySecurityLogManager IdentitySecurityLogManager { get; }
 
@@ -71,14 +71,14 @@ public class AccountAppService : ApplicationService, IAccountAppService
     private IRefreshTokenService RefreshTokenService { get; }
 
     public AccountAppService(IIdentityRoleRepository roleRepository, IdentityUserManager userManager,
-        IAccountEmailer accountEmailer,IdentitySecurityLogManager identitySecurityLogManager,
+        /*IAccountEmailer accountEmailer,*/IdentitySecurityLogManager identitySecurityLogManager,
         IOptions<IdentityOptions> identityOptions, DefaultCaptcha defaultCaptcha,
         ConfigDomainService configDomainService, IDistributedCache<String> distributedCache, ITokenService tokenService,
         IRefreshTokenService refreshTokenService, IOptions<JwtOptions> jwtOptions/*, SignInManager<IdentityUser> signInManager*/)
     {
         RoleRepository = roleRepository;
         UserManager = userManager;
-        AccountEmailer = accountEmailer;
+        // AccountEmailer = accountEmailer;
         IdentitySecurityLogManager = identitySecurityLogManager;
         IdentityOptions = identityOptions;
         DefaultCaptcha = defaultCaptcha;
@@ -99,7 +99,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
     [ActionName("register")]
     public async Task<CommonResult<IdentityUserDto>> RegisterAsync(RegisterInput input)
     {
-        await CheckSelfRegistrationAsync();
+        // await CheckSelfRegistrationAsync();
 
         await IdentityOptions.SetAsync();
 
@@ -134,7 +134,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
             await ValidateCaptcha(input.UserNameOrEmailAddress, input.Code, input.Uuid);
         }
 
-        await CheckLocalLoginAsync();
+        // await CheckLocalLoginAsync();
 
         ValidateLoginInfo(input);
 
@@ -184,40 +184,40 @@ public class AccountAppService : ApplicationService, IAccountAppService
     }
 
 
-    /// <summary>
-    /// 修改密码 发送邮件
-    /// </summary>
-    /// <param name="input"></param>
-    [HttpPost]
-    [ActionName("passwordResetCode")]
-    public async Task SendPasswordResetCodeAsync(SendPasswordResetCodeDto input)
-    {
-        var user = await GetUserByEmailAsync(input.Email);
-        var resetToken = await UserManager.GeneratePasswordResetTokenAsync(user);
-        await AccountEmailer.SendPasswordResetLinkAsync(user, resetToken, input.AppName, input.ReturnUrl,
-            input.ReturnUrlHash);
-    }
+    // /// <summary>
+    // /// 修改密码 发送邮件
+    // /// </summary>
+    // /// <param name="input"></param>
+    // [HttpPost]
+    // [ActionName("passwordResetCode")]
+    // public async Task SendPasswordResetCodeAsync(SendPasswordResetCodeDto input)
+    // {
+    //     var user = await GetUserByEmailAsync(input.Email);
+    //     var resetToken = await UserManager.GeneratePasswordResetTokenAsync(user);
+    //     await AccountEmailer.SendPasswordResetLinkAsync(user, resetToken, input.AppName, input.ReturnUrl,
+    //         input.ReturnUrlHash);
+    // }
 
 
     /// <summary>
     /// 修改密码
     /// </summary>
     /// <param name="input"></param>
-    [HttpPost]
-    [ActionName("resetPassword")]
-    public async Task ResetPasswordAsync(ResetPasswordDto input)
-    {
-        await IdentityOptions.SetAsync();
-
-        var user = await UserManager.GetByIdAsync(input.UserId);
-        (await UserManager.ResetPasswordAsync(user, input.ResetToken, input.Password)).CheckErrors();
-
-        await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext
-        {
-            Identity = IdentitySecurityLogIdentityConsts.Identity,
-            Action = IdentitySecurityLogActionConsts.ChangePassword
-        });
-    }
+    // [HttpPost]
+    // [ActionName("resetPassword")]
+    // public async Task ResetPasswordAsync(ResetPasswordDto input)
+    // {
+    //     await IdentityOptions.SetAsync();
+    //
+    //     var user = await UserManager.GetByIdAsync(input.UserId);
+    //     (await UserManager.ResetPasswordAsync(user, input.ResetToken, input.Password)).CheckErrors();
+    //
+    //     await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext
+    //     {
+    //         Identity = IdentitySecurityLogIdentityConsts.Identity,
+    //         Action = IdentitySecurityLogActionConsts.ChangePassword
+    //     });
+    // }
 
     /// <summary>
     /// 生成验证码 
@@ -269,25 +269,25 @@ public class AccountAppService : ApplicationService, IAccountAppService
     /// 检查用户是否启用本地注册
     /// </summary>
     /// <exception cref="UserFriendlyException"></exception>
-    protected virtual async Task CheckSelfRegistrationAsync()
-    {
-        if (!await SettingProvider.IsTrueAsync(AccountSettingNames.IsSelfRegistrationEnabled))
-        {
-            throw new UserFriendlyException(L["SelfRegistrationDisabledMessage"]);
-        }
-    }
+    // protected virtual async Task CheckSelfRegistrationAsync()
+    // {
+    //     if (!await SettingProvider.IsTrueAsync(AccountSettingNames.IsSelfRegistrationEnabled))
+    //     {
+    //         throw new UserFriendlyException(L["SelfRegistrationDisabledMessage"]);
+    //     }
+    // }
 
     /// <summary>
     /// 检查是否启用本地登录
     /// </summary>
     /// <exception cref="UserFriendlyException"></exception>
-    protected virtual async Task CheckLocalLoginAsync()
-    {
-        if (!await SettingProvider.IsTrueAsync(AccountSettingNames.EnableLocalLogin))
-        {
-            throw new UserFriendlyException(L["LocalLoginDisabledMessage"]);
-        }
-    }
+    // protected virtual async Task CheckLocalLoginAsync()
+    // {
+    //     if (!await SettingProvider.IsTrueAsync(AccountSettingNames.EnableLocalLogin))
+    //     {
+    //         throw new UserFriendlyException(L["LocalLoginDisabledMessage"]);
+    //     }
+    // }
 
     /// <summary>
     /// 检验用户信息

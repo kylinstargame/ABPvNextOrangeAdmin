@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
 using ABPvNextOrangeAdmin.System.Account.Dto;
-using Volo.Abp.Account;
+// using Volo.Abp.Account;
 using Volo.Abp.Identity;
 
 namespace ABPvNextOrangeAdmin.System.Account;
@@ -35,18 +35,18 @@ public interface IAccountAppService
     /// <returns></returns>
     public Task<CommonResult<string>> LogoutAsync();
     
-    /// <summary>
-    /// 发送重置密码验证码
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public Task SendPasswordResetCodeAsync(SendPasswordResetCodeDto input);
+    // /// <summary>
+    // /// 发送重置密码验证码
+    // /// </summary>
+    // /// <param name="input"></param>
+    // /// <returns></returns>
+    // /// <exception cref="NotImplementedException"></exception>
+    // public Task SendPasswordResetCodeAsync(SendPasswordResetCodeDto input);
   
-    /// <summary>
-    /// 重置密码
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    public Task ResetPasswordAsync(ResetPasswordDto input);
+    // /// <summary>
+    // /// 重置密码
+    // /// </summary>
+    // /// <param name="input"></param>
+    // /// <returns></returns>
+    // public Task ResetPasswordAsync(ResetPasswordDto input);
 }

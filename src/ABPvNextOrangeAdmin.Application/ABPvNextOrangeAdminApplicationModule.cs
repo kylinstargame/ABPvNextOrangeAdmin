@@ -1,4 +1,4 @@
-﻿using Volo.Abp.Account;
+﻿// using Volo.Abp.Account;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
@@ -11,7 +11,7 @@ namespace ABPvNextOrangeAdmin;
 
 [DependsOn(
     typeof(ABPvNextOrangeAdminDomainModule),
-    typeof(AbpAccountApplicationModule),
+    // typeof(AbpAccountApplicationModule),
     typeof(ABPvNextOrangeAdminApplicationContractsModule),
     typeof(AbpIdentityApplicationModule),
     typeof(AbpPermissionManagementApplicationModule),

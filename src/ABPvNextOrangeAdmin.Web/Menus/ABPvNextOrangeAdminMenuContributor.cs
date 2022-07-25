@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ABPvNextOrangeAdmin.Localization;
 using ABPvNextOrangeAdmin.MultiTenancy;
-using Volo.Abp.Account.Localization;
+// using Volo.Abp.Account.Localization;
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Identity.Web.Navigation;
 using Volo.Abp.SettingManagement.Web.Navigation;
@@ -68,13 +68,13 @@ public class ABPvNextOrangeAdminMenuContributor : IMenuContributor
 
     private Task ConfigureUserMenuAsync(MenuConfigurationContext context)
     {
-        var l = context.GetLocalizer<ABPvNextOrangeAdminResource>();
-        var accountStringLocalizer = context.GetLocalizer<AccountResource>();
-        var identityServerUrl = _configuration["AuthServer:Authority"] ?? "";
-
-        context.Menu.AddItem(new ApplicationMenuItem("Account.Manage", accountStringLocalizer["MyAccount"],
-            $"{identityServerUrl.EnsureEndsWith('/')}Account/Manage?returnUrl={_configuration["App:SelfUrl"]}", icon: "fa fa-cog", order: 1000, null, "_blank").RequireAuthenticated());
-        context.Menu.AddItem(new ApplicationMenuItem("Account.Logout", l["Logout"], url: "~/Account/Logout", icon: "fa fa-power-off", order: int.MaxValue - 1000).RequireAuthenticated());
+        // var l = context.GetLocalizer<ABPvNextOrangeAdminResource>();
+        // var accountStringLocalizer = context.GetLocalizer<AccountResource>();
+        // var identityServerUrl = _configuration["AuthServer:Authority"] ?? "";
+        //
+        // context.Menu.AddItem(new ApplicationMenuItem("Account.Manage", accountStringLocalizer["MyAccount"],
+        //     $"{identityServerUrl.EnsureEndsWith('/')}Account/Manage?returnUrl={_configuration["App:SelfUrl"]}", icon: "fa fa-cog", order: 1000, null, "_blank").RequireAuthenticated());
+        // context.Menu.AddItem(new ApplicationMenuItem("Account.Logout", l["Logout"], url: "~/Account/Logout", icon: "fa fa-power-off", order: int.MaxValue - 1000).RequireAuthenticated());
 
         return Task.CompletedTask;
     }

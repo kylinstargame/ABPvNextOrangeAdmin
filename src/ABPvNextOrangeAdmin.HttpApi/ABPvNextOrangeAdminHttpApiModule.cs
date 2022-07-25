@@ -1,6 +1,6 @@
 ﻿using Localization.Resources.AbpUi;
 using ABPvNextOrangeAdmin.Localization;
-using Volo.Abp.Account;
+// using Volo.Abp.Account;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
 using Volo.Abp.Localization;
@@ -13,7 +13,7 @@ namespace ABPvNextOrangeAdmin;
 
 [DependsOn(
     typeof(ABPvNextOrangeAdminApplicationContractsModule),
-    typeof(AbpAccountHttpApiModule),
+    // typeof(AbpAccountHttpApiModule),
     typeof(AbpIdentityHttpApiModule),
     typeof(AbpPermissionManagementHttpApiModule),
     typeof(AbpTenantManagementHttpApiModule),

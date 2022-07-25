@@ -27,7 +27,7 @@ public class IdentityServerDataSeedContributor : IDataSeedContributor, ITransien
     private readonly IClientRepository _clientRepository;
     private readonly IIdentityResourceDataSeeder _identityResourceDataSeeder;
     private readonly IGuidGenerator _guidGenerator;
-    private readonly IPermissionDataSeeder _permissionDataSeeder;
+    // private readonly IPermissionDataSeeder _permissionDataSeeder;
     private readonly IConfiguration _configuration;
     private readonly ICurrentTenant _currentTenant;
 
@@ -37,7 +37,7 @@ public class IdentityServerDataSeedContributor : IDataSeedContributor, ITransien
         IApiScopeRepository apiScopeRepository,
         IIdentityResourceDataSeeder identityResourceDataSeeder,
         IGuidGenerator guidGenerator,
-        IPermissionDataSeeder permissionDataSeeder,
+        // IPermissionDataSeeder permissionDataSeeder,
         IConfiguration configuration,
         ICurrentTenant currentTenant)
     {
@@ -46,7 +46,7 @@ public class IdentityServerDataSeedContributor : IDataSeedContributor, ITransien
         _apiScopeRepository = apiScopeRepository;
         _identityResourceDataSeeder = identityResourceDataSeeder;
         _guidGenerator = guidGenerator;
-        _permissionDataSeeder = permissionDataSeeder;
+        // _permissionDataSeeder = permissionDataSeeder;
         _configuration = configuration;
         _currentTenant = currentTenant;
     }
@@ -290,15 +290,15 @@ public class IdentityServerDataSeedContributor : IDataSeedContributor, ITransien
             }
         }
 
-        if (permissions != null)
-        {
-            await _permissionDataSeeder.SeedAsync(
-                ClientPermissionValueProvider.ProviderName,
-                name,
-                permissions,
-                null
-            );
-        }
+        // if (permissions != null)
+        // {
+        //     await _permissionDataSeeder.SeedAsync(
+        //         ClientPermissionValueProvider.ProviderName,
+        //         name,
+        //         permissions,
+        //         null
+        //     );
+        // }
 
         if (corsOrigins != null)
         {

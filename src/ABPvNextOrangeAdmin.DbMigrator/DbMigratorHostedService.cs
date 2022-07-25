@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using ABPvNextOrangeAdmin.Data;
 using Serilog;
 using Volo.Abp;
+using Volo.Abp.Data;
 
 namespace ABPvNextOrangeAdmin.DbMigrator;
 
