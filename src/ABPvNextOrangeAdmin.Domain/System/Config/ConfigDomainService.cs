@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Utils;
+using Microsoft.Extensions.Logging;
 using Volo.Abp.Caching;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 
@@ -59,12 +62,21 @@ public class ConfigDomainService : DomainService
         else
         {
             //从数据库获取配置
-            var config = await _configRepository.GetAsync(x => x.ConfigKey == configKey);
-            if (!String.IsNullOrEmpty(configValue))
+            try
             {
-                // 将配置放入缓存
-                await _distributedCache.SetAsync(config.ConfigKey, config.ConfigValue);
-                return config.ConfigValue;
+                var config = await _configRepository.GetAsync(x => x.ConfigKey == configKey).ConfigureAwait(false);
+                if (!String.IsNullOrEmpty(configValue))
+                {
+                    // 将配置放入缓存
+                    await _distributedCache.SetAsync(config.ConfigKey, config.ConfigValue);
+                    return config.ConfigValue;
+                }
+            }
+            catch (EntityNotFoundException e)
+            {
+                Debug.Assert(e.Message != null, (string)"e.Message != null");
+                Logger.LogWarning(e.Message);
+                return  String.Empty;
             }
             return  String.Empty;
         }

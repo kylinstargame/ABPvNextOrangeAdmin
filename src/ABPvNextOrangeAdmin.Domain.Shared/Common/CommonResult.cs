@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using ABPvNextOrangeAdmin.Common.Attribute;
+using JetBrains.Annotations;
 
 namespace ABPvNextOrangeAdmin.Common;
 
@@ -25,14 +26,14 @@ public class CommonResult<T>
     {
     }
 
-    private CommonResult(long code, string message, T data)
+    private CommonResult(long code, string message, T? data)
     {
         this.code = code;
         this.message = message;
-        this.data = data ?? throw new ArgumentNullException(nameof(data));
+        this.data = data;
     }
 
-    public static CommonResult<T> CreateInstance(long code, string message, object data)
+    public static CommonResult<T> CreateInstance(long code, string message, [CanBeNull] object data)
     {
         return new CommonResult<T>(code, message, (T) data);
     }
@@ -73,7 +74,7 @@ public class CommonResult<T>
      * @param errorCode 错误码
      * @param message 错误信息
      */
-    public static CommonResult<T> failed(IErrorCode errorCode, String message)
+    public static CommonResult<T> Failed(IErrorCode errorCode, String message)
     {
         return CreateInstance(errorCode.getCode(), message, null);
     }
@@ -82,7 +83,7 @@ public class CommonResult<T>
      * 失败返回结果
      * @param message 提示信息
      */
-    public static CommonResult<T> failed(String message)
+    public static CommonResult<T> Failed(String message)
     {
         return CreateInstance(ResultCode.FAILED, message, null);
     }

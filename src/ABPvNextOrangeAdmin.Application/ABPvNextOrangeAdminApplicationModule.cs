@@ -2,6 +2,7 @@
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
+using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.SettingManagement;
@@ -14,6 +15,7 @@ namespace ABPvNextOrangeAdmin;
     // typeof(AbpAccountApplicationModule),
     typeof(ABPvNextOrangeAdminApplicationContractsModule),
     typeof(AbpIdentityApplicationModule),
+    typeof(AbpIdentityAspNetCoreModule),
     typeof(AbpPermissionManagementApplicationModule),
     typeof(AbpTenantManagementApplicationModule),
     typeof(AbpFeatureManagementApplicationModule),
