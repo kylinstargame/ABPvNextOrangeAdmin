@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
@@ -15,6 +17,7 @@ using ABPvNextOrangeAdmin.MultiTenancy;
 using ABPvNextOrangeAdmin.Options;
 using IdentityServer4;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 using Microsoft.OpenApi.Models;
 using Volo.Abp;
@@ -59,7 +62,7 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
         ConfigureJwtOption(context, configuration);
-        
+
         Configure<AbpAntiForgeryOptions>(options =>
         {
             options.TokenCookie.Expiration = TimeSpan.Zero;
@@ -107,20 +110,33 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
             options.ConventionalControllers.Create(typeof(ABPvNextOrangeAdminApplicationModule).Assembly);
         });
 
-        Configure<AbpConventionalControllerOptions>(options =>
-        {
-            options.UseV3UrlStyle = false;
-        });
+        Configure<AbpConventionalControllerOptions>(options => { options.UseV3UrlStyle = false; });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)
     {
-        context.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        context.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
             .AddJwtBearer(options =>
             {
-                // options.Authority = configuration["AuthServer:Authority"];
-                options.RequireHttpsMetadata = Convert.ToBoolean(configuration["AuthServer:RequireHttpsMetadata"]);
-                options.Audience = "ABPvNextOrangeAdmin";
+                options.TokenValidationParameters =
+                    new TokenValidationParameters()
+                    {
+                        // 是否开启签名认证
+                        ValidateIssuerSigningKey = true,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        //ClockSkew = TimeSpan.Zero,
+                        ValidIssuer = configuration["Jwt:Issuer"],
+                        ValidAudience = configuration["Jwt:Audience"],
+                        IssuerSigningKey =
+                            new SymmetricSecurityKey(
+                                Encoding.ASCII.GetBytes(configuration["Jwt:SecurityKey"]))
+                    };
             });
     }
 
@@ -130,7 +146,7 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
             configuration["AuthServer:Authority"],
             new Dictionary<string, string>
             {
-                    {"ABPvNextOrangeAdmin", "ABPvNextOrangeAdmin API"}
+                { "ABPvNextOrangeAdmin", "ABPvNextOrangeAdmin API" }
             },
             options =>
             {
@@ -142,7 +158,6 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
 
     private void ConfigureLocalization()
     {
-    
         Configure<AbpLocalizationOptions>(options =>
         {
             options.Languages.Add(new LanguageInfo("ar", "ar", "العربية"));

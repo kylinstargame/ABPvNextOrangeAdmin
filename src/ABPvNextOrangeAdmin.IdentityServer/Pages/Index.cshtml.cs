@@ -10,7 +10,7 @@ public class IndexModel : AbpPageModel
 {
     public List<Client> Clients { get; protected set; }
     
-    protected IClientRepository ClientRepository { get; }
+    protected IClientRepository ClientRepository { get; set; }
     
     public IndexModel(IClientRepository clientRepository)
     {
