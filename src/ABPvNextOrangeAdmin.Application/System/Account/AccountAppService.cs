@@ -13,6 +13,7 @@ using ABPvNextOrangeAdmin.Exception;
 using ABPvNextOrangeAdmin.Options;
 using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.Config;
+using ABPvNextOrangeAdmin.System.Menu;
 using ABPvNextOrangeAdmin.Utils;
 using ABPvNextOrangeAdmin.Utils.ImageProducer;
 using IdentityModel;
@@ -77,6 +78,8 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
     private PermissionManager PermissionManager { get; }
 
+    private MenuDomainService MenuDomainService { get; }
+
 
     public AccountAppService(IdentityUserManager userManager,
         /*IAccountEmailer accountEmailer,*/IdentitySecurityLogManager identitySecurityLogManager,
@@ -84,7 +87,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
         ConfigDomainService configDomainService, IDistributedCache<String> distributedCache, ITokenService tokenService,
         IRefreshTokenService refreshTokenService, IOptions<JwtOptions> jwtOptions,
         PermissionManager permissionManager, IdentityDbContext identityDbContext, UserRoleFinder userRoleFinder,
-        AbpSignInManager signInManager)
+        AbpSignInManager signInManager, MenuDomainService menuDomainService)
     {
         UserManager = userManager;
         // AccountEmailer = accountEmailer;
@@ -98,6 +101,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
         PermissionManager = permissionManager;
         UserRoleFinder = userRoleFinder;
         SignInManager = signInManager;
+        MenuDomainService = menuDomainService;
         JwtOptions = jwtOptions.Value;
     }
 
@@ -300,6 +304,15 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
         return CommonResult<UserWithRoleAndPermissionOutput>.Success(
             UserWithRoleAndPermissionOutput.CreateInstance(user, roleNamnes, permissionNames.ToArray()), "获取用户信息");
+    }
+
+    [HttpGet]
+    [ActionName("getRouters")]
+    public async Task<CommonResult<List<MenuOutput>>> GetRouters()
+    {
+        List<SysMenu> menus =await MenuDomainService.GetMenuTreeByUserId(CurrentUser.GetId());
+        var menuOutputs = ObjectMapper.Map<List<SysMenu>, List<MenuOutput>>(menus);
+        return CommonResult<List<MenuOutput>>.Success(menuOutputs,"获取路由信息成功" );
     }
 
     /// <summary>

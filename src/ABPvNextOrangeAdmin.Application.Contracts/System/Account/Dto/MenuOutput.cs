@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
-using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.Application.Dtos;
 
-namespace ABPvNextOrangeAdmin.System.Menu;
+namespace ABPvNextOrangeAdmin.System.Account.Dto;
 
-public class SysMenu : FullAuditedEntity<int>
+public class MenuOutput : EntityDto
 {
     /// <summary>
     /// 菜单名称
@@ -19,7 +18,7 @@ public class SysMenu : FullAuditedEntity<int>
     /// <summary>
     /// 父菜单ID 
     /// </summary>
-    public int ParentId { get; set; }
+    public Guid ParentId { get; set; }
 
     /// <summary>
     /// 显示顺序
@@ -74,10 +73,5 @@ public class SysMenu : FullAuditedEntity<int>
     /// <summary>
     /// 菜单图标 
     /// </summary>
-    public string Icon { get; set; }
-
-    /// <summary>
-    /// 子菜单 
-    /// </summary>
-    public IEnumerable<SysMenu> Children { get; set; } = new List<SysMenu>();
+    public string Icon { get; set; } 
 }

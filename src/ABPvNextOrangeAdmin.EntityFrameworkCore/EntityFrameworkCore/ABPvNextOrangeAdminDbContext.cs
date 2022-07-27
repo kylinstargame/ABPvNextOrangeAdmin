@@ -1,4 +1,5 @@
 ﻿using ABPvNextOrangeAdmin.System.Config;
+using ABPvNextOrangeAdmin.System.Menu;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -44,6 +45,7 @@ public class ABPvNextOrangeAdminDbContext :
     //Identity
     public DbSet<IdentityUser> Users { get; set; }
     public DbSet<IdentityRole> Roles { get; set; }
+    public DbSet<IdentityUserRole> USerRoles { get; set; }
     public DbSet<IdentityClaimType> ClaimTypes { get; set; }
     public DbSet<OrganizationUnit> OrganizationUnits { get; set; }
     public DbSet<IdentitySecurityLog> SecurityLogs { get; set; }
@@ -54,7 +56,13 @@ public class ABPvNextOrangeAdminDbContext :
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
     
     // SysConfig
-    public DbSet<System.Config.SysConfig> Configs { get; set; }
+    public DbSet<SysConfig> Configs { get; set; }
+    
+    //Menu
+    public DbSet<SysMenu> Menus { get; set; }
+    public DbSet<SysRoleMenu> RoleMenus { get; set; }
+    
+    
     #endregion
 
     public ABPvNextOrangeAdminDbContext(DbContextOptions<ABPvNextOrangeAdminDbContext> options)
@@ -86,5 +94,9 @@ public class ABPvNextOrangeAdminDbContext :
         //    b.ConfigureByConvention(); //auto configure for the base class props
         //    //...
         //});
+
+        builder.Entity<SysRoleMenu>().HasKey(x =>
+            new {  x.MenuId, x.RoleId}
+        );
     }
 }

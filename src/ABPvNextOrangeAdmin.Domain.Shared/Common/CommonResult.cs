@@ -59,6 +59,8 @@ public class CommonResult<T>
     {
         return CreateInstance(ResultCode.SUCCESS, message, data);
     }
+    
+    
 
     /**
      * 失败返回结果

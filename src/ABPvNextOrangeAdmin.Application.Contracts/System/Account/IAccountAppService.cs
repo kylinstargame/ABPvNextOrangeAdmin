@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
 using ABPvNextOrangeAdmin.System.Account.Dto;
@@ -41,7 +42,14 @@ public interface IAccountAppService
     /// </summary>
     /// <returns></returns>
     public Task<CommonResult<UserWithRoleAndPermissionOutput>> GetUserInfoAsync();
-    
+
+
+    /// <summary>
+    /// 获取路由信息
+    /// </summary>
+    /// <returns></returns>
+    public Task<CommonResult<List<MenuOutput>>> GetRouters();
+
     // /// <summary>
 
     // /// 发送重置密码验证码
