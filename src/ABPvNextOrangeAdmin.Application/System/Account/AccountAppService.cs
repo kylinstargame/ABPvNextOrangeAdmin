@@ -149,7 +149,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
             await ValidateCaptcha(input.UserNameOrEmailAddress, input.Code, input.Uuid);
         }
 
-        // await CheckLocalLoginAsync();
+        // await CheckLocalLoginAsync();149gg
 
         ValidateLoginInfo(input);
 
@@ -183,7 +183,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
     /// 用户注销
     /// </summary>
     /// <returns></returns>
-    [HttpGet]
+    [HttpPost]
     [ActionName("logout")]
     public async Task<CommonResult<string>> LogoutAsync()
     {

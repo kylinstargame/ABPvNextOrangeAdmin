@@ -143,9 +143,35 @@ public class MenuDomainService : DomainService
             })
             .Distinct()
             .Where(x => new String[] { "M", "C" }.Contains(x.MenuType))
-            .OrderBy(x => x.ParentId)
-            .ThenBy(x => x.OrderNum)
             .ToList();
+        result.OrderBy(x => x.ParentId)
+            .ThenBy(x => x.OrderNum);
+        // var result = menus.Join(roleMenus, menu => menu.Id, roleMenu => roleMenu.MenuId,
+        //         (menu, roleMenu) => new { menu = menu, roleMenu })
+        //     .Join(userRoles, x => x.roleMenu.RoleId, userRole => userRole.RoleId,
+        //         (x, userRole) => new { x.menu, x.roleMenu, userRole })
+        //     .Join(roles, x => x.userRole.RoleId, role => role.Id,
+        //         (x, role) => new { x.menu, x.roleMenu, x.userRole, role })
+        //     .Where(x => x.userRole.UserId == userId)
+        //     .Select(x => new SysMenu
+        //     {
+        //         MenuName = x.menu.MenuName,
+        //         Path = x.menu.Path,
+        //         Component = x.menu.Component,
+        //         Query = x.menu.Query,
+        //         Visible = x.menu.Visible,
+        //         Status = x.menu.Status,
+        //         Perms = x.menu.Perms ?? "",
+        //         IsFrame = x.menu.IsFrame,
+        //         IsCache = x.menu.IsCache,
+        //         OrderNum = x.menu.OrderNum,
+        //         MenuType = x.menu.MenuType,
+        //     })
+        //     .Distinct()
+        //     .Where(x => new String[] { "M", "C" }.Contains(x.MenuType))
+        //     .OrderBy(x => x.ParentId)
+        //     .ThenBy(x => x.OrderNum)
+        //     .ToList();
 
         return GetChildPerms(result, 0);
     }

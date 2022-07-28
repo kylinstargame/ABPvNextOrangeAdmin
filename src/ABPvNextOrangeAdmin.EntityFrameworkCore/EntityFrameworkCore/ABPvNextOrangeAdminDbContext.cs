@@ -6,6 +6,7 @@ using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
@@ -54,21 +55,19 @@ public class ABPvNextOrangeAdminDbContext :
     // Tenant Management
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
-    
+
     // SysConfig
     public DbSet<SysConfig> Configs { get; set; }
-    
+
     //Menu
     public DbSet<SysMenu> Menus { get; set; }
     public DbSet<SysRoleMenu> RoleMenus { get; set; }
-    
-    
+
     #endregion
 
     public ABPvNextOrangeAdminDbContext(DbContextOptions<ABPvNextOrangeAdminDbContext> options)
         : base(options)
     {
-
         AbpCommonDbProperties.DbTablePrefix = "sys_";
     }
 
@@ -95,8 +94,25 @@ public class ABPvNextOrangeAdminDbContext :
         //    //...
         //});
 
-        builder.Entity<SysRoleMenu>().HasKey(x =>
-            new {  x.MenuId, x.RoleId}
-        );
+        builder.Entity<SysRoleMenu>(b =>
+        {
+            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "RoleMenu", ABPvNextOrangeAdminConsts.DbSchema);
+            b.HasKey(x =>
+                new { x.MenuId, x.RoleId }
+            );
+            b.ConfigureByConvention();
+        });
+        
+        builder.Entity<SysMenu>(b =>
+        {
+            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "Menu", ABPvNextOrangeAdminConsts.DbSchema);
+            b.ConfigureByConvention();
+        });
+        
+        builder.Entity<SysConfig>(b =>
+        {
+            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "Config", ABPvNextOrangeAdminConsts.DbSchema);
+            b.ConfigureByConvention();
+        });
     }
 }

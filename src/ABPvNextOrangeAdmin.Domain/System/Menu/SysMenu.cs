@@ -1,11 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.System.Menu;
 
-public class SysMenu : FullAuditedEntity<int>
+public sealed class SysMenu : FullAuditedEntity<int>
 {
+    // public SysMenu(string menuId, string menuName, string parentId, string orderNum, string path, string component, string query, string isFrame, string isCache, string menuType, string visible, string status, string perms, string icon, string remark)
+    // {
+    //     throw new NotImplementedException();
+    // }
+
     /// <summary>
     /// 菜单名称
     /// </summary>
@@ -55,12 +61,12 @@ public class SysMenu : FullAuditedEntity<int>
     /// 类型（M目录 C菜单 F按钮） 
     /// </summary>
     public string MenuType { get; set; }
-    
+
     /// <summary>
     /// 显示状态（0显示 1隐藏）
     /// </summary>
     public string Visible { get; set; }
-    
+
     /// <summary>
     /// 菜单状态（0显示 1隐藏）
     /// </summary>
@@ -76,8 +82,40 @@ public class SysMenu : FullAuditedEntity<int>
     /// </summary>
     public string Icon { get; set; }
 
+
+    /// <summary>
+    /// 描述信息
+    /// </summary>
+    public string Remark { get; set; }
+
     /// <summary>
     /// 子菜单 
     /// </summary>
     public IEnumerable<SysMenu> Children { get; set; } = new List<SysMenu>();
+
+
+    public SysMenu()
+    {
+    }
+
+    public SysMenu(int id, string menuName, int parentId, int orderNum, string path,
+        string component, string query, string isFrame, string isCache, string menuType, string visible, string status,
+        string perms, string icon, string remark)
+    {
+        Id = id;
+        MenuName = menuName;
+        ParentId = parentId;
+        OrderNum = orderNum;
+        Path = path;
+        Component = component;
+        Query = query;
+        IsFrame = isFrame;
+        IsCache = isCache;
+        MenuType = menuType;
+        Visible = visible;
+        Status = status;
+        Perms = perms;
+        Icon = icon;
+        Remark = remark;
+    }
 }

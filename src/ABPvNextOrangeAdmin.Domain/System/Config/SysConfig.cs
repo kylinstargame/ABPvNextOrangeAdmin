@@ -6,20 +6,21 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.System.Config;
 
-[Table("SysConfig")]
+[Table("sys_config")]
 public class SysConfig: FullAuditedEntity<Guid>
 {
+    /// <summary>
+    /// 参数键名
+    /// </summary>
+    [Required]
+    public string ConfigKey { get; set; }
+
     /// <summary>
     /// 参数名称
     /// </summary>
     [Required]
     public string ConfigName { get; set; }
 
-    /// <summary>
-    /// 参数键名
-    /// </summary>
-    [Required]
-    public string ConfigKey { get; set; }
 
     /// <summary>
     /// 参数键值
@@ -32,13 +33,27 @@ public class SysConfig: FullAuditedEntity<Guid>
     /// </summary>
     public string ConfigType { get; set; }
 
+    /// <summary>
+    /// 描述信息
+    /// </summary>
+    public string Remark { get; set; }
+
     public SysConfig()
     {
-        
     }
 
-    public SysConfig(string configKey)
+    public SysConfig(string configKey, string configName)
     {
-        this.ConfigKey = configKey;
+        ConfigKey = configKey;
+        ConfigName = configName;
+    }
+
+    public SysConfig(string configKey, string configName, string configValue, string configType,string remark)
+    {
+        ConfigKey = configKey;
+        ConfigName = configName;
+        ConfigValue = configValue;
+        ConfigType = configType;
+        Remark = remark;
     }
 }
