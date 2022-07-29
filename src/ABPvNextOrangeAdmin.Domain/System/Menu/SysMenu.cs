@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using ABPvNextOrangeAdmin.Constans;
+using ABPvNextOrangeAdmin.Utils;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.System.Menu;
@@ -117,5 +119,123 @@ public sealed class SysMenu : FullAuditedEntity<int>
         Perms = perms;
         Icon = icon;
         Remark = remark;
+    }
+
+    /**
+     * 获取路由名称
+     * 
+     * @param menu 菜单信息
+     * @return 路由名称
+     */
+    public String GetRouteName()
+    {
+        String routerName = StringUtils.Capitalize(Path);
+        // 非外链并且是一级目录（类型为目录）
+        if (IsMenuFrame())
+        {
+            routerName = StringUtils.EMPTY;
+        }
+
+        return routerName;
+    }
+
+
+    /**
+     * 获取路由地址
+     * 
+     * @param menu 菜单信息
+     * @return 路由地址
+     */
+    public String GetRouterPath()
+    {
+        String routerPath = Path;
+        // 内链打开外网方式
+        if (ParentId != 0 && IsInnerLink())
+        {
+            routerPath = InnerLinkReplaceEach(routerPath);
+        }
+
+        // 非外链并且是一级目录（类型为目录）
+        if (0 == ParentId && UserConstants.TYPE_DIR.Equals(MenuType)
+                          && UserConstants.NO_FRAME.Equals(IsFrame))
+        {
+            routerPath = "/" + Path;
+        }
+        // 非外链并且是一级目录（类型为菜单）
+        else if (IsMenuFrame())
+        {
+            routerPath = "/";
+        }
+
+        return routerPath;
+    }
+    
+    /**
+     * 获取组件信息
+     * 
+     * @param menu 菜单信息
+     * @return 组件信息
+     */
+    public String GetComponent()
+    {
+        String component = UserConstants.LAYOUT;
+        if (StringUtils.IsNotEmpty(Component) && !IsMenuFrame())
+        {
+            component = Component;
+        }
+        else if (StringUtils.IsEmpty(Component) && ParentId != 0 && IsInnerLink())
+        {
+            component = UserConstants.INNER_LINK;
+        }
+        else if (StringUtils.IsEmpty(Component) && IsParentView())
+        {
+            component = UserConstants.PARENT_VIEW;
+        }
+        return component;
+    }
+    
+    /**
+     * 是否为parent_view组件
+     * 
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    public Boolean IsParentView()
+    {
+        return ParentId != 0 && UserConstants.TYPE_DIR.Equals(MenuType);
+    }
+
+    /**
+     * 是否为菜单内部跳转
+     * 
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    public Boolean IsMenuFrame()
+    {
+        return Convert.ToInt32(ParentName) == 0 && UserConstants.TYPE_MENU.Equals(MenuType)
+                                                && IsFrame.Equals(UserConstants.NO_FRAME);
+    }
+
+    /**
+     * 是否为内链组件
+     * 
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    public Boolean IsInnerLink()
+    {
+        return IsFrame.Equals(UserConstants.NO_FRAME) && StringUtils.IsHTTP(Path);
+    }
+
+    /**
+     * 内链域名特殊字符替换
+     * 
+     * @return
+     */
+    public String InnerLinkReplaceEach(String path)
+    {
+        return StringUtils.ReplaceEach(path, new String[] { CommonConstants.HTTP, CommonConstants.HTTPS },
+            new String[] { "", "" });
     }
 }

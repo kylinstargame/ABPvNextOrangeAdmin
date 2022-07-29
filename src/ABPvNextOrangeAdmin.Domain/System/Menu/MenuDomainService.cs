@@ -11,6 +11,7 @@ using Volo.Abp.Identity;
 using Volo.Abp.Identity.Settings;
 using Volo.Abp.Specifications;
 using IdentityRole = Volo.Abp.Identity.IdentityRole;
+using IdentityUser = Volo.Abp.Identity.IdentityUser;
 
 namespace ABPvNextOrangeAdmin.System.Menu;
 
@@ -109,13 +110,53 @@ public class MenuDomainService : DomainService
         return result;
     }
 
+    public async Task<List<SysMenu>> GetMenuTreeAll()
+    {
+        var menus = await _menuRepository.WithDetailsAsync();
+        var roleMenus = await _roleMenuRepository.WithDetailsAsync();
+        var userRoles = await _userRoleRepository.WithDetailsAsync();
+        var roles = await _roleRepository.WithDetailsAsync();
+        var result = menus
+            // .Join(roleMenus, menu => menu.Id, roleMenu => roleMenu.MenuId,
+            //     (menu, roleMenu) => new { menu = menu, roleMenu })
+            // .Join(userRoles, x => x.roleMenu.RoleId, userRole => userRole.RoleId,
+            //     (x, userRole) => new { x.menu, x.roleMenu, userRole })
+            // .Join(roles, x => x.userRole.RoleId, role => role.Id,
+            //     (x, role) => new { x.menu, x.roleMenu, x.userRole, role })
+            .Select(x => new SysMenu
+            {
+                MenuName = x.MenuName,
+                Path = x.Path,
+                Component = x.Component,
+                Query = x.Query,
+                Visible = x.Visible,
+                Status = x.Status,
+                Perms = x.Perms ?? "",
+                IsFrame = x.IsFrame,
+                IsCache = x.IsCache,
+                OrderNum = x.OrderNum,
+                MenuType = x.MenuType,
+                Icon = x.Icon
+            })
+            .Distinct()
+            .Where(x => new String[] { "M", "C" }.Contains(x.MenuType))
+            .ToList();
+        result.OrderBy(x => x.ParentId)
+            .ThenBy(x => x.OrderNum);
+        return GetChildPerms(result, 0);
+    }
+
     /// <summary>
     /// 根据用户ID查询菜单树信息
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<List<SysMenu>> GetMenuTreeByUserId(Guid userId)
+    public async Task<List<SysMenu>> GetMenuTreeByUserId(Guid userId, bool isAdmin = false)
     {
+        if (isAdmin)
+        {
+            return await GetMenuTreeAll();
+        }
         var menus = await _menuRepository.WithDetailsAsync();
         var roleMenus = await _roleMenuRepository.WithDetailsAsync();
         var userRoles = await _userRoleRepository.WithDetailsAsync();
@@ -140,6 +181,7 @@ public class MenuDomainService : DomainService
                 IsCache = x.menu.IsCache,
                 OrderNum = x.menu.OrderNum,
                 MenuType = x.menu.MenuType,
+                Icon = x.menu.Icon
             })
             .Distinct()
             .Where(x => new String[] { "M", "C" }.Contains(x.MenuType))
@@ -202,12 +244,12 @@ public class MenuDomainService : DomainService
     public List<SysMenu> GetChildPerms(List<SysMenu> menus, int parentId)
     {
         List<SysMenu> returnList = new List<SysMenu>();
-        IEnumerator enumerator = returnList.GetEnumerator();
+        IEnumerator enumerator = menus.GetEnumerator();
         while (enumerator.MoveNext())
         {
             SysMenu menu = (SysMenu)enumerator.Current;
             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
-            if (Equals(menu.ParentId, parentId.ToString()))
+            if (Equals(menu.ParentId, parentId))
             {
                 RecursionFn(menus, menu);
                 returnList.Add(menu);
@@ -216,6 +258,7 @@ public class MenuDomainService : DomainService
 
         return returnList;
     }
+    
 
     public List<SysMenu> BuildMenuTree(List<SysMenu> menus)
     {

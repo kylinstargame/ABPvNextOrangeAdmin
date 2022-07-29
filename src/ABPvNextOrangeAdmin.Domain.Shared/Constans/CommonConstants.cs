@@ -4,6 +4,16 @@ namespace ABPvNextOrangeAdmin.Constans;
 
 public class CommonConstants
 {
+    /**
+     * http请求
+     */
+    public static readonly String HTTP = "http://";
+
+    /**
+     * https请求
+     */
+    public static readonly String HTTPS = "https://";
+    
     /// <summary>
     /// 验证码 Redis KEY
     /// </summary>

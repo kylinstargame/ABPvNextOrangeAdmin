@@ -48,7 +48,7 @@ public interface IAccountAppService
     /// 获取路由信息
     /// </summary>
     /// <returns></returns>
-    public Task<CommonResult<List<MenuOutput>>> GetRouters();
+    public Task<CommonResult<List<RouteOutput>>> GetRouters();
 
     // /// <summary>
 

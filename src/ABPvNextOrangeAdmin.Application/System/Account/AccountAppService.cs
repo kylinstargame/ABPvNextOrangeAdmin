@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
 using ABPvNextOrangeAdmin.Constans;
 using ABPvNextOrangeAdmin.CustomException;
+using ABPvNextOrangeAdmin.CustomExtensions;
 using ABPvNextOrangeAdmin.Exception;
 using ABPvNextOrangeAdmin.Options;
 using ABPvNextOrangeAdmin.System.Account.Dto;
@@ -18,6 +19,7 @@ using ABPvNextOrangeAdmin.Utils;
 using ABPvNextOrangeAdmin.Utils.ImageProducer;
 using IdentityModel;
 using IdentityServer4;
+using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
@@ -308,11 +310,11 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
     [HttpGet]
     [ActionName("getRouters")]
-    public async Task<CommonResult<List<MenuOutput>>> GetRouters()
+    public async Task<CommonResult<List<RouteOutput>>> GetRouters()
     {
-        List<SysMenu> menus =await MenuDomainService.GetMenuTreeByUserId(CurrentUser.GetId());
-        var menuOutputs = ObjectMapper.Map<List<SysMenu>, List<MenuOutput>>(menus);
-        return CommonResult<List<MenuOutput>>.Success(menuOutputs,"获取路由信息成功" );
+        List<SysMenu> menus =await MenuDomainService.GetMenuTreeByUserId(CurrentUser.GetId(),CurrentUser.IsAdmin());
+        List<RouteOutput>  routes  =BuildMenuRoutes(menus);
+        return CommonResult<List<RouteOutput>>.Success(routes,"获取路由信息成功" );
     }
 
     /// <summary>
@@ -459,5 +461,62 @@ public class AccountAppService : ApplicationService, IAccountAppService
         var handler = new JwtSecurityTokenHandler();
         var token = handler.CreateToken(tokenDescriptor);
         return handler.WriteToken(token);
+    }
+    
+    
+    /// <summary>
+    /// 构建前端路由所需要的菜单
+    /// </summary>
+    /// <param name="menus"></param>
+    /// <returns></returns>
+    private  List<RouteOutput> BuildMenuRoutes(List<SysMenu> menus)
+    {
+        List<RouteOutput> routers = new List<RouteOutput>();
+        foreach (SysMenu menu in menus)
+        {
+            RouteOutput router = new RouteOutput();
+            router.Hidden = "1".Equals(menu.Visible);
+            router.Name = menu.GetRouteName();
+            router.Path = menu.GetRouterPath();
+            router.Component = menu.GetComponent();;
+            router.Query = menu.Query;
+            router.Meta = new MetaVo(menu.MenuName, menu.Icon, StringUtils.Equals("0", menu.IsCache), menu.Path);
+            List<SysMenu> cMenus = menu.Children.ToList();
+            if (!cMenus.IsNullOrEmpty() && cMenus.Count > -1 && UserConstants.TYPE_DIR.Equals(menu.MenuType))
+            {
+                router.AlwaysShow = true;
+                router.Redirect = "noRedirect";
+                router.Children = BuildMenuRoutes(cMenus);
+            }
+            else if (menu.IsMenuFrame())
+            {
+                router.Meta = null;
+                List<RouteOutput> childrenList = new List<RouteOutput>();
+                RouteOutput children = new RouteOutput();
+                children.Name = menu.GetRouteName();
+                children.Path = menu.GetRouterPath();
+                children.Component = menu.GetComponent();
+                children.Meta = new MetaVo(menu.MenuName, menu.Icon, StringUtils.Equals("0", menu.IsCache), menu.Path);
+                children.Query = menu.Query;
+                childrenList.Add(children);
+                router.Children = childrenList;
+            }
+            else if (menu.ParentId == -1 && menu.IsInnerLink())
+            {
+                router.Meta = new MetaVo(menu.MenuName, menu.Icon);
+                router.Path = "/";
+                var childrenList = new List<RouteOutput>();
+                var children = new RouteOutput();
+                String routerPath = menu.InnerLinkReplaceEach(menu.Path);
+                children.Path = routerPath;
+                children.Component = UserConstants.INNER_LINK;
+                children.Name = StringUtils.Capitalize(routerPath);
+                children.Meta = new MetaVo(menu.MenuName, menu.Icon, menu.Path);
+                childrenList.Add(children);
+                router.Children = childrenList;
+            }
+            routers.Add(router);
+        }
+        return routers;
     }
 }
