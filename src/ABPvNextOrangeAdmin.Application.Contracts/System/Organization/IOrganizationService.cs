@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
 using ABPvNextOrangeAdmin.System.Organization.Dto;
@@ -21,5 +22,5 @@ public interface IOrganizationService
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Task<CommonResult<PagedResultDto<OrganizationOutput>>> GetTreeAsync(OrganizationInput input);
+    public Task<CommonResult<List<DeptOutput>>> GetTreeAsync(OrganizationInput input);
 }

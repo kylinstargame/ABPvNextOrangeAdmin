@@ -1,9 +1,9 @@
+using ABPvNextOrangeAdmin.System.Organization.Dto;
 using ABPvNextOrangeAdmin.System.User.Dto;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Settings;
 using Volo.Abp.ObjectMapping;
-using NotImplementedException = System.NotImplementedException;
 
 namespace ABPvNextOrangeAdmin.ObjectMapper;
 
@@ -23,6 +23,26 @@ public class UserOutObjectMapper : IObjectMapper<IdentityUser, UserOutput>, ITra
         destination.PhoneNumber = source.PhoneNumber;
         destination.Email = source.Email;
         destination.Sex = source.ExtraProperties.ContainsKey("Sex")?source.ExtraProperties["Sex"].ToString():"";
+        return destination;
+    }
+}
+
+
+public class DeptOutputObjectMapper : IObjectMapper<OrganizationUnit, DeptOutput>, ITransientDependency
+{
+    public DeptOutput Map(OrganizationUnit source)
+    {
+        return new DeptOutput();
+    }
+
+    public DeptOutput Map(OrganizationUnit source, DeptOutput destination)
+    {
+        destination.Id = source.Id;
+        destination.Code = source.Code;
+        destination.DeptName = source.DisplayName;
+        destination.Leader =source.ExtraProperties.ContainsKey("Leader")? source.ExtraProperties["Leader"].ToString():""; 
+        destination.Phone  =source.ExtraProperties.ContainsKey("Phone")? source.ExtraProperties["Phone"].ToString():""; 
+        destination.Email =source.ExtraProperties.ContainsKey("Email")? source.ExtraProperties["Email"].ToString():""; 
         return destination;
     }
 }

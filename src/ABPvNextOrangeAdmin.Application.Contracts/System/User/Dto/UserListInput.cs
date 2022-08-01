@@ -13,12 +13,22 @@ public class UserListInput : IPagedAndSortedResultRequest
     public string PhoneNumber { get; set; }
     public Boolean Status { get; set; }
     public string DeptId { get; set; }
-    
+
     public DateTime? BeginTime { get; set; }
-    
+
     public DateTime? EndTime { get; set; }
 
-    public int MaxResultCount { get; set; }
-    public int SkipCount { get; set; }
+    public int MaxResultCount
+    {
+        get { return PageSize; }
+        set { }
+    }
+
+    public int SkipCount
+    {
+        get { return (PageNum -1) * PageSize ; }
+        set { }
+    }
+
     public string Sorting { get; set; }
 }

@@ -27,4 +27,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Migrations\ABPvNextOrangeAdminDbContextModelSnapshot.cs" />
+  </ItemGroup>
+
 </Project>
