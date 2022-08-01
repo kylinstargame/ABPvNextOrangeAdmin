@@ -25,7 +25,7 @@ public static class ABPvNextOrangeAdminEfCoreEntityExtensionMappings
                  * USE ABPvNextOrangeAdminModuleExtensionConfigurator CLASS (in the Domain.Shared project)
                  * FOR A HIGH LEVEL API TO DEFINE EXTRA PROPERTIES TO ENTITIES OF THE USED MODULES
                  *
-                 * Example: Map a property to a table field:
+                 * Example: Map a property to a table 
 
                      ObjectExtensionManager.Instance
                          .MapEfCoreProperty<IdentityUser, string>(

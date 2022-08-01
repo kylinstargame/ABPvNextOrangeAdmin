@@ -9,11 +9,6 @@ namespace ABPvNextOrangeAdmin.System.Menu;
 
 public sealed class SysMenu : FullAuditedEntity<int>
 {
-    // public SysMenu(string menuId, string menuName, string parentId, string orderNum, string path, string component, string query, string isFrame, string isCache, string menuType, string visible, string status, string perms, string icon, string remark)
-    // {
-    //     throw new NotImplementedException();
-    // }
-
     /// <summary>
     /// 菜单名称
     /// </summary>
@@ -95,9 +90,13 @@ public sealed class SysMenu : FullAuditedEntity<int>
     /// </summary>
     public IEnumerable<SysMenu> Children { get; set; } = new List<SysMenu>();
 
-
     public SysMenu()
     {
+    }
+
+    public SysMenu(int id)
+    {
+        Id = id;
     }
 
     public SysMenu(int id, string menuName, int parentId, int orderNum, string path,
@@ -119,6 +118,25 @@ public sealed class SysMenu : FullAuditedEntity<int>
         Perms = perms;
         Icon = icon;
         Remark = remark;
+    }
+
+    public SysMenu(int id, string menuName, string path, string component, string query, string visible, string status,
+        string perms, string isFrame, string isCache, int orderNum, string menuType, string icon, int parentId) : this()
+    {
+        Id = id;
+        MenuName = menuName;
+        Path = path;
+        Component = component;
+        Query = query;
+        Visible = visible;
+        Status = status;
+        Perms = perms;
+        IsFrame = isFrame;
+        IsCache = isCache;
+        OrderNum = orderNum;
+        MenuType = menuType;
+        Icon = icon;
+        ParentId = parentId;
     }
 
     /**
@@ -169,7 +187,7 @@ public sealed class SysMenu : FullAuditedEntity<int>
 
         return routerPath;
     }
-    
+
     /**
      * 获取组件信息
      * 
@@ -191,9 +209,10 @@ public sealed class SysMenu : FullAuditedEntity<int>
         {
             component = UserConstants.PARENT_VIEW;
         }
+
         return component;
     }
-    
+
     /**
      * 是否为parent_view组件
      * 
@@ -213,7 +232,7 @@ public sealed class SysMenu : FullAuditedEntity<int>
      */
     public Boolean IsMenuFrame()
     {
-        return Convert.ToInt32(ParentName) == 0 && UserConstants.TYPE_MENU.Equals(MenuType)
+        return Convert.ToInt32(ParentId) == 0 && UserConstants.TYPE_MENU.Equals(MenuType)
                                                 && IsFrame.Equals(UserConstants.NO_FRAME);
     }
 
@@ -235,7 +254,7 @@ public sealed class SysMenu : FullAuditedEntity<int>
      */
     public String InnerLinkReplaceEach(String path)
     {
-        return StringUtils.ReplaceEach(path, new String[] { CommonConstants.HTTP, CommonConstants.HTTPS },
-            new String[] { "", "" });
+        return StringUtils.ReplaceEach(path, new String[] {CommonConstants.HTTP, CommonConstants.HTTPS},
+            new String[] {"", ""});
     }
 }

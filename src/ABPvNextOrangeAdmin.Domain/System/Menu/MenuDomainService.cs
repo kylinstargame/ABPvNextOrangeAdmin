@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityModel.Client;
@@ -123,7 +124,7 @@ public class MenuDomainService : DomainService
             //     (x, userRole) => new { x.menu, x.roleMenu, userRole })
             // .Join(roles, x => x.userRole.RoleId, role => role.Id,
             //     (x, role) => new { x.menu, x.roleMenu, x.userRole, role })
-            .Select(x => new SysMenu
+            .Select(x => new SysMenu(x.Id)
             {
                 MenuName = x.MenuName,
                 Path = x.Path,
@@ -136,7 +137,8 @@ public class MenuDomainService : DomainService
                 IsCache = x.IsCache,
                 OrderNum = x.OrderNum,
                 MenuType = x.MenuType,
-                Icon = x.Icon
+                Icon = x.Icon,
+                ParentId = x.ParentId
             })
             .Distinct()
             .Where(x => new String[] { "M", "C" }.Contains(x.MenuType))
@@ -168,7 +170,7 @@ public class MenuDomainService : DomainService
             .Join(roles, x => x.userRole.RoleId, role => role.Id,
                 (x, role) => new { x.menu, x.roleMenu, x.userRole, role })
             .Where(x => x.userRole.UserId == userId)
-            .Select(x => new SysMenu
+            .Select(x => new SysMenu(x.menu.Id)
             {
                 MenuName = x.menu.MenuName,
                 Path = x.menu.Path,
@@ -181,7 +183,8 @@ public class MenuDomainService : DomainService
                 IsCache = x.menu.IsCache,
                 OrderNum = x.menu.OrderNum,
                 MenuType = x.menu.MenuType,
-                Icon = x.menu.Icon
+                Icon = x.menu.Icon,
+                ParentId = x.menu.ParentId,
             })
             .Distinct()
             .Where(x => new String[] { "M", "C" }.Contains(x.MenuType))
@@ -249,6 +252,7 @@ public class MenuDomainService : DomainService
         {
             SysMenu menu = (SysMenu)enumerator.Current;
             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
+            Debug.Assert(menu != null, (string?) (nameof(menu) + " != null"));
             if (Equals(menu.ParentId, parentId))
             {
                 RecursionFn(menus, menu);
@@ -323,7 +327,7 @@ public class MenuDomainService : DomainService
         while (it.MoveNext())
         {
             SysMenu current = (SysMenu)it.Current;
-            if (current != null && current.ParentId == menu.ParentId)
+            if (current != null && current.ParentId == menu.Id)
             {
                 resultMenus.Add(current);
             }

@@ -65,7 +65,7 @@ public class ConfigDomainService : DomainService
             try
             {
                 var config = await _configRepository.GetAsync(x => x.ConfigKey == configKey).ConfigureAwait(false);
-                if (!String.IsNullOrEmpty(configValue))
+                if (!String.IsNullOrEmpty(config.ConfigValue))
                 {
                     // 将配置放入缓存
                     await _distributedCache.SetAsync(config.ConfigKey, config.ConfigValue);
@@ -74,7 +74,6 @@ public class ConfigDomainService : DomainService
             }
             catch (EntityNotFoundException e)
             {
-                Debug.Assert(e.Message != null, (string)"e.Message != null");
                 Logger.LogWarning(e.Message);
                 return  String.Empty;
             }

@@ -1,4 +1,5 @@
 ﻿using ABPvNextOrangeAdmin.System.Config;
+using ABPvNextOrangeAdmin.System.Dict;
 using ABPvNextOrangeAdmin.System.Menu;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -62,6 +63,10 @@ public class ABPvNextOrangeAdminDbContext :
     //Menu
     public DbSet<SysMenu> Menus { get; set; }
     public DbSet<SysRoleMenu> RoleMenus { get; set; }
+    
+    //Dict
+    public DbSet<SysDictData> DictDatas { get; set; }
+    public DbSet<SysDictType> DictTypes { get; set; }
 
     #endregion
 
@@ -112,6 +117,18 @@ public class ABPvNextOrangeAdminDbContext :
         builder.Entity<SysConfig>(b =>
         {
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "Config", ABPvNextOrangeAdminConsts.DbSchema);
+            b.ConfigureByConvention();
+        });
+        
+        builder.Entity<SysDictData>(b =>
+        {
+            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "dict_data", ABPvNextOrangeAdminConsts.DbSchema);
+            b.ConfigureByConvention();
+        });
+        
+        builder.Entity<SysDictType>(b =>
+        {
+            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "dict_type", ABPvNextOrangeAdminConsts.DbSchema);
             b.ConfigureByConvention();
         });
     }

@@ -47,7 +47,7 @@ public class SysConfig: FullAuditedEntity<Guid>
         ConfigName = configName;
     }
 
-    public SysConfig(string configKey, string configName, string configValue, string configType,string remark)
+    public SysConfig(string configName, string configKey, string configValue, string configType,string remark)
     {
         ConfigKey = configKey;
         ConfigName = configName;

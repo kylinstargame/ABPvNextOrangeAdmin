@@ -24,10 +24,9 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
         #region 系统管理
 
         menus.Add(new SysMenu(1, "系统管理", 0, 1, "system", "", "", "1", "0", "M", "0", "0", "", "system", "系统管理目录"));
-        menus.Add(new SysMenu(2, "系统监控", 0, 2, "monitor", "", "1", "0", "M", "0", "0", "", "", "monitor", "系统监控目录"));
-        menus.Add(new SysMenu(3, "系统工具", 0, 3, "tool", "", "1", "0", "M", "0", "0", "", "tool", "", "系统工具目录"));
-        menus.Add(new SysMenu(4, "橙卡官网", 0, 4, "http://ruoyi.vip", "", "0", "0", "M", "0", "0", "", "guide", "",
-            "橙卡官网地址"));
+        menus.Add(new SysMenu(2, "系统监控", 0, 2, "monitor", "","", "1", "0", "M", "0", "0", "", "monitor", "系统监控目录"));
+        menus.Add(new SysMenu(3, "系统工具", 0, 3, "tool", "","", "1", "0", "M", "0", "0", "", "tool",  "系统工具目录"));
+        menus.Add(new SysMenu(4, "橙卡官网", 0, 4, "http://ruoyi.vip", "","", "0", "0", "M", "0", "0", "", "guide", "橙卡官网地址"));
 
         #endregion
 
