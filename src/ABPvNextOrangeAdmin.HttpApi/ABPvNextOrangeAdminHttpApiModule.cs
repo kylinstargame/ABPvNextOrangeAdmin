@@ -14,7 +14,7 @@ namespace ABPvNextOrangeAdmin;
 [DependsOn(
     typeof(ABPvNextOrangeAdminApplicationContractsModule),
     // typeof(AbpAccountHttpApiModule),
-    typeof(AbpIdentityHttpApiModule),
+    // typeof(AbpIdentityHttpApiModule),
     typeof(AbpPermissionManagementHttpApiModule),
     typeof(AbpTenantManagementHttpApiModule),
     typeof(AbpFeatureManagementHttpApiModule),

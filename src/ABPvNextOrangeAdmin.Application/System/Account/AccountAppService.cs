@@ -45,7 +45,6 @@ using Volo.Abp.Validation;
 using IdentityUser = Volo.Abp.Identity.IdentityUser;
 using SignInResultExtensions = Volo.Abp.IdentityServer.AspNetIdentity.SignInResultExtensions;
 
-// ReSharper disable StringLastIndexOfIsCultureSpecific.1
 
 namespace ABPvNextOrangeAdmin.System.Account;
 
@@ -113,6 +112,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost]
+    [AllowAnonymous]
     [ActionName("register")]
     public async Task<CommonResult<IdentityUserDto>> RegisterAsync(RegisterInput input)
     {

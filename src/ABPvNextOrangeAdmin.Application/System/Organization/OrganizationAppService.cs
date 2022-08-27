@@ -45,7 +45,7 @@ public class OrganizationAppService : ApplicationService, IOrganizationService
     {
         var organizations = await OrganzationRepository.GetListAsync();
         var deptOutputs = ObjectMapper.Map<List<OrganizationUnit>, List<DeptOutput>>(organizations);
-        var deptTree = BuildDeptTree(deptOutputs, Guid.Empty);
+        var deptTree = BuildDeptTree(deptOutputs, null);
         return CommonResult<List<DeptOutput>>.Success(deptTree, "获取部分树状结构成功");
     }
 

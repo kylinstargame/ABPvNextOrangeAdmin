@@ -20,8 +20,4 @@
     <PackageReference Include="Volo.Abp.SettingManagement.Application" Version="5.3.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="System\Organization\Dto" />
-  </ItemGroup>
-
 </Project>
