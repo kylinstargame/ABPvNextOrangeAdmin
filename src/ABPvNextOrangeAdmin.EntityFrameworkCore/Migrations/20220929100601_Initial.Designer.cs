@@ -3,6 +3,7 @@ using System;
 using ABPvNextOrangeAdmin.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -11,9 +12,10 @@ using Volo.Abp.EntityFrameworkCore;
 namespace ABPvNextOrangeAdmin.Migrations
 {
     [DbContext(typeof(ABPvNextOrangeAdminDbContext))]
-    partial class ABPvNextOrangeAdminDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220929100601_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

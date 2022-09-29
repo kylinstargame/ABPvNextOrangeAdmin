@@ -55,7 +55,7 @@ public class UserAppService : ApplicationService, IUserAppService
     [ActionName("add")]
     public async Task<CommonResult<String>> CreateAsync(UserListInput input)
     {
-        return CommonResult<String>.Success("", "获取用户列表成功");
+        return  CommonResult<String>.Success("", "获取用户列表成功");
     }
 
     [HttpGet]

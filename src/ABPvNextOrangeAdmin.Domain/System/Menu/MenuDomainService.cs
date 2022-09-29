@@ -4,15 +4,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityModel.Client;
-using Microsoft.AspNetCore.Identity;
+using ABPvNextOrangeAdmin.System.Roles;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Settings;
 using Volo.Abp.Specifications;
-using IdentityRole = Volo.Abp.Identity.IdentityRole;
-using IdentityUser = Volo.Abp.Identity.IdentityUser;
 
 namespace ABPvNextOrangeAdmin.System.Menu;
 
@@ -20,11 +17,11 @@ public class MenuDomainService : DomainService
 {
     private readonly IRepository<SysMenu> _menuRepository;
     private readonly IRepository<SysRoleMenu> _roleMenuRepository;
-    private readonly IRepository<IdentityRole> _roleRepository;
-    private readonly IRepository<IdentityUserRole> _userRoleRepository;
+    private readonly IRepository<SysRole> _roleRepository;
+    private readonly IRepository<SysUserRole> _userRoleRepository;
 
     public MenuDomainService(IRepository<SysMenu> menuRepository, IRepository<SysRoleMenu> roleMenuRepository,
-        IRepository<IdentityUserRole> userRoleRepository, IRepository<IdentityRole> roleRepository)
+        IRepository<SysUserRole> userRoleRepository, IRepository<SysRole> roleRepository)
     {
         _menuRepository = menuRepository;
         _roleMenuRepository = roleMenuRepository;
@@ -37,7 +34,7 @@ public class MenuDomainService : DomainService
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<List<SysMenu>> GetMenuList(Guid userId)
+    public async Task<List<SysMenu>> GetMenuList(long userId)
     {
         return await GetMenuList(userId, new SysMenu());
     }
@@ -48,7 +45,7 @@ public class MenuDomainService : DomainService
     /// <param name="userId"></param>
     /// <param name="menu"></param>
     /// <returns></returns>
-    public async Task<List<SysMenu>> GetMenuList(Guid userId, SysMenu menu)
+    public async Task<List<SysMenu>> GetMenuList(long userId, SysMenu menu)
     {
         var menus = await _menuRepository.WithDetailsAsync();
         var roleMenus = await _roleMenuRepository.WithDetailsAsync();
@@ -90,7 +87,7 @@ public class MenuDomainService : DomainService
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<List<String>> GetMenuPermissionsByUserId(Guid userId)
+    public async Task<List<String>> GetMenuPermissionsByUserId(long userId)
     {
         var menus = await _menuRepository.WithDetailsAsync();
         var roleMenus = await _roleMenuRepository.WithDetailsAsync();
@@ -103,7 +100,7 @@ public class MenuDomainService : DomainService
             .Join(roles, x => x.userRole.RoleId, role => role.Id,
                 (x, role) => new { x.menu, x.roleMenu, x.userRole, role })
             .Where(x => x.menu.Status == "0")
-            .Where(x => x.role.IsPublic)
+            // .Where(x => x.role.IsPublic)
             .Where(x => x.userRole.RoleId == userId)
             .Where(x => x.menu.Status == "0")
             .Select(x => new String(x.menu.Perms ?? ""))
@@ -153,7 +150,7 @@ public class MenuDomainService : DomainService
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<List<SysMenu>> GetMenuTreeByUserId(Guid userId, bool isAdmin = false)
+    public async Task<List<SysMenu>> GetMenuTreeByUserId(long userId, bool isAdmin = false)
     {
         if (isAdmin)
         {
@@ -226,9 +223,9 @@ public class MenuDomainService : DomainService
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<List<int>> GetMenuListByRoleId(Guid roleId)
+    public async Task<List<int>> GetMenuListByRoleId(long roleId)
     {
-        IdentityRole usrRole = await _roleRepository.GetAsync(x => x.Id == roleId);
+        SysRole sysRole = await _roleRepository.GetAsync(x => x.Id == roleId);
 
         var menus = await _menuRepository.WithDetailsAsync();
         var roleMenus = await _roleMenuRepository.WithDetailsAsync();

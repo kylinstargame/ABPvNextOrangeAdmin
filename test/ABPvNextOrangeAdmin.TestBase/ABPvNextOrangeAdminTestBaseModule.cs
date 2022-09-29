@@ -21,15 +21,15 @@ public class ABPvNextOrangeAdminTestBaseModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
-        PreConfigure<AbpIdentityServerBuilderOptions>(options =>
-        {
-            options.AddDeveloperSigningCredential = false;
-        });
-
-        PreConfigure<IIdentityServerBuilder>(identityServerBuilder =>
-        {
-            identityServerBuilder.AddDeveloperSigningCredential(false, Guid.NewGuid().ToString());
-        });
+        // PreConfigure<AbpIdentityServerBuilderOptions>(options =>
+        // {
+        //     options.AddDeveloperSigningCredential = false;
+        // });
+        //
+        // PreConfigure<IIdentityServerBuilder>(identityServerBuilder =>
+        // {
+        //     identityServerBuilder.AddDeveloperSigningCredential(false, Guid.NewGuid().ToString());
+        // });
     }
 
     public override void ConfigureServices(ServiceConfigurationContext context)

@@ -55,10 +55,10 @@ public class ABPvNextOrangeAdminMenuContributor : IMenuContributor
         {
             administration.SetSubItemOrder(TenantManagementMenuNames.GroupName, 1);
         }
-        else
-        {
-            administration.TryRemoveMenuItem(TenantManagementMenuNames.GroupName);
-        }
+        // else
+        // {
+        //     administration.TryRemoveMenuItem(TenantManagementMenuNames.GroupName);
+        // }
 
         administration.SetSubItemOrder(IdentityMenuNames.GroupName, 2);
         administration.SetSubItemOrder(SettingManagementMenuNames.GroupName, 3);

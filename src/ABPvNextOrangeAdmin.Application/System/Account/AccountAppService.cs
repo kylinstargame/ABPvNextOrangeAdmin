@@ -15,14 +15,11 @@ using ABPvNextOrangeAdmin.Options;
 using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.Config;
 using ABPvNextOrangeAdmin.System.Menu;
+using ABPvNextOrangeAdmin.System.User;
 using ABPvNextOrangeAdmin.Utils;
 using ABPvNextOrangeAdmin.Utils.ImageProducer;
 using IdentityModel;
-using IdentityServer4;
-using IdentityServer4.Extensions;
-using IdentityServer4.Models;
 using IdentityServer4.Services;
-using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +32,6 @@ using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.AspNetCore;
-using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.ObjectExtending;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.Security.Claims;
@@ -43,7 +39,6 @@ using Volo.Abp.Settings;
 using Volo.Abp.Users;
 using Volo.Abp.Validation;
 using IdentityUser = Volo.Abp.Identity.IdentityUser;
-using SignInResultExtensions = Volo.Abp.IdentityServer.AspNetIdentity.SignInResultExtensions;
 
 
 namespace ABPvNextOrangeAdmin.System.Account;
@@ -58,7 +53,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
     private UserRoleFinder UserRoleFinder { get; set; }
 
-    private IdentityUserManager UserManager { get; set; }
+    private UserManager UserManager { get; set; }
 
     // private IAccountEmailer AccountEmailer { get; set; }
 
@@ -82,12 +77,12 @@ public class AccountAppService : ApplicationService, IAccountAppService
     private MenuDomainService MenuDomainService { get; }
 
 
-    public AccountAppService(IdentityUserManager userManager,
+    public AccountAppService(UserManager userManager,
         /*IAccountEmailer accountEmailer,*/IdentitySecurityLogManager identitySecurityLogManager,
         IOptions<IdentityOptions> identityOptions, DefaultCaptcha defaultCaptcha,
         ConfigDomainService configDomainService, IDistributedCache<String> distributedCache, ITokenService tokenService,
         IRefreshTokenService refreshTokenService, IOptions<JwtOptions> jwtOptions,
-        PermissionManager permissionManager, IdentityDbContext identityDbContext, UserRoleFinder userRoleFinder,
+        PermissionManager permissionManager,  UserRoleFinder userRoleFinder,
         AbpSignInManager signInManager, MenuDomainService menuDomainService)
     {
         UserManager = userManager;
@@ -116,20 +111,18 @@ public class AccountAppService : ApplicationService, IAccountAppService
     [ActionName("register")]
     public async Task<CommonResult<IdentityUserDto>> RegisterAsync(RegisterInput input)
     {
-        // await CheckSelfRegistrationAsync();
-
         await IdentityOptions.SetAsync();
 
         //创建新用户
-        var user = new IdentityUser(GuidGenerator.Create(), input.UserName, input.EmailAddress, CurrentTenant.Id);
+        var user = new SysUser( input.UserName, input.EmailAddress, CurrentTenant.Id);
         input.MapExtraPropertiesTo(user);
 
         (await UserManager.CreateAsync(user, input.Password)).CheckErrors();
 
         await UserManager.SetEmailAsync(user, input.EmailAddress);
-        await UserManager.AddDefaultRolesAsync(user);
+        // await UserManager.AddDefaultRolesAsync(user);
 
-        var identityUserDto = ObjectMapper.Map<IdentityUser, IdentityUserDto>(user);
+        var identityUserDto = ObjectMapper.Map<SysUser, IdentityUserDto>(user);
         return CommonResult<IdentityUserDto>.Success(identityUserDto, "注册账户完成");
     }
 
@@ -150,8 +143,6 @@ public class AccountAppService : ApplicationService, IAccountAppService
         {
             await ValidateCaptcha(input.UserNameOrEmailAddress, input.Code, input.Uuid);
         }
-
-        // await CheckLocalLoginAsync();149gg
 
         ValidateLoginInfo(input);
 
@@ -271,7 +262,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
         var identityUser = await UserManager.GetByIdAsync(CurrentUser.Id.Value);
 
 
-        var user = ObjectMapper.Map<IdentityUser, IdentityUserDto>(identityUser);
+        var user = ObjectMapper.Map<SysUser, IdentityUserDto>(identityUser);
         //获取角色名称
         String[]
             roleNamnes =
@@ -312,7 +303,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
     [ActionName("getRouters")]
     public async Task<CommonResult<List<RouteOutput>>> GetRouters()
     {
-        List<SysMenu> menus =await MenuDomainService.GetMenuTreeByUserId(CurrentUser.GetId(),CurrentUser.IsAdmin());
+        List<SysMenu> menus =await MenuDomainService.GetMenuTreeByUserId(0,CurrentUser.IsAdmin());
         List<RouteOutput>  routes  =BuildMenuRoutes(menus);
         return CommonResult<List<RouteOutput>>.Success(routes,"获取路由信息成功" );
     }
@@ -339,29 +330,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
             throw new CaptchaException();
         }
     }
-
-    /// <summary>
-    /// 检查用户是否启用本地注册
-    /// </summary>
-    /// <exception cref="UserFriendlyException"></exception>
-// protected virtual async Task CheckSelfRegistrationAsync()
-// {
-//     if (!await SettingProvider.IsTrueAsync(AccountSettingNames.IsSelfRegistrationEnabled))
-//     {
-//         throw new UserFriendlyException(L["SelfRegistrationDisabledMessage"]);
-//     }
-// }
-    /// <summary>
-    /// 检查是否启用本地登录
-    /// </summary>
-    /// <exception cref="UserFriendlyException"></exception>
-// protected virtual async Task CheckLocalLoginAsync()
-// {
-//     if (!await SettingProvider.IsTrueAsync(AccountSettingNames.EnableLocalLogin))
-//     {
-//         throw new UserFriendlyException(L["LocalLoginDisabledMessage"]);
-//     }
-// }
+    
     /// <summary>
     /// 检验用户信息
     /// </summary>
@@ -418,7 +387,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
     /// <param name="email"></param>
     /// <returns></returns>
     /// <exception cref="UserFriendlyException"></exception>
-    protected virtual async Task<IdentityUser> GetUserByEmailAsync(string email)
+    protected virtual async Task<SysUser> GetUserByEmailAsync(string email)
     {
         var user = await UserManager.FindByEmailAsync(email);
         if (user == null)
@@ -432,9 +401,9 @@ public class AccountAppService : ApplicationService, IAccountAppService
     /// <summary>
     /// 生成IdentityUser AccessToken
     /// </summary>
-    /// <param name="identityUser"></param>
+    /// <param name="user"></param>
     /// <returns></returns>
-    private string GenerateAccessToken(IdentityUser identityUser)
+    private string GenerateAccessToken(SysUser user)
     {
         var dateNow = DateTime.Now;
         var expirationTime = dateNow + TimeSpan.FromHours(JwtOptions.ExpirationTime);
@@ -444,11 +413,11 @@ public class AccountAppService : ApplicationService, IAccountAppService
         {
             new Claim(JwtClaimTypes.Audience, JwtOptions.Audience),
             new Claim(JwtClaimTypes.Issuer, JwtOptions.Issuer),
-            new Claim(AbpClaimTypes.UserId, identityUser.Id.ToString()),
-            new Claim(AbpClaimTypes.Name, identityUser.Name),
-            new Claim(AbpClaimTypes.UserName, identityUser.UserName),
-            new Claim(AbpClaimTypes.Email, identityUser.Email),
-            new Claim(AbpClaimTypes.TenantId, identityUser.TenantId.ToString())
+            new Claim(AbpClaimTypes.UserId, user.Id.ToString()),
+            new Claim(AbpClaimTypes.Name, user.NickName),
+            new Claim(AbpClaimTypes.UserName, user.UserName),
+            new Claim(AbpClaimTypes.Email, user.Email),
+            new Claim(AbpClaimTypes.TenantId, user.TenantId.ToString())
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor()

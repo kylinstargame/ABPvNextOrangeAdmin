@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using IdentityServer4.Models;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.System.Config;

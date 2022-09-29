@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+using ABPvNextOrangeAdmin.System.Roles;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Guids;
-using IdentityRole = Volo.Abp.Identity.IdentityRole;
 using NotImplementedException = System.NotImplementedException;
 
 namespace ABPvNextOrangeAdmin.System.Menu;
@@ -13,11 +12,11 @@ namespace ABPvNextOrangeAdmin.System.Menu;
 public class RoleMenuDataSeedContributor : IDataSeedContributor, ITransientDependency
 {
     private IGuidGenerator _guidGenerator;
-    private IRepository<IdentityRole> _roleRepository;
+    private IRepository<SysRole> _roleRepository;
     private IRepository<SysRoleMenu> _roleMenuRepository;
 
     public RoleMenuDataSeedContributor(IRepository<SysRoleMenu> roleMenuRepository,
-        IRepository<IdentityRole> roleRepository, IGuidGenerator guidGenerator)
+        IRepository<SysRole> roleRepository, IGuidGenerator guidGenerator)
     {
         _roleMenuRepository = roleMenuRepository;
         _roleRepository = roleRepository;
@@ -26,7 +25,7 @@ public class RoleMenuDataSeedContributor : IDataSeedContributor, ITransientDepen
 
     public async Task SeedAsync(DataSeedContext context)
     {
-        IdentityRole role = new IdentityRole(_guidGenerator.Create(), "common");
+        SysRole role = new SysRole( "common");
         await _roleRepository.InsertAsync(role);
 
         List<SysRoleMenu> sysRoleMenus = new List<SysRoleMenu>();

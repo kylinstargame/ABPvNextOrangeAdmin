@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="IdentityServer4" Version="4.1.2" />
     <PackageReference Include="Volo.Abp.Identity.Application" Version="5.3.2" />
     <PackageReference Include="Volo.Abp.Identity.AspNetCore" Version="5.3.3" />
     <PackageReference Include="Volo.Abp.TenantManagement.Application" Version="5.3.2" />
