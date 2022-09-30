@@ -12,17 +12,19 @@ namespace ABPvNextOrangeAdmin.System.User;
 
 public class UserManager : UserManager<SysUser>, IDomainService
 {
-    public UserManager(IUserStore<SysUser> store, IOptions<IdentityOptions> optionsAccessor,
-        IPasswordHasher<SysUser> passwordHasher, IEnumerable<IUserValidator<SysUser>> userValidators,
-        IEnumerable<IPasswordValidator<SysUser>> passwordValidators, ILookupNormalizer keyNormalizer,
+    public UserManager( IUserStore<SysUser> store, IOptions<IdentityOptions> optionsAccessor,
+        /*IPasswordHasher<SysUser> passwordHasher, */ /*IEnumerable<IUserValidator<SysUser>> userValidators,*/
+        // IEnumerable<IPasswordValidator<SysUser>> passwordValidators, ILookupNormalizer keyNormalizer,
         IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<SysUser>> logger) : base(store,
-        optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
+        optionsAccessor, null /*passwordHasher*/, null /*userValidators*/, null /*passwordValidators*/,
+        null /*keyNormalizer*/, errors, services, logger)
     {
     }
-    
+
+
     public virtual async Task<SysUser> GetByIdAsync(Guid id)
     {
-        var user = await Store.FindByIdAsync(id.ToString(), CancellationToken);
+        SysUser user = null; // await Store.FindByIdAsync(id.ToString(), CancellationToken);
         if (user == null)
         {
             throw new EntityNotFoundException(typeof(SysUser), id);

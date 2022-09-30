@@ -49,9 +49,9 @@ public class AccountAppService : ApplicationService, IAccountAppService
 {
     private JwtOptions JwtOptions { get; set; }
 
-    private AbpSignInManager SignInManager { get; set; }
+    private SignInManager SignInManager { get; set; }
 
-    private UserRoleFinder UserRoleFinder { get; set; }
+    // private UserRoleFinder UserRoleFinder { get; set; }
 
     private UserManager UserManager { get; set; }
 
@@ -67,35 +67,35 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
     private IDistributedCache<String> DistributedCache { get; set; }
 
-    private ITokenService TokenService { get; set; }
+    // private ITokenService TokenService { get; set; }
 
-    private IRefreshTokenService RefreshTokenService { get; set; }
+    // private IRefreshTokenService RefreshTokenService { get; set; }
 
 
-    private PermissionManager PermissionManager { get; }
+    // private PermissionManager PermissionManager { get; }
 
     private MenuDomainService MenuDomainService { get; }
 
 
     public AccountAppService(UserManager userManager,
-        /*IAccountEmailer accountEmailer,*/IdentitySecurityLogManager identitySecurityLogManager,
+        /*IAccountEmailer accountEmailer,*//*IdentitySecurityLogManager identitySecurityLogManager,*/
         IOptions<IdentityOptions> identityOptions, DefaultCaptcha defaultCaptcha,
-        ConfigDomainService configDomainService, IDistributedCache<String> distributedCache, ITokenService tokenService,
-        IRefreshTokenService refreshTokenService, IOptions<JwtOptions> jwtOptions,
-        PermissionManager permissionManager,  UserRoleFinder userRoleFinder,
-        AbpSignInManager signInManager, MenuDomainService menuDomainService)
+        ConfigDomainService configDomainService, IDistributedCache<String> distributedCache, /*ITokenService tokenService,*/
+        /*IRefreshTokenService refreshTokenService,*/ IOptions<JwtOptions> jwtOptions,
+        /*PermissionManager permissionManager,*/ /* UserRoleFinder userRoleFinder,*/
+        SignInManager signInManager, MenuDomainService menuDomainService)
     {
         UserManager = userManager;
         // AccountEmailer = accountEmailer;
-        IdentitySecurityLogManager = identitySecurityLogManager;
+        // IdentitySecurityLogManager = identitySecurityLogManager;
         IdentityOptions = identityOptions;
         DefaultCaptcha = defaultCaptcha;
         ConfigDomainService = configDomainService;
         DistributedCache = distributedCache;
-        TokenService = tokenService;
-        RefreshTokenService = refreshTokenService;
-        PermissionManager = permissionManager;
-        UserRoleFinder = userRoleFinder;
+        // TokenService = tokenService;
+        // RefreshTokenService = refreshTokenService;
+        // PermissionManager = permissionManager;
+        // UserRoleFinder = userRoleFinder;
         SignInManager = signInManager;
         MenuDomainService = menuDomainService;
         JwtOptions = jwtOptions.Value;
@@ -264,39 +264,36 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
         var user = ObjectMapper.Map<SysUser, IdentityUserDto>(identityUser);
         //获取角色名称
-        String[]
-            roleNamnes =
-                await UserRoleFinder.GetRolesAsync((Guid)CurrentUser
-                    .Id); //IdentityUserRepository.GetRoleNamesAsync((Guid)CurrentUser.Id);
+        String[] roleNamnes; //=await UserRoleFinder.GetRolesAsync((Guid)CurrentUser.Id); //IdentityUserRepository.GetRoleNamesAsync((Guid)CurrentUser.Id);
 
 
         HashSet<String> permissionNames = new HashSet<string>();
         // 获取角色权限
-        foreach (var roleName in roleNamnes)
-        {
-            var withGrantedRolePermissions = await PermissionManager.GetAllAsync(PermissionConstans.Role, roleName);
-            foreach (var rolePermission in withGrantedRolePermissions)
-            {
-                if (rolePermission.IsGranted)
-                {
-                    permissionNames.Add(rolePermission.Name);
-                }
-            }
-        }
+        // foreach (var roleName in roleNamnes)
+        // {
+        //     var withGrantedRolePermissions = await PermissionManager.GetAllAsync(PermissionConstans.Role, roleName);
+        //     foreach (var rolePermission in withGrantedRolePermissions)
+        //     {
+        //         if (rolePermission.IsGranted)
+        //         {
+        //             permissionNames.Add(rolePermission.Name);
+        //         }
+        //     }
+        // }
 
         // 获取用户权限
-        var withGrantedUserPermissions =
-            await PermissionManager.GetAllAsync(PermissionConstans.User, CurrentUser.Id.ToString());
-        foreach (var userPermission in withGrantedUserPermissions)
-        {
-            if (userPermission.IsGranted)
-            {
-                permissionNames.Add(userPermission.Name);
-            }
-        }
+        // var withGrantedUserPermissions =
+        //     await PermissionManager.GetAllAsync(PermissionConstans.User, CurrentUser.Id.ToString());
+        // foreach (var userPermission in withGrantedUserPermissions)
+        // {
+        //     if (userPermission.IsGranted)
+        //     {
+        //         permissionNames.Add(userPermission.Name);
+        //     }
+        // }
 
         return CommonResult<UserWithRoleAndPermissionOutput>.Success(
-            UserWithRoleAndPermissionOutput.CreateInstance(user, roleNamnes, permissionNames.ToArray()), "获取用户信息");
+            UserWithRoleAndPermissionOutput.CreateInstance(user, new string[] { }/*roleNamnes*/, permissionNames.ToArray()), "获取用户信息");
     }
 
     [HttpGet]
