@@ -25,6 +25,11 @@ public class SysRole : FullAuditedAggregateRoot<long>, IMultiTenant
     /// </summary>
     public String Permissions;
 
+    public SysRole(long roleName, long roleId, Guid? tenantId)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// 角色排序
     /// </summary>

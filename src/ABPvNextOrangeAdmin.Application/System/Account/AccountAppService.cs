@@ -19,7 +19,6 @@ using ABPvNextOrangeAdmin.System.User;
 using ABPvNextOrangeAdmin.Utils;
 using ABPvNextOrangeAdmin.Utils.ImageProducer;
 using IdentityModel;
-using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -29,16 +28,11 @@ using Microsoft.IdentityModel.Tokens;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
-using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.ObjectExtending;
-using Volo.Abp.PermissionManagement;
 using Volo.Abp.Security.Claims;
-using Volo.Abp.Settings;
-using Volo.Abp.Users;
 using Volo.Abp.Validation;
-using IdentityUser = Volo.Abp.Identity.IdentityUser;
 
 
 namespace ABPvNextOrangeAdmin.System.Account;
@@ -120,7 +114,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
         (await UserManager.CreateAsync(user, input.Password)).CheckErrors();
 
         await UserManager.SetEmailAsync(user, input.EmailAddress);
-        // await UserManager.AddDefaultRolesAsync(user);
+        await UserManager.AddDefaultRolesAsync(user);
 
         var identityUserDto = ObjectMapper.Map<SysUser, IdentityUserDto>(user);
         return CommonResult<IdentityUserDto>.Success(identityUserDto, "注册账户完成");

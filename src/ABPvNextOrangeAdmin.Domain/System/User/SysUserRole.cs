@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -8,6 +9,8 @@ namespace ABPvNextOrangeAdmin.System.Roles;
 /// </summary>
 public class SysUserRole : FullAuditedEntity
 {
+    private readonly Guid? _tenantId;
+
     /// <summary>
     /// 用户ID
     /// </summary>
@@ -26,6 +29,13 @@ public class SysUserRole : FullAuditedEntity
 
     private SysUserRole()
     {
+    }
+
+    public SysUserRole(long userId, long roleId,  Guid? tenantId)
+    {
+        _tenantId = tenantId;
+        UserId = userId;
+        RoleId = roleId;
     }
 
     public static List<SysUserRole> CreateInstances(long userId, int[] roleIds)

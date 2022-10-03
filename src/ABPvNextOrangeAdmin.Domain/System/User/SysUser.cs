@@ -1,4 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using ABPvNextOrangeAdmin.System.Roles;
+using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
 
@@ -14,6 +19,9 @@ public class SysUser : FullAuditedAggregateRoot<long>, IMultiTenant
         UserName = userName;
         TenantId = tenantId;
         Email = email;
+        Logins = new Collection<SysUserLogin>();
+        IsActive = true;
+
     }
 
     public SysUser(string userName, string email, string password, Guid? tenantId = null)
@@ -21,7 +29,10 @@ public class SysUser : FullAuditedAggregateRoot<long>, IMultiTenant
         UserName = userName;
         Email = email;
         Password = password;
+        Logins = new Collection<SysUserLogin>();
         TenantId = tenantId;
+        IsActive = true;
+
     }
 
     /// <summary>
@@ -83,4 +94,53 @@ public class SysUser : FullAuditedAggregateRoot<long>, IMultiTenant
     /// 租户Id
     /// </summary>
     public Guid? TenantId { get; }
+    
+    /// <summary>
+    /// Gets or sets a flag indicating if the user is active.
+    /// </summary>
+    public bool IsActive { get; protected internal set; }
+    
+    
+    /// <summary>
+    /// Navigation property for this users login accounts.
+    /// </summary>
+    public ICollection<SysUserLogin> Logins { get; protected set; }
+    
+    /// <summary>
+    /// Navigation property for the roles this user belongs to.
+    /// </summary>
+    public ICollection<SysUserRole> Roles { get; protected set; }
+    
+    
+    public virtual bool IsInRole(long roleId)
+    {
+        Check.NotNull(roleId, nameof(roleId));
+
+        return Roles.Any(r => r.RoleId == roleId);
+    }
+
+    
+    public virtual void AddRole(long roleId)
+    {
+        Check.NotNull(roleId, nameof(roleId));
+
+        if (IsInRole(roleId))
+        {
+            return;
+        }
+
+        Roles.Add(new SysUserRole(Id, roleId, TenantId));
+    }
+
+    public virtual void RemoveRole(long roleId)
+    {
+        Check.NotNull(roleId, nameof(roleId));
+
+        if (!IsInRole(roleId))
+        {
+            return;
+        }
+
+        Roles.RemoveAll(r => r.RoleId == roleId);
+    }
 }
