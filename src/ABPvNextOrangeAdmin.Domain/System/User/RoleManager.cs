@@ -8,7 +8,9 @@ namespace ABPvNextOrangeAdmin.System.User;
 
 public class RoleManager : RoleManager<SysRole>, IDomainService
 {
-    public RoleManager(IRoleStore<SysRole> store, IEnumerable<IRoleValidator<SysRole>> roleValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, ILogger<RoleManager<SysRole>> logger) : base(store, roleValidators, keyNormalizer, errors, logger)
+    public RoleManager(IRoleStore<SysRole> store, IEnumerable<IRoleValidator<SysRole>> roleValidators,
+        ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, ILogger<RoleManager<SysRole>> logger) : base(
+        store, roleValidators, keyNormalizer, errors, logger)
     {
     }
 }

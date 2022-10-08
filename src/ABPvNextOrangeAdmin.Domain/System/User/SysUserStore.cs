@@ -17,10 +17,9 @@ public class SysUserStore : IUserStore<SysUser>,
     IUserRoleStore<SysUser>,ITransientDependency
 {
     
-    public SysUserStore(IUserRepository userRepository, bool autoSaveChanges, IdentityErrorDescriber errorDescriber, IRoleRepository roleRepository)
+    public SysUserStore(IUserRepository userRepository,  IdentityErrorDescriber errorDescriber, IRoleRepository roleRepository)
     {
         UserRepository = userRepository;
-        AutoSaveChanges = autoSaveChanges;
         ErrorDescriber = errorDescriber;
         RoleRepository = roleRepository;
     }

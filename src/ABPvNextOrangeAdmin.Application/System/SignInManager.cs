@@ -13,13 +13,14 @@ namespace ABPvNextOrangeAdmin.System;
 
 public class SignInManager : SignInManager<SysUser>, ITransientDependency
 {
-    public SignInManager(UserManager<SysUser> userManager, IHttpContextAccessor contextAccessor, IUserClaimsPrincipalFactory<SysUser> claimsFactory, IOptions<IdentityOptions> optionsAccessor, ILogger<SignInManager<SysUser>> logger, IAuthenticationSchemeProvider schemes, IUserConfirmation<SysUser> confirmation) : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
+    public SignInManager(UserManager<SysUser> userManager, IHttpContextAccessor contextAccessor,
+        IUserClaimsPrincipalFactory<SysUser> claimsFactory, IOptions<IdentityOptions> optionsAccessor,
+        ILogger<SignInManager<SysUser>> logger, IAuthenticationSchemeProvider schemes,
+        IUserConfirmation<SysUser> confirmation) : base(userManager, contextAccessor, claimsFactory, optionsAccessor,
+        logger, schemes, confirmation)
     {
     }
-
-    public SignInManager(UserManager userManager, IHttpContextAccessor contextAccessor, IUserClaimsPrincipalFactory<SysUser> claimsFactory, IOptions<IdentityOptions> optionsAccessor, ILogger<SignInManager<SysUser>> logger, IAuthenticationSchemeProvider schemes, IUserConfirmation<SysUser> confirmation) : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
-    {
-    }
+    
 
     protected SysUserOptions Options { get; }
 
@@ -27,13 +28,16 @@ public class SignInManager : SignInManager<SysUser>, ITransientDependency
     {
         if (user.IsActive)
         {
-            Logger.LogWarning($"The user is not active therefore cannot login! (username: {user.UserName}, id:{user.Id})");
+            Logger.LogWarning(
+                $"The user is not active therefore cannot login! (username: {user.UserName}, id:{user.Id})");
             return SignInResult.NotAllowed;
         }
+
         return await base.PreSignInCheck(user);
     }
 
-    public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
+    public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent,
+        bool lockoutOnFailure)
     {
         foreach (var externalLoginProviderInfo in Options.ExternalLoginProviders.Values)
         {
@@ -46,7 +50,8 @@ public class SignInManager : SignInManager<SysUser>, ITransientDependency
                 {
                     if (externalLoginProvider is IExternalLoginProviderWithPassword externalLoginProviderWithPassword)
                     {
-                        user = await externalLoginProviderWithPassword.CreateUserAsync(userName, externalLoginProviderInfo.Name, password);
+                        user = await externalLoginProviderWithPassword.CreateUserAsync(userName,
+                            externalLoginProviderInfo.Name, password);
                     }
                     else
                     {
@@ -57,7 +62,8 @@ public class SignInManager : SignInManager<SysUser>, ITransientDependency
                 {
                     if (externalLoginProvider is IExternalLoginProviderWithPassword externalLoginProviderWithPassword)
                     {
-                        await externalLoginProviderWithPassword.UpdateUserAsync(user, externalLoginProviderInfo.Name, password);
+                        await externalLoginProviderWithPassword.UpdateUserAsync(user, externalLoginProviderInfo.Name,
+                            password);
                     }
                     else
                     {
