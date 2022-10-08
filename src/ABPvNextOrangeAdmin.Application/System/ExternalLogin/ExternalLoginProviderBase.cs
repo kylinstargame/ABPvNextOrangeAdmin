@@ -48,6 +48,7 @@ public abstract class ExternalLoginProviderBase : IExternalLoginProvider
         var user = new SysUser(
             userName,
             externalUser.Email,
+            "",
             tenantId: CurrentTenant.Id
         );
 

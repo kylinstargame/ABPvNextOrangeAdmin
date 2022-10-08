@@ -108,7 +108,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
         await IdentityOptions.SetAsync();
 
         //创建新用户
-        var user = new SysUser( input.UserName, input.EmailAddress, CurrentTenant.Id);
+        var user = new SysUser( input.UserName, input.EmailAddress, input.Password, CurrentTenant.Id); 
         input.MapExtraPropertiesTo(user);
 
         (await UserManager.CreateAsync(user, input.Password)).CheckErrors();

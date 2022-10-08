@@ -185,7 +185,7 @@ public class SysUserStore : IUserStore<SysUser>,
             return;
         }
 
-        var role = await RoleRepository.FindByNormalizedNameAsync(roleName, cancellationToken: cancellationToken);
+        var role = await RoleRepository.FindByNameAsync(roleName, cancellationToken: cancellationToken);
         if (role == null)
         {
             throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Role {0} does not exist!", roleName));
@@ -203,7 +203,7 @@ public class SysUserStore : IUserStore<SysUser>,
         Check.NotNull(user, nameof(user));
         Check.NotNullOrWhiteSpace(roleName, nameof(roleName));
 
-        var role = await RoleRepository.FindByNormalizedNameAsync(roleName, cancellationToken: cancellationToken);
+        var role = await RoleRepository.FindByNameAsync(roleName, cancellationToken: cancellationToken);
         if (role == null)
         {
             return;

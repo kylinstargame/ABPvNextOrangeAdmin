@@ -41,15 +41,15 @@ public class ABPvNextOrangeAdminDbContext :
      */
 
     //Identity
-    public DbSet<SysUser> User { get; set; }
-    public DbSet<SysRole> Role { get; set; }
-    public DbSet<SysDept> Dept { get; set; }
-    public DbSet<SysPost> Post { get; set; }
-    public DbSet<SysUserRole> UserRole { get; set; }
-    public DbSet<SysUserPost> UserPost { get; set; }
+    public DbSet<SysUser> Users { get; set; }
+    public DbSet<SysRole> Roles { get; set; }
+    public DbSet<SysDept> Depts { get; set; }
+    public DbSet<SysPost> Posts { get; set; }
+    public DbSet<SysUserRole> UserRoles { get; set; }
+    public DbSet<SysUserDept> UserDepts { get; set; }
+    public DbSet<SysUserPost> UserPosts { get; set; }
+    public DbSet<SysUserLogin> UserLogins { get; set; }
     
-    public DbSet<SysRoleMenu> RoleMenu { get; set; }
-
     // Tenant Management
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
@@ -102,6 +102,12 @@ public class ABPvNextOrangeAdminDbContext :
             b.ConfigureByConvention();
         });
         
+        builder.Entity<SysUserLogin>(b =>
+        {
+            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_login", ABPvNextOrangeAdminConsts.DbSchema);
+            b.ConfigureByConvention();
+        });
+        
         builder.Entity<SysRole>(b =>
         {
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "role", ABPvNextOrangeAdminConsts.DbSchema);
@@ -125,6 +131,15 @@ public class ABPvNextOrangeAdminDbContext :
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_role", ABPvNextOrangeAdminConsts.DbSchema);
             b.HasKey(x =>
                 new {x.UserId, x.RoleId}
+            );
+            b.ConfigureByConvention();
+        });
+        
+        builder.Entity<SysUserDept>(b =>
+        {
+            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_dept", ABPvNextOrangeAdminConsts.DbSchema);
+            b.HasKey(x =>
+                new {x.UserId, x.DeptId}
             );
             b.ConfigureByConvention();
         });

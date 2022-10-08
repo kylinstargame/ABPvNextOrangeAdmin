@@ -96,8 +96,8 @@ public interface IUserRepository : IBasicRepository<SysUser, long>
 
     Task<long> GetCountAsync(
         string filter = null,
-        Guid? roleId = null,
-        Guid? organizationUnitId = null,
+        long roleId = -1,
+        long deptId= -1,
         string userName = null,
         string phoneNumber = null,
         string emailAddress = null,

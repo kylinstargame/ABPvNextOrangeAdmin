@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using ABPvNextOrangeAdmin.System.Organization;
 using ABPvNextOrangeAdmin.System.Roles;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -12,27 +13,51 @@ namespace ABPvNextOrangeAdmin.System.User;
 /// <summary>
 /// 系统用户
 /// </summary>
-public class SysUser : FullAuditedAggregateRoot<long>, IMultiTenant
+public sealed class SysUser : FullAuditedAggregateRoot<long>, IMultiTenant
 {
-    public SysUser(string userName, string email, Guid? tenantId = null )
+    public SysUser(string userName, string email, Guid? tenantId = null)
     {
         UserName = userName;
         TenantId = tenantId;
         Email = email;
-        Logins = new Collection<SysUserLogin>();
-        IsActive = true;
-
+        // Password = password;
+    }
+    
+    public SysUser(string userName, string email, string password, Guid? tenantId = null)
+    {
+        UserName = userName;
+        TenantId = tenantId;
+        Email = email;
+        Password = password;
     }
 
-    public SysUser(string userName, string email, string password, Guid? tenantId = null)
+    public SysUser(string userName, string email, string nickName, string phoneNumber, string password,
+        Guid? tenantId = null)
+    {
+        UserName = userName;
+        NickName = nickName;
+        Password = password;
+        TenantId = tenantId;
+        PhoneNumber = phoneNumber;
+        Sex = "男";
+        Email = email;
+        LockoutEnabled = false;
+        LockoutEnd = DateTimeOffset.MaxValue;
+        Logins = new Collection<SysUserLogin>();
+        IsActive = true;
+    }
+
+    public SysUser(string userName, string email, string password, bool lockoutEnabled, DateTimeOffset? lockoutEnd,
+        Guid? tenantId = null)
     {
         UserName = userName;
         Email = email;
         Password = password;
+        LockoutEnabled = lockoutEnabled;
+        LockoutEnd = lockoutEnd;
         Logins = new Collection<SysUserLogin>();
         TenantId = tenantId;
         IsActive = true;
-
     }
 
     /// <summary>
@@ -91,36 +116,51 @@ public class SysUser : FullAuditedAggregateRoot<long>, IMultiTenant
     public string LoginTime { get; set; }
 
     /// <summary>
+    /// 账户解锁时间
+    /// </summary>
+    public DateTimeOffset? LockoutEnd { get; protected internal set; }
+
+    /// <summary>
+    /// 账户是否锁定.
+    /// </summary>
+    public bool LockoutEnabled { get; protected internal set; }
+
+    /// <summary>
     /// 租户Id
     /// </summary>
     public Guid? TenantId { get; }
-    
+
     /// <summary>
     /// Gets or sets a flag indicating if the user is active.
     /// </summary>
     public bool IsActive { get; protected internal set; }
-    
-    
+
+
     /// <summary>
-    /// Navigation property for this users login accounts.
+    /// 关联登录记录
     /// </summary>
     public ICollection<SysUserLogin> Logins { get; protected set; }
-    
+
     /// <summary>
-    /// Navigation property for the roles this user belongs to.
+    /// 关联角色
     /// </summary>
     public ICollection<SysUserRole> Roles { get; protected set; }
-    
-    
-    public virtual bool IsInRole(long roleId)
+
+    /// <summary>
+    /// 关联部门
+    /// </summary>
+    public ICollection<SysDept> Depts { get; protected set; }
+
+
+    public bool IsInRole(long roleId)
     {
         Check.NotNull(roleId, nameof(roleId));
 
         return Roles.Any(r => r.RoleId == roleId);
     }
 
-    
-    public virtual void AddRole(long roleId)
+
+    public void AddRole(long roleId)
     {
         Check.NotNull(roleId, nameof(roleId));
 
@@ -132,7 +172,7 @@ public class SysUser : FullAuditedAggregateRoot<long>, IMultiTenant
         Roles.Add(new SysUserRole(Id, roleId, TenantId));
     }
 
-    public virtual void RemoveRole(long roleId)
+    public void RemoveRole(long roleId)
     {
         Check.NotNull(roleId, nameof(roleId));
 

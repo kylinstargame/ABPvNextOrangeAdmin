@@ -31,6 +31,17 @@ public class UserManager : UserManager<SysUser>, IDomainService
 
     protected IRoleRepository RoleRepository { get; }
 
+    
+    public virtual async Task<IdentityResult> CreateAsync(SysUser user, string password, bool validatePassword)
+    {
+        var result = await UpdatePasswordHash(user, password, validatePassword);
+        if (!result.Succeeded)
+        {
+            return result;
+        }
+
+        return await CreateAsync(user);
+    }
     public virtual async Task<SysUser> GetByIdAsync(Guid id)
     {
         SysUser user =  await Store.FindByIdAsync(id.ToString(), CancellationToken);

@@ -10,9 +10,10 @@ namespace ABPvNextOrangeAdmin.System.Roles;
 /// </summary>
 public class SysRole : FullAuditedAggregateRoot<long>, IMultiTenant
 {
-    public SysRole(string roleName)
+    public SysRole(string roleName, Guid? tenantId = null)
     {
         RoleName = roleName;
+        TenantId = tenantId;
     }
 
     /// <summary>
@@ -24,6 +25,8 @@ public class SysRole : FullAuditedAggregateRoot<long>, IMultiTenant
     /// 角色权限字符
     /// </summary>
     public String Permissions;
+    
+    public virtual bool IsDefault { get; set; }
 
     public SysRole(long roleName, long roleId, Guid? tenantId)
     {

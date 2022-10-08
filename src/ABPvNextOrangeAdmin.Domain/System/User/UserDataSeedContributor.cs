@@ -8,12 +8,15 @@ using NotImplementedException = System.NotImplementedException;
 
 namespace ABPvNextOrangeAdmin.System.User;
 
-public class UserDataSeedContributor  : IDataSeedContributor, ITransientDependency
+public class UserDataSeedContributor : IDataSeedContributor, ITransientDependency
 {
-    public UserDataSeedContributor(IRepository<SysUser> userRepository)
+    public UserDataSeedContributor(IRepository<SysUser> userRepository, IUserDataSeeder userDataSeeder)
     {
         _userRepository = userRepository;
+        UserDataSeeder = userDataSeeder;
     }
+
+    protected IUserDataSeeder UserDataSeeder { get; }
 
     public const string AdminEmailPropertyName = "AdminEmail";
     public const string AdminEmailDefaultValue = "orangecardgame@163.com";
@@ -21,12 +24,11 @@ public class UserDataSeedContributor  : IDataSeedContributor, ITransientDependen
     public const string AdminPasswordDefaultValue = "1q2w3E*";
 
     protected IRepository<SysUser> _userRepository { get; }
-    
+
     public async Task SeedAsync(DataSeedContext context)
     {
         List<SysUser> sysUsers = new List<SysUser>();
-        sysUsers.Add(new SysUser("admin",context?[AdminEmailPropertyName] as string ?? AdminEmailDefaultValue,
-            context?[AdminPasswordPropertyName] as string ?? AdminPasswordDefaultValue));
-        await _userRepository.InsertManyAsync(sysUsers);
+        UserDataSeeder.SeedAsync("admin", context?[AdminEmailPropertyName] as string ?? AdminEmailDefaultValue,
+            "橙卡软件科技", "15803843236", context?[AdminPasswordPropertyName] as string ?? AdminPasswordDefaultValue);
     }
 }

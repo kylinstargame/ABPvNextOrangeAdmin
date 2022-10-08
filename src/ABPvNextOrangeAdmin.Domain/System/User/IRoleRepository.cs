@@ -8,7 +8,7 @@ namespace ABPvNextOrangeAdmin.System.User;
 
 public interface IRoleRepository
 {
-    Task<SysRole> FindByNormalizedNameAsync(
+    Task<SysRole> FindByNameAsync(
         string normalizedRoleName,
         bool includeDetails = true,
         CancellationToken cancellationToken = default
@@ -23,7 +23,7 @@ public interface IRoleRepository
         CancellationToken cancellationToken = default
     );
     Task<List<SysRole>> GetListAsync(
-        IEnumerable<Guid> ids,
+        IEnumerable<long> ids,
         CancellationToken cancellationToken = default
     );
 
