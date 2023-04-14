@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Organization;
 using ABPvNextOrangeAdmin.System.Roles;
 using ABPvNextOrangeAdmin.System.User;
+using ABPvNextOrangeAdmin.System.User.Exstension;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -14,26 +17,29 @@ using Volo.Abp.EntityFrameworkCore;
 
 namespace ABPvNextOrangeAdmin.EntityFrameworkCore.Repository;
 
-public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContext, SysUser, long>, IUserRepository
+public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContext, SysUser, Guid>, IUserRepository
 {
-    public EfCoreUserRepository(IDbContextProvider<ABPvNextOrangeAdminDbContext> dbContextProvider) : base(
+    public EfCoreUserRepository(IDbContextProvider<ABPvNextOrangeAdminDbContext> dbContextProvider,
+        ILookupNormalizer lookupNormalizer) : base(
         dbContextProvider)
     {
+        LookNormalizer = lookupNormalizer;
     }
+
+    public ILookupNormalizer LookNormalizer { get; set; }
 
     public async Task<SysUser> FindByNormalizedUserNameAsync(string userName, bool includeDetails = true,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         return await (await GetDbSetAsync())
-            // .IncludeDetails(includeDetails)
             .OrderBy(x => x.Id)
             .FirstOrDefaultAsync(
-                u => u.UserName == userName,
-                GetCancellationToken(cancellationToken)
+                u => u.UserName == userName
             );
     }
 
-    public async Task<List<string>> GetRoleNamesAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<List<string>> GetRoleNamesAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var dbContext = await GetDbContextAsync();
         // 用户角色
@@ -42,78 +48,47 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
             where userRole.UserId == id
             select role.RoleName;
         var deptIds = dbContext.Set<SysUserDept>().Where(q => q.UserId == id).Select(q => q.DeptId).ToArray();
-        
+
         //部门角色
         var deptRoleIds = await (
             from roleDept in dbContext.Set<SysRoleDept>()
             join dept in dbContext.Set<SysDept>() on roleDept.DeptId equals dept.Id
             where deptIds.Contains(roleDept.DeptId)
             select roleDept.RoleId
-        ).ToListAsync(GetCancellationToken(cancellationToken));
+        ).ToListAsync();
 
         var deptRoleNameQuery = dbContext.Roles.Where(r => deptRoleIds.Contains(r.Id)).Select(n => n.RoleName);
         var resultQuery = query.Union(deptRoleNameQuery);
-        return await resultQuery.ToListAsync(GetCancellationToken(cancellationToken));
+        return await resultQuery.ToListAsync(GetCancellationToken());
     }
 
-    public Task<List<string>> GetRoleNamesInOrganizationUnitAsync(long id,
+    public async Task<List<string>> GetRoleNamesInOrganizationUnitAsync(Guid id,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var dbContext = await GetDbContextAsync();
+        var query = from userDept in dbContext.Set<SysUserDept>()
+            join roleDept in dbContext.Set<SysRoleDept>() on userDept.DeptId equals roleDept.DeptId
+            join dept in dbContext.Set<SysDept>() on roleDept.DeptId equals dept.Id
+            join roles in dbContext.Roles on roleDept.RoleId equals roles.Id
+            where userDept.UserId == id
+            select roles.RoleName;
+
+        var result = await query.ToListAsync(GetCancellationToken());
+
+        return result;
+    }
+
+    public async Task<List<SysUser>> GetListByNormalizedRoleNameAsync(string normalizedRoleName,
+        bool includeDetails = false,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return (await (await GetDbSetAsync()).OrderBy(x => x.Id).ToListAsync()).Where(
+            u=>LookNormalizer.NormalizeName(u.UserName) == normalizedRoleName
+        ).ToList();
     }
 
     public Task<SysUser> FindByLoginAsync(string loginProvider, string providerKey, bool includeDetails = true,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<SysUser> FindByNormalizedEmailAsync(string normalizedEmail, bool includeDetails = true,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<SysUser>> GetListByClaimAsync(Claim claim, bool includeDetails = false,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<SysUser>> GetListByNormalizedRoleNameAsync(string normalizedRoleName, bool includeDetails = false,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<SysUser>> GetListAsync(string sorting = null, int maxResultCount = Int32.MaxValue,
-        int skipCount = 0, string filter = null,
-        bool includeDetails = false, Guid? roleId = null, Guid? organizationUnitId = null, string userName = null,
-        string phoneNumber = null, string emailAddress = null, bool? isLockedOut = null, bool? notActive = null,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<SysRole>> GetRolesAsync(Guid id, bool includeDetails = false,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<SysUser>> GetUsersInOrganizationUnitAsync(Guid organizationUnitId,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<SysUser>> GetUsersInOrganizationsListAsync(List<Guid> organizationUnitIds,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<SysUser>> GetUsersInOrganizationUnitWithChildrenAsync(string code,
         CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();

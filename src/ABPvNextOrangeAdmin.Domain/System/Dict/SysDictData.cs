@@ -4,7 +4,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.System.Dict;
 
-public class SysDictData : FullAuditedEntity<long>
+public sealed class SysDictData : FullAuditedEntity<long>
 {
     public SysDictData()
     {

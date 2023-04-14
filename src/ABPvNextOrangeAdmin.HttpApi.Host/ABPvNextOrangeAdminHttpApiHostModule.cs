@@ -15,8 +15,6 @@ using Microsoft.Extensions.Hosting;
 using ABPvNextOrangeAdmin.EntityFrameworkCore;
 using ABPvNextOrangeAdmin.MultiTenancy;
 using ABPvNextOrangeAdmin.Options;
-using IdentityServer4;
-using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 using Microsoft.OpenApi.Models;

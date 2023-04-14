@@ -30,7 +30,15 @@ public class DictSeedContributor : IDataSeedContributor, ITransientDependency
         sysDictTypes.Add(new SysDictType(8, "通知状态", "sys_notice_status", "0", "通知状态列表"));
         sysDictTypes.Add(new SysDictType(9, "操作类型", "sys_oper_type", "0", "操作类型列表"));
         sysDictTypes.Add(new SysDictType(10, "系统状态", "sys_common_status", "0", "登录状态列表"));
-        await DictTypeRepository.InsertManyAsync(sysDictTypes);
+        int count = await DictTypeRepository.CountAsync();
+        if (count <= 0)
+        {
+            await DictTypeRepository.InsertManyAsync(sysDictTypes);
+        }
+        // else
+        // {
+        //      await DictTypeRepository.UpdateManyAsync(sysDictTypes);           
+        // }
 
         List<SysDictData> sysDictDatas = new List<SysDictData>();
         sysDictDatas.Add(new SysDictData(1, 1, "男", "0", "sys_user_sex", "", "Y", "0", "性别男"));
@@ -61,6 +69,14 @@ public class DictSeedContributor : IDataSeedContributor, ITransientDependency
         sysDictDatas.Add(new SysDictData(26, 9, "清空数据", "9", "sys_oper_type", "danger", "N", "0", "清空操作"));
         sysDictDatas.Add(new SysDictData(27, 1, "成功", "0", "sys_common_status", "primary", "N", "0", "正常状态"));
         sysDictDatas.Add(new SysDictData(28, 2, "失败", "1", "sys_common_status", "danger", "N", "0", "停用状态"));
-        await DictDataRepository.InsertManyAsync(sysDictDatas);
+        count = await DictDataRepository.CountAsync();
+        if (count <= 0)
+        {
+            await DictDataRepository.InsertManyAsync(sysDictDatas);
+        }
+        // else
+        // {
+        //     await DictDataRepository.UpdateManyAsync(sysDictDatas);           
+        // }
     }
 }

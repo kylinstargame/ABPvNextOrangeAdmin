@@ -6,10 +6,10 @@ namespace ABPvNextOrangeAdmin.System.ExternalLogin;
 public interface IExternalLoginProvider
 {
     /// <summary>
-    /// Used to try authenticate a user by this source.
+    ///  用户认证.
     /// </summary>
-    /// <param name="userName">User name or email address</param>
-    /// <param name="plainPassword">Plain password of the user</param>
+    /// <param name="userName">用户名</param>
+    /// <param name="plainPassword">P密码r</param>
     /// <returns>True, indicates that this used has authenticated by this source</returns>
     Task<bool> TryAuthenticateAsync(string userName, string plainPassword);
 

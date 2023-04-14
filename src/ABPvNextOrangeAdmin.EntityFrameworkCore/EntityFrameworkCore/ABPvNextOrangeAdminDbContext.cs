@@ -1,4 +1,5 @@
 ﻿using ABPvNextOrangeAdmin.System.Config;
+using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Dict;
 using ABPvNextOrangeAdmin.System.Menu;
 using ABPvNextOrangeAdmin.System.Organization;
@@ -47,6 +48,7 @@ public class ABPvNextOrangeAdminDbContext :
     public DbSet<SysPost> Posts { get; set; }
     public DbSet<SysUserRole> UserRoles { get; set; }
     public DbSet<SysUserDept> UserDepts { get; set; }
+    public DbSet<SysRoleDept> RoleDepts { get; set; }
     public DbSet<SysUserPost> UserPosts { get; set; }
     public DbSet<SysUserLogin> UserLogins { get; set; }
     
@@ -140,6 +142,15 @@ public class ABPvNextOrangeAdminDbContext :
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_dept", ABPvNextOrangeAdminConsts.DbSchema);
             b.HasKey(x =>
                 new {x.UserId, x.DeptId}
+            );
+            b.ConfigureByConvention();
+        });
+        
+        builder.Entity<SysRoleDept>(b =>
+        {
+            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "role_dept", ABPvNextOrangeAdminConsts.DbSchema);
+            b.HasKey(x =>
+                new {x.RoleId, x.DeptId}
             );
             b.ConfigureByConvention();
         });

@@ -15,9 +15,6 @@ namespace ABPvNextOrangeAdmin.EntityFrameworkCore;
 
 [DependsOn(
     typeof(ABPvNextOrangeAdminDomainModule),
-    // typeof(AbpIdentityEntityFrameworkCoreModule),
-    // typeof(AbpIdentityServerEntityFrameworkCoreModule),
-    // typeof(AbpPermissionManagementEntityFrameworkCoreModule),
     typeof(AbpSettingManagementEntityFrameworkCoreModule),
     typeof(AbpEntityFrameworkCoreMySQLModule),
     typeof(AbpBackgroundJobsEntityFrameworkCoreModule),

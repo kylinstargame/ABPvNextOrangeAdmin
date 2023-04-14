@@ -2,9 +2,13 @@
 using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.Config;
 using ABPvNextOrangeAdmin.System.Config.Dto;
+using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Menu;
+using ABPvNextOrangeAdmin.System.Organization;
 using ABPvNextOrangeAdmin.System.Organization.Dto;
 using ABPvNextOrangeAdmin.System.Permission.Dto;
+using ABPvNextOrangeAdmin.System.Roles;
+using ABPvNextOrangeAdmin.System.User;
 using ABPvNextOrangeAdmin.System.User.Dto;
 using AutoMapper;
 using Volo.Abp.Identity;
@@ -21,8 +25,8 @@ public class ABPvNextOrangeAdminApplicationAutoMapperProfile : Profile
         CreateMap<SysMenu, MenuOutput>();
         CreateMap<SysConfig, ConfigOutput>();
         
-        CreateMap<IdentityUser, UserOutput>();
-        CreateMap<IdentityRole, RoleOutput>();
-        CreateMap<OrganizationUnit, DeptOutput>();
+        CreateMap<SysUser, SysUserOutput>();
+        CreateMap<SysRole, SysRoleOutput>();
+        CreateMap<SysDept, SysDeptOutput>();
     }
 }

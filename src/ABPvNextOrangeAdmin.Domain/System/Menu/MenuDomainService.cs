@@ -34,7 +34,7 @@ public class MenuDomainService : DomainService
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<List<SysMenu>> GetMenuList(long userId)
+    public async Task<List<SysMenu>> GetMenuList(Guid userId)
     {
         return await GetMenuList(userId, new SysMenu());
     }
@@ -45,7 +45,7 @@ public class MenuDomainService : DomainService
     /// <param name="userId"></param>
     /// <param name="menu"></param>
     /// <returns></returns>
-    public async Task<List<SysMenu>> GetMenuList(long userId, SysMenu menu)
+    public async Task<List<SysMenu>> GetMenuList(Guid userId, SysMenu menu)
     {
         var menus = await _menuRepository.WithDetailsAsync();
         var roleMenus = await _roleMenuRepository.WithDetailsAsync();
@@ -150,7 +150,7 @@ public class MenuDomainService : DomainService
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<List<SysMenu>> GetMenuTreeByUserId(long userId, bool isAdmin = false)
+    public async Task<List<SysMenu>> GetMenuTreeByUserId(Guid userId, bool isAdmin = false)
     {
         if (isAdmin)
         {

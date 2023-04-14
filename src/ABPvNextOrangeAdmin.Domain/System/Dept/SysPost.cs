@@ -10,6 +10,11 @@ namespace ABPvNextOrangeAdmin.System.Organization;
 /// </summary>
 public class SysPost : FullAuditedAggregateRoot<long>, IMultiTenant
 {
+    public SysPost(Guid? tenantId)
+    {
+        TenantId = tenantId;
+    }
+
     /// <summary>
     /// 岗位编码 
     /// </summary>

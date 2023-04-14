@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ABPvNextOrangeAdmin.System.Organization.Dto;
 
-public class OrganizationInput
+public class DeptInput
 {
     /** 父部门ID */
     public long ParentId { get; set; }

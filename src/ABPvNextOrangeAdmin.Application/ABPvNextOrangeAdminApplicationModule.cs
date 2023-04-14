@@ -1,4 +1,8 @@
 ﻿// using Volo.Abp.Account;
+
+using ABPvNextOrangeAdmin.System.User;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
@@ -13,7 +17,6 @@ namespace ABPvNextOrangeAdmin;
 
 [DependsOn(
     typeof(ABPvNextOrangeAdminDomainModule),
-    // typeof(AbpAccountApplicationModule),
     typeof(ABPvNextOrangeAdminApplicationContractsModule),
     typeof(AbpIdentityApplicationModule),
     typeof(AbpIdentityAspNetCoreModule),
@@ -30,5 +33,6 @@ public class ABPvNextOrangeAdminApplicationModule : AbpModule
         {
             options.AddMaps<ABPvNextOrangeAdminApplicationModule>();
         });
+        context.Services.AddAssemblyOf<PasswordHasher<SysUser>>();
     }
 }

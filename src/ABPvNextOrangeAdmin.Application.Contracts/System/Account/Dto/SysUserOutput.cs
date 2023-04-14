@@ -3,7 +3,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace ABPvNextOrangeAdmin.System.Account.Dto;
 
-public class SysUserOutPut : EntityDto<long>
+public class SysUserOutput : EntityDto<Guid>
 {
     /// <summary>
     /// 部门ID
@@ -59,6 +59,12 @@ public class SysUserOutPut : EntityDto<long>
     /// 最后登录时间
     /// </summary>
     public string LoginTime { get; set; }
+    
+    
+    /// <summary>
+    /// 最后登录时间
+    /// </summary>
+    public DateTime? CreationTime { get; set; }
 
     /// <summary>
     /// 租户Id

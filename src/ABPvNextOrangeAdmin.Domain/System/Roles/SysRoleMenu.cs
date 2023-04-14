@@ -14,7 +14,7 @@ public class SysRoleMenu : FullAuditedEntity
     /// <summary>
     /// 菜单ID
     /// </summary>
-    public int MenuId { get; set; }
+    public long MenuId { get; set; }
 
     public override object[] GetKeys()
     {

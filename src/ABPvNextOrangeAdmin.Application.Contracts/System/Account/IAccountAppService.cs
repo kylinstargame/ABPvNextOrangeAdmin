@@ -14,7 +14,7 @@ public interface IAccountAppService
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Task<CommonResult<IdentityUserDto>> RegisterAsync(RegisterInput input);
+    public Task<CommonResult<SysUserOutput>> RegisterAsync(RegisterInput input);
 
     /// <summary>
     /// 账号登录

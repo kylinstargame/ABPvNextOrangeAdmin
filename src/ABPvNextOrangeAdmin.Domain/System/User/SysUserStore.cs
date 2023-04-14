@@ -4,33 +4,35 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ABPvNextOrangeAdmin.System.User.Exstension;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
-using NotImplementedException = System.NotImplementedException;
+using Volo.Abp.Domain.Repositories;
 
 namespace ABPvNextOrangeAdmin.System.User;
 
-public class SysUserStore : IUserStore<SysUser>,
+public class SysUserStore : IUserPasswordStore<SysUser>,
     IUserRoleStore<SysUser>,ITransientDependency
 {
     
-    public SysUserStore(IUserRepository userRepository, bool autoSaveChanges, IdentityErrorDescriber errorDescriber, IRoleRepository roleRepository)
+    public SysUserStore(IUserRepository userRepository,SysUserErrorDescriber errorDescriber, IRoleRepository roleRepository, ILookupNormalizer lookupNormalizer)
     {
         UserRepository = userRepository;
-        AutoSaveChanges = autoSaveChanges;
+        AutoSaveChanges = true;
         ErrorDescriber = errorDescriber;
         RoleRepository = roleRepository;
+        LookupNormalizer = lookupNormalizer;
     }
 
-    protected IUserRepository UserRepository { get; }
-    
-    protected IRoleRepository RoleRepository { get; }
-    
-    
-    protected ILookupNormalizer LookupNormalizer { get; }
+    private IUserRepository UserRepository { get; }
+
+    private IRoleRepository RoleRepository { get; }
+
+
+    private ILookupNormalizer LookupNormalizer { get; }
     
     /// <summary>
     /// Gets or sets a flag indicating if changes should be persisted after CreateAsync, UpdateAsync and DeleteAsync are called.
@@ -86,7 +88,7 @@ public class SysUserStore : IUserStore<SysUser>,
 
         Check.NotNull(user, nameof(user));
 
-        return Task.FromResult(user.UserName);
+        return Task.FromResult( LookupNormalizer.NormalizeName(user.UserName));
     }
 
     public Task SetNormalizedUserNameAsync(SysUser user, string normalizedName, CancellationToken cancellationToken)
@@ -95,7 +97,7 @@ public class SysUserStore : IUserStore<SysUser>,
 
         Check.NotNull(user, nameof(user));
 
-        user.UserName = normalizedName;
+        user.UserName = LookupNormalizer.NormalizeName(normalizedName);
 
         return Task.CompletedTask;
     }
@@ -156,7 +158,7 @@ public class SysUserStore : IUserStore<SysUser>,
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        return UserRepository.FindAsync(long.Parse(userId), cancellationToken: cancellationToken);
+        return UserRepository.FindAsync(Guid.Parse(userId), cancellationToken: cancellationToken);
     }
 
     public Task<SysUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
@@ -165,7 +167,7 @@ public class SysUserStore : IUserStore<SysUser>,
 
         Check.NotNull(normalizedUserName, nameof(normalizedUserName));
 
-        return UserRepository.FindByNormalizedUserNameAsync(normalizedUserName, includeDetails: false, cancellationToken: cancellationToken);
+        return UserRepository.FindByNormalizedUserNameAsync(normalizedUserName, includeDetails: true, cancellationToken: cancellationToken);
 
     }
 
@@ -256,4 +258,31 @@ public class SysUserStore : IUserStore<SysUser>,
     }
 
     #endregion
+
+    public Task SetPasswordHashAsync(SysUser user, string passwordHash, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (user == null)
+        {
+            throw new ArgumentNullException(nameof(user));
+        }
+        user.PasswordHash = passwordHash;
+        return Task.CompletedTask;
+    }
+
+    public Task<string> GetPasswordHashAsync(SysUser user, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (user == null)
+        {
+            throw new ArgumentNullException(nameof(user));
+        }
+        return Task.FromResult(user.PasswordHash);
+    }
+
+    public Task<bool> HasPasswordAsync(SysUser user, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(user.PasswordHash != null);
+    }
 }

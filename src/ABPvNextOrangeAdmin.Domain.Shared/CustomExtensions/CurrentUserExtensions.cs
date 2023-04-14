@@ -6,6 +6,6 @@ public static class CurrentUserExtensions
 {
     public static bool IsAdmin(this ICurrentUser user)
     {
-        return user.Name.ToLower() == "admin";
+        return user.UserName.ToLower() == "admin";
     } 
 }

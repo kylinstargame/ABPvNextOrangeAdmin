@@ -1,22 +1,25 @@
+using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.Organization.Dto;
+using ABPvNextOrangeAdmin.System.User;
 using ABPvNextOrangeAdmin.System.User.Dto;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Settings;
 using Volo.Abp.ObjectMapping;
+using NotImplementedException = System.NotImplementedException;
 
 namespace ABPvNextOrangeAdmin.ObjectMapper;
 
-public class UserOutObjectMapper : IObjectMapper<IdentityUser, UserOutput>, ITransientDependency
+public class UserOutObjectMapper : IObjectMapper<SysUser, SysUserOutput>, ITransientDependency
 {
-    public UserOutput Map(IdentityUser source)
+    public SysUserOutput Map(SysUser source)
     {
-        return new UserOutput();
+        return new SysUserOutput();
     }
 
-    public UserOutput Map(IdentityUser source, UserOutput destination)
+    public SysUserOutput Map(SysUser source, SysUserOutput destination)
     {
-        destination.UserId = source.Id;
+        destination.Id = source.Id;
         destination.UserName = source.UserName;
         destination.NickName = source.ExtraProperties.ContainsKey("NickName")? source.ExtraProperties["NickName"].ToString():""; 
         destination.Password = source.ExtraProperties.ContainsKey("Password")?source.ExtraProperties["Password"].ToString():"";
@@ -28,14 +31,14 @@ public class UserOutObjectMapper : IObjectMapper<IdentityUser, UserOutput>, ITra
 }
 
 
-public class DeptOutputObjectMapper : IObjectMapper<OrganizationUnit, DeptOutput>, ITransientDependency
+public class DeptOutputObjectMapper : IObjectMapper<OrganizationUnit, SysDeptOutput>, ITransientDependency
 {
-    public DeptOutput Map(OrganizationUnit source)
+    public SysDeptOutput Map(OrganizationUnit source)
     {
-        return new DeptOutput();
+        return new SysDeptOutput();
     }
 
-    public DeptOutput Map(OrganizationUnit source, DeptOutput destination)
+    public SysDeptOutput Map(OrganizationUnit source, SysDeptOutput destination)
     {
         destination.Id = source.Id;
         destination.Code = source.Code;

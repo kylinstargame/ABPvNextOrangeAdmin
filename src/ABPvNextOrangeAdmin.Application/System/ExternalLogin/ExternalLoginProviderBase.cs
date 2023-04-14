@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
+using Volo.Abp.Guids;
 using Volo.Abp.MultiTenancy;
 using NotImplementedException = System.NotImplementedException;
 
@@ -13,11 +14,14 @@ namespace ABPvNextOrangeAdmin.System.ExternalLogin;
 
 public abstract class ExternalLoginProviderBase : IExternalLoginProvider
 {
-    protected ExternalLoginProviderBase(IOptions<IdentityOptions> identityOptions, ICurrentTenant currentTenant, IUserRepository userRepository)
+    private IGuidGenerator GuidGenerator;
+    protected ExternalLoginProviderBase(IOptions<IdentityOptions> identityOptions, ICurrentTenant currentTenant, IUserRepository userRepository, UserManager userManager, IGuidGenerator guidGenerator)
     {
         IdentityOptions = identityOptions;
         CurrentTenant = currentTenant;
         UserRepository = userRepository;
+        UserManager = userManager;
+        GuidGenerator = guidGenerator;
     }
 
     public abstract Task<bool> TryAuthenticateAsync(string userName, string plainPassword);
@@ -46,6 +50,7 @@ public abstract class ExternalLoginProviderBase : IExternalLoginProvider
         NormalizeExternalLoginUserInfo(externalUser, userName);
 
         var user = new SysUser(
+            GuidGenerator.Create(),
             userName,
             externalUser.Email,
             "",

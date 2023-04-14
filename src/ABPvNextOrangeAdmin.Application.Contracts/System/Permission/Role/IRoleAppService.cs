@@ -12,5 +12,5 @@ public interface IRoleAppService
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Task<CommonResult<PagedResultDto<RoleOutput>>> GetListAsync(RoleListInput input);
+    public Task<CommonResult<PagedResultDto<SysRoleOutput>>> GetListAsync(RoleListInput input);
 }

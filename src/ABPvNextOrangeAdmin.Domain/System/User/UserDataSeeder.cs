@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Extensions;
 using ABPvNextOrangeAdmin.System.Roles;
@@ -30,27 +31,25 @@ public interface IUserDataSeeder
 
 class UserDataSeeder : IUserDataSeeder, ITransientDependency
 {
-    public UserDataSeeder(UserManager userManager, IUserRepository userRepository, ICurrentTenant currentTenant,
-        IOptions<IdentityOptions> identityOptions, IRoleRepository roleRepository, RoleManager roleManager)
+    public UserDataSeeder(UserManager userStore, SysRoleManager sysRoleManager, IUserRepository userRepository,
+        IRoleRepository roleRepository, ICurrentTenant currentTenant)
     {
-        UserManager = userManager;
+        UserStore = userStore;
         UserRepository = userRepository;
         CurrentTenant = currentTenant;
-        IdentityOptions = identityOptions;
         RoleRepository = roleRepository;
-        RoleManager = roleManager;
+        SysRoleManager = sysRoleManager;
     }
 
-    protected UserManager UserManager { get; }
+    protected UserManager UserStore { get; }
 
     protected IUserRepository UserRepository { get; }
 
-    protected RoleManager RoleManager { get; }
+    protected SysRoleManager SysRoleManager { get; }
 
     protected IRoleRepository RoleRepository { get; }
     protected ICurrentTenant CurrentTenant { get; }
 
-    protected IOptions<IdentityOptions> IdentityOptions { get; }
 
     public async Task<UserDataSeedResult> SeedAsync(string adminName, string adminEmail, string nickName,
         string adminPhone, string adminPassword,
@@ -61,8 +60,6 @@ class UserDataSeeder : IUserDataSeeder, ITransientDependency
 
         using (CurrentTenant.Change(tenantId))
         {
-            await IdentityOptions.SetAsync();
-
             var result = new UserDataSeedResult();
 
             var adminUser = await UserRepository.FindByNormalizedUserNameAsync(
@@ -75,15 +72,14 @@ class UserDataSeeder : IUserDataSeeder, ITransientDependency
             }
 
             adminUser = new SysUser(
-                adminName,
+                Guid.Empty, adminName,
                 adminEmail,
                 nickName,
                 adminPhone,
                 adminPassword,
                 tenantId
             );
-
-            (await UserManager.CreateAsync(adminUser, adminPassword, false)).CheckErrors();
+            (await UserStore.CreateAsync(adminUser, adminPassword, false)).CheckErrors();
             result.CreatedAdminUser = true;
 
             //"admin" role
@@ -97,11 +93,11 @@ class UserDataSeeder : IUserDataSeeder, ITransientDependency
                     tenantId
                 );
 
-                (await RoleManager.CreateAsync(adminRole)).CheckErrors();
+                (await SysRoleManager.CreateAsync(adminRole)).CheckErrors();
                 result.CreatedAdminRole = true;
             }
 
-            (await UserManager.AddToRoleAsync(adminUser, adminRoleName)).CheckErrors();
+            (await UserStore.AddToRoleAsync(adminUser, adminRoleName)).CheckErrors();
 
             return result;
         }

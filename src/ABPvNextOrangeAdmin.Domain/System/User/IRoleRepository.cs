@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.System.Roles;
+using Volo.Abp.Domain.Repositories;
 
 namespace ABPvNextOrangeAdmin.System.User;
 
-public interface IRoleRepository
+public interface IRoleRepository  : IBasicRepository<SysRole, long>
 {
     Task<SysRole> FindByNameAsync(
         string normalizedRoleName,

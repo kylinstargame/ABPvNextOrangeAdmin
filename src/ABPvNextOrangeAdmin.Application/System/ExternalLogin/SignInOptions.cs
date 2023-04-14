@@ -5,11 +5,12 @@ using ExternalLoginProviderInfo = ABPvNextOrangeAdmin.System.ExternalLogin.Exter
 
 namespace ABPvNextOrangeAdmin.System;
 
-public class SysUserOptions 
+
+public class SignInOptions 
 {
     public Dictionary<string, ExternalLoginProviderInfo> ExternalLoginProviders { get; }
 
-    public SysUserOptions()
+    public SignInOptions()
     {
         ExternalLoginProviders = new Dictionary<string, ExternalLoginProviderInfo>();
     } 

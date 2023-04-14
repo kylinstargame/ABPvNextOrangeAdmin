@@ -358,8 +358,8 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("longtext");
 
-                    b.Property<long?>("SysUserId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("SysUserId")
+                        .HasColumnType("char(36)");
 
                     b.Property<Guid?>("TenantId")
                         .HasColumnType("char(36)")
@@ -439,6 +439,49 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.ToTable("sys_post", (string)null);
                 });
 
+            modelBuilder.Entity("ABPvNextOrangeAdmin.System.Organization.SysRoleDept", b =>
+                {
+                    b.Property<long>("RoleId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("DeptId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.HasKey("RoleId", "DeptId");
+
+                    b.ToTable("sys_role_dept", (string)null);
+                });
+
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Roles.SysRole", b =>
                 {
                     b.Property<long>("Id")
@@ -477,6 +520,9 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("ExtraProperties");
 
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
@@ -514,8 +560,8 @@ namespace ABPvNextOrangeAdmin.Migrations
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Roles.SysRoleMenu", b =>
                 {
-                    b.Property<int>("MenuId")
-                        .HasColumnType("int");
+                    b.Property<long>("MenuId")
+                        .HasColumnType("bigint");
 
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
@@ -557,8 +603,8 @@ namespace ABPvNextOrangeAdmin.Migrations
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Roles.SysUserRole", b =>
                 {
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
 
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
@@ -593,8 +639,8 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("LastModifierId");
 
-                    b.Property<long?>("SysUserId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("SysUserId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -605,9 +651,8 @@ namespace ABPvNextOrangeAdmin.Migrations
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.User.SysUser", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Avatar")
                         .HasColumnType("longtext");
@@ -679,6 +724,9 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("longtext");
 
@@ -702,8 +750,8 @@ namespace ABPvNextOrangeAdmin.Migrations
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.User.SysUserDept", b =>
                 {
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
 
                     b.Property<long>("DeptId")
                         .HasColumnType("bigint");
@@ -819,8 +867,8 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("longtext");
 
-                    b.Property<long?>("SysUserId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("SysUserId")
+                        .HasColumnType("char(36)");
 
                     b.Property<Guid?>("TenantId")
                         .HasColumnType("char(36)")

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
+using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.User.Dto;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Identity;
@@ -14,7 +15,7 @@ public interface IUserAppService
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Task<CommonResult<PagedResultDto<UserOutput>>> GetListAsync(UserListInput input);
+    public Task<CommonResult<PagedResultDto<SysUserOutput>>> GetListAsync(UserListInput input);
     
     
     /// <summary>

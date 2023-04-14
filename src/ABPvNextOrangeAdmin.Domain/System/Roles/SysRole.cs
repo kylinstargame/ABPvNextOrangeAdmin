@@ -28,7 +28,7 @@ public class SysRole : FullAuditedAggregateRoot<long>, IMultiTenant
     
     public virtual bool IsDefault { get; set; }
 
-    public SysRole(long roleName, long roleId, Guid? tenantId)
+    public SysRole(long roleName, Guid roleId, Guid? tenantId)
     {
         throw new NotImplementedException();
     }

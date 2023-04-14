@@ -23,15 +23,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
+using Volo.Abp.Guids;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.ObjectExtending;
+using Volo.Abp.PermissionManagement;
 using Volo.Abp.Security.Claims;
+using Volo.Abp.Users;
 using Volo.Abp.Validation;
 
 
@@ -41,15 +45,14 @@ namespace ABPvNextOrangeAdmin.System.Account;
 [Route("api/sys/account/[action]")]
 public class AccountAppService : ApplicationService, IAccountAppService
 {
+    // private IGuidGenerator GuidGenerator { get; set; }
     private JwtOptions JwtOptions { get; set; }
 
     private SignInManager SignInManager { get; set; }
 
-    // private UserRoleFinder UserRoleFinder { get; set; }
-
     private UserManager UserManager { get; set; }
 
-    // private IAccountEmailer AccountEmailer { get; set; }
+    // private IPermissionManager PermissionManager { get; set; }
 
     private IdentitySecurityLogManager IdentitySecurityLogManager { get; set; }
 
@@ -61,37 +64,23 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
     private IDistributedCache<String> DistributedCache { get; set; }
 
-    // private ITokenService TokenService { get; set; }
-
-    // private IRefreshTokenService RefreshTokenService { get; set; }
-
-
-    // private PermissionManager PermissionManager { get; }
-
     private MenuDomainService MenuDomainService { get; }
 
 
     public AccountAppService(UserManager userManager,
-        /*IAccountEmailer accountEmailer,*//*IdentitySecurityLogManager identitySecurityLogManager,*/
         IOptions<IdentityOptions> identityOptions, DefaultCaptcha defaultCaptcha,
-        ConfigDomainService configDomainService, IDistributedCache<String> distributedCache, /*ITokenService tokenService,*/
-        /*IRefreshTokenService refreshTokenService,*/ IOptions<JwtOptions> jwtOptions,
-        /*PermissionManager permissionManager,*/ /* UserRoleFinder userRoleFinder,*/
-        SignInManager signInManager, MenuDomainService menuDomainService)
+        ConfigDomainService configDomainService, IDistributedCache<String> distributedCache,
+        IOptions<JwtOptions> jwtOptions,
+        SignInManager signInManager, MenuDomainService menuDomainService /*,IPermissionManager permissionManager*/)
     {
         UserManager = userManager;
-        // AccountEmailer = accountEmailer;
-        // IdentitySecurityLogManager = identitySecurityLogManager;
         IdentityOptions = identityOptions;
         DefaultCaptcha = defaultCaptcha;
         ConfigDomainService = configDomainService;
         DistributedCache = distributedCache;
-        // TokenService = tokenService;
-        // RefreshTokenService = refreshTokenService;
-        // PermissionManager = permissionManager;
-        // UserRoleFinder = userRoleFinder;
         SignInManager = signInManager;
         MenuDomainService = menuDomainService;
+        // PermissionManager = permissionManager;
         JwtOptions = jwtOptions.Value;
     }
 
@@ -103,12 +92,12 @@ public class AccountAppService : ApplicationService, IAccountAppService
     [HttpPost]
     [AllowAnonymous]
     [ActionName("register")]
-    public async Task<CommonResult<IdentityUserDto>> RegisterAsync(RegisterInput input)
+    public async Task<CommonResult<SysUserOutput>> RegisterAsync(RegisterInput input)
     {
         await IdentityOptions.SetAsync();
 
         //创建新用户
-        var user = new SysUser( input.UserName, input.EmailAddress, input.Password, CurrentTenant.Id); 
+        var user = new SysUser(GuidGenerator.Create(),input.UserName, input.EmailAddress, input.Password, CurrentTenant.Id);
         input.MapExtraPropertiesTo(user);
 
         (await UserManager.CreateAsync(user, input.Password)).CheckErrors();
@@ -116,12 +105,12 @@ public class AccountAppService : ApplicationService, IAccountAppService
         await UserManager.SetEmailAsync(user, input.EmailAddress);
         await UserManager.AddDefaultRolesAsync(user);
 
-        var identityUserDto = ObjectMapper.Map<SysUser, IdentityUserDto>(user);
-        return CommonResult<IdentityUserDto>.Success(identityUserDto, "注册账户完成");
+        var identityUserDto = ObjectMapper.Map<SysUser, SysUserOutput>(user);
+        return CommonResult<SysUserOutput>.Success(identityUserDto, "注册账户完成");
     }
 
     /// <summary>
-    /// 用户注册
+    /// 用户登录
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
@@ -135,7 +124,18 @@ public class AccountAppService : ApplicationService, IAccountAppService
         // 验证码开关
         if (captchaOnOff)
         {
-            await ValidateCaptcha(input.UserNameOrEmailAddress, input.Code, input.Uuid);
+            try
+            {
+                await ValidateCaptcha(input.UserNameOrEmailAddress, input.Code, input.Uuid);
+            }
+            catch (CaptchaExpireException ex)
+            {
+                return CommonResult<String>.Failed(ResultCode.CAPTCHAEXPIRE, ex.Message /*"验证码超时"*/);
+            }
+            catch (CaptchaException ex)
+            {
+                return CommonResult<String>.Failed(ResultCode.CAPTCHAERROR, ex.Message /*"验证码错误"*/);
+            }
         }
 
         ValidateLoginInfo(input);
@@ -155,13 +155,16 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
         var token = GenerateAccessToken(await UserManager.FindByNameAsync(input.UserNameOrEmailAddress));
 
-        //登录日志
-        await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()
+        if (IdentitySecurityLogManager != null)
         {
-            Identity = IdentitySecurityLogIdentityConsts.Identity,
-            Action = SignInResultExtensions.ToIdentitySecurityLogAction(signInResult),
-            UserName = input.UserNameOrEmailAddress
-        });
+            //登录日志
+            await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()
+            {
+                Identity = IdentitySecurityLogIdentityConsts.Identity,
+                Action = SignInResultExtensions.ToIdentitySecurityLogAction(signInResult),
+                UserName = input.UserNameOrEmailAddress
+            });
+        }
 
         return CommonResult<String>.Success(signInResult.Succeeded ? token : "", "");
     }
@@ -174,12 +177,14 @@ public class AccountAppService : ApplicationService, IAccountAppService
     [ActionName("logout")]
     public async Task<CommonResult<string>> LogoutAsync()
     {
-        await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()
+        if (IdentitySecurityLogManager != null)
         {
-            Identity = IdentitySecurityLogIdentityConsts.Identity,
-            Action = IdentitySecurityLogActionConsts.Logout
-        });
-
+            await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()
+            {
+                Identity = IdentitySecurityLogIdentityConsts.Identity,
+                Action = IdentitySecurityLogActionConsts.Logout
+            });
+        }
 
         await SignInManager.SignOutAsync();
 
@@ -226,20 +231,20 @@ public class AccountAppService : ApplicationService, IAccountAppService
     /// 生成验证码 
     /// </summary>
     /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
     [HttpGet]
     [ActionName("captchaImage")]
     [AllowAnonymous]
     public async Task<CommonResult<CaptchaCodeOutput>> GetCaptchaImageAsync()
     {
-        var guid = GuidGenerator.Create();
         String capText = DefaultCaptcha.createText();
 
         byte[] image = DefaultCaptcha.createImage(capText);
         var uuid = GuidGenerator.Create();
+
         String verifyKey = CommonConstants.CAPTCHA_CODE_KEY + uuid;
         await DistributedCache.SetAsync(verifyKey, capText,
             new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(120) });
+        Logger.LogInformation(string.Format("生成验证码： uuid is {0},  Image is {1}", uuid, capText));
         return CommonResult<CaptchaCodeOutput>.Success(
             CaptchaCodeOutput.CreateInstance(uuid.ToString(), image), "生成验证码成功");
     }
@@ -253,12 +258,13 @@ public class AccountAppService : ApplicationService, IAccountAppService
     public async Task<CommonResult<UserWithRoleAndPermissionOutput>> GetUserInfoAsync()
     {
         Debug.Assert(CurrentUser.Id != null, (string)"CurrentUser.Id != null");
-        var identityUser = await UserManager.GetByIdAsync(CurrentUser.Id.Value);
+        var sysUser = await UserManager.GetByIdAsync(CurrentUser.Id.Value);
 
 
-        var user = ObjectMapper.Map<SysUser, IdentityUserDto>(identityUser);
+        var sysUserOutput = ObjectMapper.Map<SysUser, SysUserOutput>(sysUser);
         //获取角色名称
-        String[] roleNamnes; //=await UserRoleFinder.GetRolesAsync((Guid)CurrentUser.Id); //IdentityUserRepository.GetRoleNamesAsync((Guid)CurrentUser.Id);
+        IList<string> roleNames =
+            await UserManager.GetRolesAsync(sysUser); //IdentityUserRepository.GetRoleNamesAsync((Guid)CurrentUser.Id);
 
 
         HashSet<String> permissionNames = new HashSet<string>();
@@ -274,8 +280,8 @@ public class AccountAppService : ApplicationService, IAccountAppService
         //         }
         //     }
         // }
-
-        // 获取用户权限
+        //
+        // //获取用户权限
         // var withGrantedUserPermissions =
         //     await PermissionManager.GetAllAsync(PermissionConstans.User, CurrentUser.Id.ToString());
         // foreach (var userPermission in withGrantedUserPermissions)
@@ -287,16 +293,18 @@ public class AccountAppService : ApplicationService, IAccountAppService
         // }
 
         return CommonResult<UserWithRoleAndPermissionOutput>.Success(
-            UserWithRoleAndPermissionOutput.CreateInstance(user, new string[] { }/*roleNamnes*/, permissionNames.ToArray()), "获取用户信息");
+            UserWithRoleAndPermissionOutput.CreateInstance(sysUserOutput, roleNames.ToArray(),
+                permissionNames.ToArray()), "获取用户信息");
     }
 
     [HttpGet]
     [ActionName("getRouters")]
     public async Task<CommonResult<List<RouteOutput>>> GetRouters()
     {
-        List<SysMenu> menus =await MenuDomainService.GetMenuTreeByUserId(0,CurrentUser.IsAdmin());
-        List<RouteOutput>  routes  =BuildMenuRoutes(menus);
-        return CommonResult<List<RouteOutput>>.Success(routes,"获取路由信息成功" );
+        Debug.Assert(CurrentUser.Id != null, (string)"CurrentUser.Id != null");
+        List<SysMenu> menus = await MenuDomainService.GetMenuTreeByUserId(CurrentUser.Id.Value, CurrentUser.IsAdmin());
+        List<RouteOutput> routes = BuildMenuRoutes(menus);
+        return CommonResult<List<RouteOutput>>.Success(routes, "获取路由信息成功");
     }
 
     /// <summary>
@@ -310,6 +318,8 @@ public class AccountAppService : ApplicationService, IAccountAppService
     {
         String verifyKey = CommonConstants.CAPTCHA_CODE_KEY + StringUtils.Nvl(uuid, "");
         String captcha = (await DistributedCache.GetAsync(verifyKey));
+
+        Logger.LogInformation(string.Format("收到验证码， UUID is {0}, text is {1}", uuid, captcha));
         await DistributedCache.RemoveAsync(verifyKey);
         if (captcha == null)
         {
@@ -321,7 +331,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
             throw new CaptchaException();
         }
     }
-    
+
     /// <summary>
     /// 检验用户信息
     /// </summary>
@@ -415,21 +425,21 @@ public class AccountAppService : ApplicationService, IAccountAppService
         {
             Subject = new ClaimsIdentity(claims),
             Expires = expirationTime,
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key){},
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key) { },
                 SecurityAlgorithms.HmacSha256Signature)
         };
         var handler = new JwtSecurityTokenHandler();
         var token = handler.CreateToken(tokenDescriptor);
         return handler.WriteToken(token);
     }
-    
-    
+
+
     /// <summary>
     /// 构建前端路由所需要的菜单
     /// </summary>
     /// <param name="menus"></param>
     /// <returns></returns>
-    private  List<RouteOutput> BuildMenuRoutes(List<SysMenu> menus)
+    private List<RouteOutput> BuildMenuRoutes(List<SysMenu> menus)
     {
         List<RouteOutput> routers = new List<RouteOutput>();
         foreach (SysMenu menu in menus)
@@ -438,7 +448,8 @@ public class AccountAppService : ApplicationService, IAccountAppService
             router.Hidden = "1".Equals(menu.Visible);
             router.Name = menu.GetRouteName();
             router.Path = menu.GetRouterPath();
-            router.Component = menu.GetComponent();;
+            router.Component = menu.GetComponent();
+            ;
             router.Query = menu.Query;
             router.Meta = new MetaVo(menu.MenuName, menu.Icon, StringUtils.Equals("0", menu.IsCache), menu.Path);
             List<SysMenu> cMenus = menu.Children.ToList();
@@ -475,8 +486,10 @@ public class AccountAppService : ApplicationService, IAccountAppService
                 childrenList.Add(children);
                 router.Children = childrenList;
             }
+
             routers.Add(router);
         }
+
         return routers;
     }
 }

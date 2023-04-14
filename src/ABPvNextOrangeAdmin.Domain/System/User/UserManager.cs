@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ABPvNextOrangeAdmin.System.User.Exstension;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -11,16 +12,18 @@ using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Services;
 
+
 namespace ABPvNextOrangeAdmin.System.User;
 
-public class UserManager : UserManager<SysUser>, IDomainService
+public class UserManager : Microsoft.AspNetCore.Identity.UserManager<SysUser>, IDomainService
+
 {
     public UserManager(IUserStore<SysUser> store, IOptions<IdentityOptions> optionsAccessor,
         IPasswordHasher<SysUser> passwordHasher, IEnumerable<IUserValidator<SysUser>> userValidators,
         IEnumerable<IPasswordValidator<SysUser>> passwordValidators, ILookupNormalizer keyNormalizer,
-        IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager> logger,
+        IOptions<SysUserErrorDescriber> errors, IServiceProvider services, ILogger<UserManager> logger,
         IUserRepository userRepository, IRoleRepository roleRepository) : base(store, optionsAccessor, passwordHasher, userValidators,
-        passwordValidators, keyNormalizer, errors, services, logger)
+        passwordValidators, keyNormalizer, errors.Value, services, logger)
     {
         UserRepository = userRepository;
         RoleRepository = roleRepository;
@@ -52,6 +55,18 @@ public class UserManager : UserManager<SysUser>, IDomainService
 
         return user;
     }
+    
+    public virtual async Task<SysUser> GetByNameAsync(String Name)
+    {
+        SysUser user =  await Store.FindByNameAsync(Name, CancellationToken);
+        if (user == null)
+        {
+            throw new EntityNotFoundException(typeof(SysUser), Name);
+        }
+
+        return user;
+    }
+
     
     public virtual async Task<IdentityResult> SetRolesAsync([NotNull] SysUser user,
         [NotNull] IEnumerable<string> roleNames)

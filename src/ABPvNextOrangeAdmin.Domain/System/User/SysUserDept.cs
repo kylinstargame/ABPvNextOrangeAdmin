@@ -12,7 +12,7 @@ public class SysUserDept : FullAuditedEntity
     /// <summary>
     /// 用户ID
     /// </summary>
-    public long UserId { get; set; }
+    public Guid UserId { get; set; }
 
     /// <summary>
     /// 角色ID
@@ -29,14 +29,14 @@ public class SysUserDept : FullAuditedEntity
     {
     }
 
-    public SysUserDept(long userId, long deptId, Guid? tenantId)
+    public SysUserDept(Guid userId, long deptId, Guid? tenantId)
     {
         _tenantId = tenantId;
         UserId = userId;
         DeptId = deptId;
     }
 
-    public static List<SysUserDept> CreateInstances(long userId, int[] deptIds)
+    public static List<SysUserDept> CreateInstances(Guid userId, int[] deptIds)
     {
         List<SysUserDept> userDepts = new List<SysUserDept>();
         foreach (var deptId in deptIds)

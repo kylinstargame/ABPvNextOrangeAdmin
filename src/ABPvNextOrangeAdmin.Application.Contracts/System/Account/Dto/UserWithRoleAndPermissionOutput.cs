@@ -10,7 +10,7 @@ public class UserWithRoleAndPermissionOutput
     /// <summary>
     /// 用户信息
     /// </summary>
-    public IdentityUserDto User { get; set; }
+    public SysUserOutput User { get; set; }
 
     /// <summary>
     /// 角色信息
@@ -23,14 +23,14 @@ public class UserWithRoleAndPermissionOutput
     /// </summary>
     public String[] Permissions { get;}
 
-    private UserWithRoleAndPermissionOutput(IdentityUserDto user, string[] roles, string[] permissions)
+    private UserWithRoleAndPermissionOutput(SysUserOutput user, string[] roles, string[] permissions)
     {
         User = user;
         Roles = roles;
         Permissions = permissions;
     }
 
-    public static UserWithRoleAndPermissionOutput CreateInstance(IdentityUserDto user, string[] roles, string[] permissions)
+    public static UserWithRoleAndPermissionOutput CreateInstance(SysUserOutput user, string[] roles, string[] permissions)
     {
         return new UserWithRoleAndPermissionOutput(user, roles, permissions);
     }

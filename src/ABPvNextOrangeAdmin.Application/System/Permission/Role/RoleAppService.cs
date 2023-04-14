@@ -23,12 +23,12 @@ public class RoleAppService : ApplicationService, IRoleAppService
 
     [HttpGet]
     [ActionName("list")]
-    public async Task<CommonResult<PagedResultDto<RoleOutput>>> GetListAsync(RoleListInput input)
+    public async Task<CommonResult<PagedResultDto<SysRoleOutput>>> GetListAsync(RoleListInput input)
     {
         var identityRoles = await this.roleRepository.GetListAsync();
-        var roleOutputs = ObjectMapper.Map<List<IdentityRole>, List<RoleOutput>>(identityRoles);
-        return CommonResult<PagedResultDto<RoleOutput>>.Success(
-            new PagedResultDto<RoleOutput>((long) roleOutputs.Count, roleOutputs), "");
+        var roleOutputs = ObjectMapper.Map<List<IdentityRole>, List<SysRoleOutput>>(identityRoles);
+        return CommonResult<PagedResultDto<SysRoleOutput>>.Success(
+            new PagedResultDto<SysRoleOutput>((long) roleOutputs.Count, roleOutputs), "");
     }
     
     

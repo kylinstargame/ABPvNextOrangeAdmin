@@ -14,7 +14,7 @@ public class SysUserRole : FullAuditedEntity
     /// <summary>
     /// 用户ID
     /// </summary>
-    public long UserId { get; set; }
+    public Guid UserId { get; set; }
 
     /// <summary>
     /// 角色ID
@@ -31,14 +31,14 @@ public class SysUserRole : FullAuditedEntity
     {
     }
 
-    public SysUserRole(long userId, long roleId,  Guid? tenantId)
+    public SysUserRole(Guid userId, long roleId,  Guid? tenantId)
     {
         _tenantId = tenantId;
         UserId = userId;
         RoleId = roleId;
     }
 
-    public static List<SysUserRole> CreateInstances(long userId, int[] roleIds)
+    public static List<SysUserRole> CreateInstances(Guid userId, long[] roleIds)
     {
         List<SysUserRole> userRoles = new List<SysUserRole>();
         foreach (var roleId in roleIds)

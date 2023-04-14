@@ -8,34 +8,47 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Volo.Abp.DependencyInjection;
+using UserManager = ABPvNextOrangeAdmin.System.User.UserManager;
 
 namespace ABPvNextOrangeAdmin.System;
 
 public class SignInManager : SignInManager<SysUser>, ITransientDependency
 {
-    public SignInManager(UserManager<SysUser> userManager, IHttpContextAccessor contextAccessor, IUserClaimsPrincipalFactory<SysUser> claimsFactory, IOptions<IdentityOptions> optionsAccessor, ILogger<SignInManager<SysUser>> logger, IAuthenticationSchemeProvider schemes, IUserConfirmation<SysUser> confirmation) : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
+    public SignInManager(UserManager userManager, IHttpContextAccessor contextAccessor,
+        IUserClaimsPrincipalFactory<SysUser> claimsFactory, IOptions<IdentityOptions> optionsAccessor,
+        ILogger<SignInManager<SysUser>> logger, IAuthenticationSchemeProvider schemes,
+        IUserConfirmation<SysUser> confirmation, IOptions<SignInOptions> signInOption)
+        : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
     {
+        SignInOptions = signInOption.Value;
     }
 
-    public SignInManager(UserManager userManager, IHttpContextAccessor contextAccessor, IUserClaimsPrincipalFactory<SysUser> claimsFactory, IOptions<IdentityOptions> optionsAccessor, ILogger<SignInManager<SysUser>> logger, IAuthenticationSchemeProvider schemes, IUserConfirmation<SysUser> confirmation) : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
-    {
-    }
 
-    protected SysUserOptions Options { get; }
+    protected SignInOptions SignInOptions{ get; }
 
     protected override async Task<SignInResult> PreSignInCheck(SysUser user)
     {
-        if (user.IsActive)
+        if (!user.IsActive)
         {
-            Logger.LogWarning($"The user is not active therefore cannot login! (username: {user.UserName}, id:{user.Id})");
+            Logger.LogWarning("The user is not active therefore cannot login! (username: {0}, id:{1})", user.UserName, user.Id);
             return SignInResult.NotAllowed;
         }
-        return await base.PreSignInCheck(user);
+        
+        return  await base.PreSignInCheck(user);
     }
 
-    public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
+    /// <summary>
+    /// 密码登录
+    /// </summary>
+    /// <param name="userName">用户名</param>
+    /// <param name="password">密码</param>
+    /// <param name="isPersistent">记住我</param>
+    /// <param name="lockoutOnFailure">登录失败是否锁定账户</param>
+    /// <returns></returns>
+    public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent,
+        bool lockoutOnFailure)
     {
-        foreach (var externalLoginProviderInfo in Options.ExternalLoginProviders.Values)
+        foreach (var externalLoginProviderInfo in SignInOptions.ExternalLoginProviders.Values)
         {
             var externalLoginProvider = (IExternalLoginProvider)Context.RequestServices
                 .GetRequiredService(externalLoginProviderInfo.Type);
@@ -46,7 +59,8 @@ public class SignInManager : SignInManager<SysUser>, ITransientDependency
                 {
                     if (externalLoginProvider is IExternalLoginProviderWithPassword externalLoginProviderWithPassword)
                     {
-                        user = await externalLoginProviderWithPassword.CreateUserAsync(userName, externalLoginProviderInfo.Name, password);
+                        user = await externalLoginProviderWithPassword.CreateUserAsync(userName,
+                            externalLoginProviderInfo.Name, password);
                     }
                     else
                     {
@@ -55,9 +69,11 @@ public class SignInManager : SignInManager<SysUser>, ITransientDependency
                 }
                 else
                 {
-                    if (externalLoginProvider is IExternalLoginProviderWithPassword externalLoginProviderWithPassword)
+                    var externalLoginProviderWithPassword = externalLoginProvider as IExternalLoginProviderWithPassword;
+                    if (externalLoginProviderWithPassword != null)
                     {
-                        await externalLoginProviderWithPassword.UpdateUserAsync(user, externalLoginProviderInfo.Name, password);
+                        await externalLoginProviderWithPassword.UpdateUserAsync(user, externalLoginProviderInfo.Name,
+                            password);
                     }
                     else
                     {

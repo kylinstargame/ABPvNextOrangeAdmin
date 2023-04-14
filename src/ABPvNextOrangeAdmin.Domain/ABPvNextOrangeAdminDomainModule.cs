@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using ABPvNextOrangeAdmin.MultiTenancy;
+using ABPvNextOrangeAdmin.System.User;
+using Microsoft.AspNetCore.Identity;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
 using Volo.Abp.Emailing;

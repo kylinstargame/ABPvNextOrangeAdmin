@@ -9,7 +9,8 @@ namespace ABPvNextOrangeAdmin.System;
 public class UserClaimsPrincipalFactory : UserClaimsPrincipalFactory<SysUser, SysRole>,
     ITransientDependency
 {
-    public UserClaimsPrincipalFactory(UserManager<SysUser> userManager, RoleManager<SysRole> roleManager, IOptions<IdentityOptions> options) : base(userManager, roleManager, options)
+    public UserClaimsPrincipalFactory(UserManager userManager, SysRoleManager sysRoleManager, IOptions<IdentityOptions> options) 
+        : base(userManager, sysRoleManager, options)
     {
     }
 }

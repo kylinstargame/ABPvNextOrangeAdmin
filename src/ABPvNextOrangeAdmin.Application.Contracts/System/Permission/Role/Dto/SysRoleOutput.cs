@@ -2,7 +2,7 @@ using System;
 
 namespace ABPvNextOrangeAdmin.System.Permission.Dto;
 
-public class RoleOutput
+public class SysRoleOutput
 {
     /// <summary>
     /// 角色名称
@@ -28,6 +28,6 @@ public class RoleOutput
     /// <summary>
     /// 创建事件
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreationTime { get; set; }
 
 }   

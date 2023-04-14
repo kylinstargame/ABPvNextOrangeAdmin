@@ -66,9 +66,19 @@ public class CommonResult<T>
      * 失败返回结果
      * @param errorCode 错误码
      */
-    public static CommonResult<T> failed(IErrorCode errorCode)
+    public static CommonResult<T> Failed(IErrorCode errorCode)
     {
         return CreateInstance(errorCode.getCode(), errorCode.getMessage(), null);
+    }
+    
+    /**
+     * 失败返回结果
+     * @param errorCode 错误码
+     * @param message 错误信息
+     */
+    public static CommonResult<T> Failed(long errorCode, String message)
+    {
+        return CreateInstance(errorCode, message, null);
     }
 
     /**
@@ -94,9 +104,9 @@ public class CommonResult<T>
      * 失败返回结果
      * <param name="errorCode"></param>
      */
-    public static CommonResult<T> failed(long errorCode)
+    public static CommonResult<T> Failed(long errorCode)
     {
-        return failed(ResultCode.FAILED);
+        return Failed(ResultCode.FAILED);
     }
 
     /**
@@ -104,7 +114,7 @@ public class CommonResult<T>
      */
     public static CommonResult<T> validateFailed()
     {
-        return failed(ResultCode.NOTFOUND);
+        return Failed(ResultCode.NOTFOUND);
     }
 
     /**
