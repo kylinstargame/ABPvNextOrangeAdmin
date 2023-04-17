@@ -18,6 +18,10 @@ public class ConfigDataSeedContributor : IDataSeedContributor, ITransientDepende
 
     public async Task SeedAsync(DataSeedContext context)
     {
+        //清空所有配置
+        var configs = await _configRepository.GetListAsync();
+        await _configRepository.HardDeleteAsync(await _configRepository.GetListAsync());
+        
         List<SysConfig> sysConfigs = new List<SysConfig>();
 
         sysConfigs.Add(new SysConfig("主框架页-默认皮肤样式名称", "sys.index.skinName", "skin-blue", "Y",

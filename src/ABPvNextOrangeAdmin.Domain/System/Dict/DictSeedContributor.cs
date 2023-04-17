@@ -3,22 +3,25 @@ using System.Threading.Tasks;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Uow;
 
 namespace ABPvNextOrangeAdmin.System.Dict;
 
 public class DictSeedContributor : IDataSeedContributor, ITransientDependency
 {
-    IRepository<SysDictData> DictDataRepository;
-    IRepository<SysDictType> DictTypeRepository;
+    IRepository<SysDictData> _dictDataRepository;
+    IRepository<SysDictType> _dictTypeRepository;
 
     public DictSeedContributor(IRepository<SysDictData> dictDataRepository, IRepository<SysDictType> dictTypeRepository)
     {
-        DictDataRepository = dictDataRepository;
-        DictTypeRepository = dictTypeRepository;
+        _dictDataRepository = dictDataRepository;
+        _dictTypeRepository = dictTypeRepository;
     }
 
     public async Task SeedAsync(DataSeedContext context)
     {
+
+        await _dictTypeRepository.HardDeleteAsync(await _dictTypeRepository.GetListAsync());
         List<SysDictType> sysDictTypes = new List<SysDictType>();
         sysDictTypes.Add(new SysDictType(1, "用户性别", "sys_user_sex", "0", "用户性别列表"));
         sysDictTypes.Add(new SysDictType(2, "菜单状态", "sys_show_hide", "0", "菜单状态列表"));
@@ -30,16 +33,18 @@ public class DictSeedContributor : IDataSeedContributor, ITransientDependency
         sysDictTypes.Add(new SysDictType(8, "通知状态", "sys_notice_status", "0", "通知状态列表"));
         sysDictTypes.Add(new SysDictType(9, "操作类型", "sys_oper_type", "0", "操作类型列表"));
         sysDictTypes.Add(new SysDictType(10, "系统状态", "sys_common_status", "0", "登录状态列表"));
-        int count = await DictTypeRepository.CountAsync();
+        int count = await _dictTypeRepository.CountAsync();
         if (count <= 0)
         {
-            await DictTypeRepository.InsertManyAsync(sysDictTypes);
+            await _dictTypeRepository.InsertManyAsync(sysDictTypes);
         }
         // else
         // {
         //      await DictTypeRepository.UpdateManyAsync(sysDictTypes);           
         // }
 
+        var dictDatas =await _dictDataRepository.GetListAsync();
+        await _dictDataRepository.HardDeleteAsync(await _dictDataRepository.GetListAsync());
         List<SysDictData> sysDictDatas = new List<SysDictData>();
         sysDictDatas.Add(new SysDictData(1, 1, "男", "0", "sys_user_sex", "", "Y", "0", "性别男"));
         sysDictDatas.Add(new SysDictData(2, 2, "女", "1", "sys_user_sex", "", "N", "0", "性别女"));
@@ -69,14 +74,14 @@ public class DictSeedContributor : IDataSeedContributor, ITransientDependency
         sysDictDatas.Add(new SysDictData(26, 9, "清空数据", "9", "sys_oper_type", "danger", "N", "0", "清空操作"));
         sysDictDatas.Add(new SysDictData(27, 1, "成功", "0", "sys_common_status", "primary", "N", "0", "正常状态"));
         sysDictDatas.Add(new SysDictData(28, 2, "失败", "1", "sys_common_status", "danger", "N", "0", "停用状态"));
-        count = await DictDataRepository.CountAsync();
+        count = await _dictDataRepository.CountAsync();
         if (count <= 0)
         {
-            await DictDataRepository.InsertManyAsync(sysDictDatas);
+            await _dictDataRepository.InsertManyAsync(sysDictDatas);
         }
-        // else
-        // {
-        //     await DictDataRepository.UpdateManyAsync(sysDictDatas);           
-        // }
+        else
+        {
+            await _dictDataRepository.UpdateManyAsync(sysDictDatas);           
+        }
     }
 }

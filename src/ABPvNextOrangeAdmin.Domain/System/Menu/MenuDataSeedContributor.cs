@@ -18,6 +18,7 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
 
     public async Task SeedAsync(DataSeedContext context)
     {
+        await _menuRepository.HardDeleteAsync(await _menuRepository.GetListAsync());
         List<SysMenu> menus = new List<SysMenu>();
         // "menu_id", "menu_name", "parent_id", "order_num", "path", "component", "query", "is_frame", "is_cache", "menu_type", "visible", "status", "perms", "icon", "create_by", "create_time", "update_by", "update_time", "remark"
 

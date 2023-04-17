@@ -1,4 +1,7 @@
 using System;
+using System.Linq;
+using ABPvNextOrangeAdmin.System.Dept;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.Identity;
 using Volo.Abp.MultiTenancy;
@@ -62,4 +65,20 @@ public class SysRole : FullAuditedAggregateRoot<long>, IMultiTenant
     /// 租户标识
     /// </summary>
     public Guid? TenantId { get; }
+}
+
+
+public static class RoleCoreQueryableExtensions
+{
+    public static IQueryable<SysRole> IncludeDetails(this IQueryable<SysRole> queryable, bool include = true)
+    {
+        if (!include)
+        {
+            return queryable;
+        }
+
+        return queryable;
+        // return queryable
+        //     .Include(x => x.Claims);
+    }
 }

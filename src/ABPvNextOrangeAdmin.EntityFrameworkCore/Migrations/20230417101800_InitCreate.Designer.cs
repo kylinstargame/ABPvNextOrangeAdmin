@@ -12,7 +12,7 @@ using Volo.Abp.EntityFrameworkCore;
 namespace ABPvNextOrangeAdmin.Migrations
 {
     [DbContext(typeof(ABPvNextOrangeAdminDbContext))]
-    [Migration("20230414034823_InitCreate")]
+    [Migration("20230417101800_InitCreate")]
     partial class InitCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -79,6 +79,88 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("sys_config", (string)null);
+                });
+
+            modelBuilder.Entity("ABPvNextOrangeAdmin.System.Dept.SysDept", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Ancestors")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("DeptName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ExtraProperties")
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<string>("Leader")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("TenantId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("sys_dept", (string)null);
                 });
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Dict.SysDictData", b =>
@@ -290,90 +372,6 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.ToTable("sys_menu", (string)null);
                 });
 
-            modelBuilder.Entity("ABPvNextOrangeAdmin.System.Organization.SysDept", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Ancestors")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("ConcurrencyStamp");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("DeleterId");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("DeletionTime");
-
-                    b.Property<string>("DeptName")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ExtraProperties")
-                        .HasColumnType("longtext")
-                        .HasColumnName("ExtraProperties");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false)
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<string>("Leader")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<long>("ParentId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid?>("SysUserId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("TenantId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SysUserId");
-
-                    b.ToTable("sys_dept", (string)null);
-                });
-
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Organization.SysPost", b =>
                 {
                     b.Property<long>("Id")
@@ -479,7 +477,16 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("LastModifierId");
 
+                    b.Property<long?>("SysDeptId")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("TenantId");
+
                     b.HasKey("RoleId", "DeptId");
+
+                    b.HasIndex("SysDeptId");
 
                     b.ToTable("sys_role_dept", (string)null);
                 });
@@ -665,7 +672,8 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .HasColumnType("varchar(40)")
                         .HasColumnName("ConcurrencyStamp");
 
-                    b.Property<DateTime>("CreationTime")
+                    b.Property<DateTime?>("CreationTime")
+                        .IsRequired()
                         .HasColumnType("datetime(6)")
                         .HasColumnName("CreationTime");
 
@@ -788,7 +796,12 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("LastModifierId");
 
+                    b.Property<Guid?>("SysUserId")
+                        .HasColumnType("char(36)");
+
                     b.HasKey("UserId", "DeptId");
+
+                    b.HasIndex("SysUserId");
 
                     b.ToTable("sys_user_dept", (string)null);
                 });
@@ -1364,17 +1377,24 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .HasForeignKey("SysMenuId");
                 });
 
-            modelBuilder.Entity("ABPvNextOrangeAdmin.System.Organization.SysDept", b =>
+            modelBuilder.Entity("ABPvNextOrangeAdmin.System.Organization.SysRoleDept", b =>
                 {
-                    b.HasOne("ABPvNextOrangeAdmin.System.User.SysUser", null)
-                        .WithMany("Depts")
-                        .HasForeignKey("SysUserId");
+                    b.HasOne("ABPvNextOrangeAdmin.System.Dept.SysDept", null)
+                        .WithMany("Roles")
+                        .HasForeignKey("SysDeptId");
                 });
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Roles.SysUserRole", b =>
                 {
                     b.HasOne("ABPvNextOrangeAdmin.System.User.SysUser", null)
                         .WithMany("Roles")
+                        .HasForeignKey("SysUserId");
+                });
+
+            modelBuilder.Entity("ABPvNextOrangeAdmin.System.User.SysUserDept", b =>
+                {
+                    b.HasOne("ABPvNextOrangeAdmin.System.User.SysUser", null)
+                        .WithMany("Depts")
                         .HasForeignKey("SysUserId");
                 });
 
@@ -1419,6 +1439,11 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ABPvNextOrangeAdmin.System.Dept.SysDept", b =>
+                {
+                    b.Navigation("Roles");
                 });
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Menu.SysMenu", b =>

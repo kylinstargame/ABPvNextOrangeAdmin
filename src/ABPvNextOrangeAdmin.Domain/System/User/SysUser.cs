@@ -5,6 +5,7 @@ using System.Linq;
 using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Organization;
 using ABPvNextOrangeAdmin.System.Roles;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
@@ -171,7 +172,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
     /// <summary>
     /// 关联部门
     /// </summary>
-    public ICollection<SysDept> Depts { get;  set; }
+    public ICollection<SysUserDept> Depts { get;  set; }
 
 
     public bool IsInRole(long roleId)
@@ -204,5 +205,48 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         }
 
         Roles.RemoveAll(r => r.RoleId == roleId);
+    }
+
+    public bool IsInDept(long deptId)
+    {
+        return Depts.Any(dept=>dept.DeptId == deptId);
+    }
+    
+    public void AddDept(long deptId)
+    {
+        if (this.IsInDept(deptId))
+        {
+            return;
+        }
+
+        this.Depts.Add(new  SysUserDept(Id, deptId, TenantId));
+    }
+
+    public void RemoveOrganizationUnit(long deptId)
+    {
+        if (this.IsInDept(deptId))
+        {
+            return;
+        }
+        Depts.RemoveAll<SysUserDept>((Func<SysUserDept, bool>) (userDept => userDept.DeptId == deptId));
+    }
+
+}
+
+public static class UserEfCoreQueryableExtensions
+{
+    public static IQueryable<SysUser> IncludeDetails(this IQueryable<SysUser> queryable, bool include = true)
+    {
+        if (!include)
+        {
+            return queryable;
+        }
+
+        return queryable
+            .Include(x => x.Roles)
+            .Include(x => x.Logins)
+            // .Include(x => x.Claims)
+            // .Include(x => x.Tokens)
+            .Include(x => x.Depts);
     }
 }

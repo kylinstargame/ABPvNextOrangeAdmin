@@ -35,6 +35,11 @@ public class SysUserDept : FullAuditedEntity
         UserId = userId;
         DeptId = deptId;
     }
+    public SysUserDept(Guid userId, long deptId)
+    {
+        UserId = userId;
+        DeptId = deptId;
+    }
 
     public static List<SysUserDept> CreateInstances(Guid userId, int[] deptIds)
     {

@@ -55,6 +55,10 @@ class UserDataSeeder : IUserDataSeeder, ITransientDependency
         string adminPhone, string adminPassword,
         Guid? tenantId = null)
     {
+        //清空所有配置
+        
+        // await UserRepository.HardDeleteAsync(await UserRepository.GetListAsync());
+        
         Check.NotNullOrWhiteSpace(adminEmail, nameof(adminEmail));
         Check.NotNullOrWhiteSpace(adminPassword, nameof(adminPassword));
 

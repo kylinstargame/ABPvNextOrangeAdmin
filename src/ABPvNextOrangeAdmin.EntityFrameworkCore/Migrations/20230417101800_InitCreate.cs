@@ -120,6 +120,47 @@ namespace ABPvNextOrangeAdmin.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "sys_dept",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ParentId = table.Column<long>(type: "bigint", nullable: true),
+                    Ancestors = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DeptName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Code = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Order = table.Column<int>(type: "int", nullable: false),
+                    Leader = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PhoneNumber = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TenantId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    ExtraProperties = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ConcurrencyStamp = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreationTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    LastModificationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
+                    DeleterId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    DeletionTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_sys_dept", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "sys_dict_data",
                 columns: table => new
                 {
@@ -306,26 +347,6 @@ namespace ABPvNextOrangeAdmin.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "sys_role_dept",
-                columns: table => new
-                {
-                    RoleId = table.Column<long>(type: "bigint", nullable: false),
-                    DeptId = table.Column<long>(type: "bigint", nullable: false),
-                    CreationTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    CreatorId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    LastModificationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    LastModifierId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
-                    DeleterId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    DeletionTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_sys_role_dept", x => new { x.RoleId, x.DeptId });
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "sys_role_menu",
                 columns: table => new
                 {
@@ -418,6 +439,7 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     LoginTime = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreationTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: true),
                     LockoutEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     TenantId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
@@ -426,7 +448,6 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ConcurrencyStamp = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreationTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     CreatorId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     LastModificationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     LastModifierId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
@@ -437,26 +458,6 @@ namespace ABPvNextOrangeAdmin.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_sys_user", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "sys_user_dept",
-                columns: table => new
-                {
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    DeptId = table.Column<long>(type: "bigint", nullable: false),
-                    CreationTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    CreatorId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    LastModificationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    LastModifierId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
-                    DeleterId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    DeletionTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_sys_user_dept", x => new { x.UserId, x.DeptId });
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -540,6 +541,33 @@ namespace ABPvNextOrangeAdmin.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "sys_role_dept",
+                columns: table => new
+                {
+                    RoleId = table.Column<long>(type: "bigint", nullable: false),
+                    DeptId = table.Column<long>(type: "bigint", nullable: false),
+                    TenantId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    SysDeptId = table.Column<long>(type: "bigint", nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    LastModificationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
+                    DeleterId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    DeletionTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_sys_role_dept", x => new { x.RoleId, x.DeptId });
+                    table.ForeignKey(
+                        name: "FK_sys_role_dept_sys_dept_SysDeptId",
+                        column: x => x.SysDeptId,
+                        principalTable: "sys_dept",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "sys_TenantConnectionStrings",
                 columns: table => new
                 {
@@ -562,31 +590,12 @@ namespace ABPvNextOrangeAdmin.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "sys_dept",
+                name: "sys_user_dept",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ParentId = table.Column<long>(type: "bigint", nullable: false),
-                    Ancestors = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DeptName = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Order = table.Column<int>(type: "int", nullable: false),
-                    Leader = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PhoneNumber = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Email = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Status = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TenantId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    DeptId = table.Column<long>(type: "bigint", nullable: false),
                     SysUserId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    ExtraProperties = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ConcurrencyStamp = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CreationTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     CreatorId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     LastModificationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -597,9 +606,9 @@ namespace ABPvNextOrangeAdmin.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_sys_dept", x => x.Id);
+                    table.PrimaryKey("PK_sys_user_dept", x => new { x.UserId, x.DeptId });
                     table.ForeignKey(
-                        name: "FK_sys_dept_sys_user_SysUserId",
+                        name: "FK_sys_user_dept_sys_user_SysUserId",
                         column: x => x.SysUserId,
                         principalTable: "sys_user",
                         principalColumn: "Id");
@@ -738,11 +747,6 @@ namespace ABPvNextOrangeAdmin.Migrations
                 columns: new[] { "IsAbandoned", "NextTryTime" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_sys_dept_SysUserId",
-                table: "sys_dept",
-                column: "SysUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_sys_EntityChanges_AuditLogId",
                 table: "sys_EntityChanges",
                 column: "AuditLogId");
@@ -763,6 +767,11 @@ namespace ABPvNextOrangeAdmin.Migrations
                 column: "SysMenuId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_sys_role_dept_SysDeptId",
+                table: "sys_role_dept",
+                column: "SysDeptId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_sys_Settings_Name_ProviderName_ProviderKey",
                 table: "sys_Settings",
                 columns: new[] { "Name", "ProviderName", "ProviderKey" },
@@ -772,6 +781,11 @@ namespace ABPvNextOrangeAdmin.Migrations
                 name: "IX_sys_Tenants_Name",
                 table: "sys_Tenants",
                 column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_sys_user_dept_SysUserId",
+                table: "sys_user_dept",
+                column: "SysUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_sys_user_login_SysUserId",
@@ -794,9 +808,6 @@ namespace ABPvNextOrangeAdmin.Migrations
 
             migrationBuilder.DropTable(
                 name: "sys_config");
-
-            migrationBuilder.DropTable(
-                name: "sys_dept");
 
             migrationBuilder.DropTable(
                 name: "sys_dict_data");
@@ -842,6 +853,9 @@ namespace ABPvNextOrangeAdmin.Migrations
 
             migrationBuilder.DropTable(
                 name: "sys_EntityChanges");
+
+            migrationBuilder.DropTable(
+                name: "sys_dept");
 
             migrationBuilder.DropTable(
                 name: "sys_Tenants");

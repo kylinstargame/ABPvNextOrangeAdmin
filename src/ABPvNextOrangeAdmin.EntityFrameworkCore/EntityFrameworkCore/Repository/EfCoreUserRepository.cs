@@ -27,7 +27,7 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
     }
 
     public ILookupNormalizer LookNormalizer { get; set; }
-
+    
     public async Task<SysUser> FindByNormalizedUserNameAsync(string userName, bool includeDetails = true,
         CancellationToken cancellationToken = default)
     {
@@ -110,7 +110,7 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
             .WhereIf(roleId >= 0, sysUser => sysUser.Roles.Any(x => x.RoleId == roleId))
             .WhereIf(deptId >= 0,
                 identityUser =>
-                    identityUser.Depts.Any(x => x.Id == deptId))
+                    identityUser.Depts.Any(x => x.DeptId == deptId))
             .WhereIf(!string.IsNullOrWhiteSpace(userName), x => x.UserName == userName)
             .WhereIf(!string.IsNullOrWhiteSpace(phoneNumber), x => x.PhoneNumber == phoneNumber)
             .WhereIf(!string.IsNullOrWhiteSpace(emailAddress), x => x.Email == emailAddress)
