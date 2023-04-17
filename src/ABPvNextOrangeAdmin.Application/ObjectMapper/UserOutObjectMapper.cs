@@ -1,4 +1,5 @@
 using ABPvNextOrangeAdmin.System.Account.Dto;
+using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Organization.Dto;
 using ABPvNextOrangeAdmin.System.User;
 using ABPvNextOrangeAdmin.System.User.Dto;
@@ -31,18 +32,18 @@ public class UserOutObjectMapper : IObjectMapper<SysUser, SysUserOutput>, ITrans
 }
 
 
-public class DeptOutputObjectMapper : IObjectMapper<OrganizationUnit, SysDeptOutput>, ITransientDependency
+public class DeptOutputObjectMapper : IObjectMapper<SysDept, SysDeptOutput>, ITransientDependency
 {
-    public SysDeptOutput Map(OrganizationUnit source)
+    public SysDeptOutput Map(SysDept source)
     {
         return new SysDeptOutput();
     }
 
-    public SysDeptOutput Map(OrganizationUnit source, SysDeptOutput destination)
+    public SysDeptOutput Map(SysDept source, SysDeptOutput destination)
     {
         destination.Id = source.Id;
         destination.Code = source.Code;
-        destination.DeptName = source.DisplayName;
+        destination.DeptName = source.DeptName;
         destination.Leader =source.ExtraProperties.ContainsKey("Leader")? source.ExtraProperties["Leader"].ToString():""; 
         destination.Phone  =source.ExtraProperties.ContainsKey("Phone")? source.ExtraProperties["Phone"].ToString():""; 
         destination.Email =source.ExtraProperties.ContainsKey("Email")? source.ExtraProperties["Email"].ToString():""; 

@@ -35,7 +35,7 @@ public class DeptAppService : ApplicationService, IOrganizationService
     {
         var organizations = await DeptRepository.GetListAsync();
         var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptOutput>>(organizations);
-        var deptTree = BuildDeptTree(deptOutputs, Guid.Empty);
+        var deptTree = BuildDeptTree(deptOutputs, null);
         return CommonResult<List<SysDeptOutput>>.Success(deptTree, "获取部分树状结构成功");
     }
 
@@ -46,11 +46,11 @@ public class DeptAppService : ApplicationService, IOrganizationService
         long count = await DeptRepository.GetCountAsync();
         var organizations = await DeptRepository.GetListAsync();
         var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptOutput>>(organizations);
-        var deptTree = BuildDeptTree(deptOutputs, null);
-        return CommonResult<List<SysDeptOutput>>.Success(deptTree, "获取部分树状结构成功");
+        var deptTree = BuildDeptTree(deptOutputs, 1);
+        return CommonResult<List<SysDeptOutput>>.Success(deptTree, "获取部门树状结构成功");
     }
 
-    private List<SysDeptOutput> BuildDeptTree(List<SysDeptOutput> deptOutputs, Guid? parentId)
+    private List<SysDeptOutput> BuildDeptTree(List<SysDeptOutput> deptOutputs, long? parentId)
     {
         List<SysDeptOutput> returnDeptOutputs = new List<SysDeptOutput>();
         foreach (var deptOutput in deptOutputs)

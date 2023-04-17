@@ -4,9 +4,9 @@ using Volo.Abp.Application.Dtos;
 
 namespace ABPvNextOrangeAdmin.System.Organization.Dto;
 
-public class SysDeptOutput : EntityDto<Guid>
+public class SysDeptOutput : EntityDto<long>
 {
-    public Guid? ParentId { get; set; }
+    public long? ParentId { get; set; }
     public string Code { get; set; }
     public string DeptName { get; set; }
     public string Leader { get; set; }
