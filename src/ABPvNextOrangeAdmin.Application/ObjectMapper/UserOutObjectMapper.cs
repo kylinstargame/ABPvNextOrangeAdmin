@@ -22,15 +22,18 @@ public class UserOutObjectMapper : IObjectMapper<SysUser, SysUserOutput>, ITrans
     {
         destination.Id = source.Id;
         destination.UserName = source.UserName;
-        destination.NickName = source.ExtraProperties.ContainsKey("NickName")? source.ExtraProperties["NickName"].ToString():""; 
-        destination.Password = source.ExtraProperties.ContainsKey("Password")?source.ExtraProperties["Password"].ToString():"";
+        destination.NickName = source.ExtraProperties.ContainsKey("NickName")
+            ? source.ExtraProperties["NickName"].ToString()
+            : "";
+        destination.Password = source.ExtraProperties.ContainsKey("Password")
+            ? source.ExtraProperties["Password"].ToString()
+            : "";
         destination.PhoneNumber = source.PhoneNumber;
         destination.Email = source.Email;
-        destination.Sex = source.ExtraProperties.ContainsKey("Sex")?source.ExtraProperties["Sex"].ToString():"";
+        destination.Sex = source.ExtraProperties.ContainsKey("Sex") ? source.ExtraProperties["Sex"].ToString() : "";
         return destination;
     }
 }
-
 
 public class DeptOutputObjectMapper : IObjectMapper<SysDept, SysDeptOutput>, ITransientDependency
 {
@@ -44,9 +47,41 @@ public class DeptOutputObjectMapper : IObjectMapper<SysDept, SysDeptOutput>, ITr
         destination.Id = source.Id;
         destination.Code = source.Code;
         destination.DeptName = source.DeptName;
-        destination.Leader =source.ExtraProperties.ContainsKey("Leader")? source.ExtraProperties["Leader"].ToString():""; 
-        destination.Phone  =source.ExtraProperties.ContainsKey("Phone")? source.ExtraProperties["Phone"].ToString():""; 
-        destination.Email =source.ExtraProperties.ContainsKey("Email")? source.ExtraProperties["Email"].ToString():""; 
+        destination.Leader = source.ExtraProperties.ContainsKey("Leader")
+            ? source.ExtraProperties["Leader"].ToString()
+            : "";
+        destination.Phone = source.ExtraProperties.ContainsKey("Phone")
+            ? source.ExtraProperties["Phone"].ToString()
+            : "";
+        destination.Email = source.ExtraProperties.ContainsKey("Email")
+            ? source.ExtraProperties["Email"].ToString()
+            : "";
+        return destination;
+    }
+}
+
+public class DeptObjectMapper : IObjectMapper<SysDept, SysDeptTreeSelectOutput>, ITransientDependency
+{
+    public SysDeptTreeSelectOutput Map(SysDept source)
+    {
+        return new SysDeptTreeSelectOutput();
+    }
+
+    public SysDeptTreeSelectOutput Map(SysDept source, SysDeptTreeSelectOutput destination)
+    {
+        destination.Id = source.Id.ToString();
+        destination.Code = source.Code;
+        destination.DeptName = source.DeptName;
+        destination.Label = source.DeptName;
+        destination.Leader = source.ExtraProperties.ContainsKey("Leader")
+            ? source.ExtraProperties["Leader"].ToString()
+            : "";
+        destination.Phone = source.ExtraProperties.ContainsKey("Phone")
+            ? source.ExtraProperties["Phone"].ToString()
+            : "";
+        destination.Email = source.ExtraProperties.ContainsKey("Email")
+            ? source.ExtraProperties["Email"].ToString()
+            : "";
         return destination;
     }
 }
