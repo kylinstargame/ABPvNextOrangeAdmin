@@ -1,22 +1,15 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
-using ABPvNextOrangeAdmin.System.Dept;
-using ABPvNextOrangeAdmin.System.Menu;
+using ABPvNextOrangeAdmin.System.Organization;
 using ABPvNextOrangeAdmin.System.Organization.Dto;
-using ABPvNextOrangeAdmin.System.User.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
-using Volo.Abp.Domain.Repositories;
-using Volo.Abp.Identity;
-using Volo.Abp.Identity.Settings;
-using NotImplementedException = System.NotImplementedException;
 
-namespace ABPvNextOrangeAdmin.System.Organization;
+namespace ABPvNextOrangeAdmin.System.Dept;
 
 [Authorize]
 [Route("api/sys/dept/[action]")]
@@ -31,31 +24,32 @@ public class DeptAppService : ApplicationService, IOrganizationService
 
     [HttpGet]
     [ActionName("list")]
-    public async Task<CommonResult<List<SysDeptOutput>>> GetListAsync(DeptInput input)
+    public async Task<CommonResult<List<SysDeptTreeSelectOutput>>> GetListAsync(DeptInput input)
     {
         var organizations = await DeptRepository.GetListAsync();
-        var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptOutput>>(organizations);
+        var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptTreeSelectOutput>>(organizations);
         var deptTree = BuildDeptTree(deptOutputs, null);
-        return CommonResult<List<SysDeptOutput>>.Success(deptTree, "获取部分树状结构成功");
+        return CommonResult<List<SysDeptTreeSelectOutput>>.Success(deptTree, "获取部分树状结构成功");
     }
 
     [HttpGet]
     [ActionName("tree")]
-    public async Task<CommonResult<List<SysDeptOutput>>> GetTreeAsync(DeptInput input)
+    public async Task<CommonResult<List<SysDeptTreeSelectOutput>>> GetTreeAsync(DeptInput input)
     {
         long count = await DeptRepository.GetCountAsync();
         var organizations = await DeptRepository.GetListAsync();
-        var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptOutput>>(organizations);
+        var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptTreeSelectOutput>>(organizations);
         var deptTree = BuildDeptTree(deptOutputs, 1);
-        return CommonResult<List<SysDeptOutput>>.Success(deptTree, "获取部门树状结构成功");
+        return CommonResult<List<SysDeptTreeSelectOutput>>.Success(deptTree, "获取部门树状结构成功");
     }
 
-    private List<SysDeptOutput> BuildDeptTree(List<SysDeptOutput> deptOutputs, long? parentId)
+    private List<SysDeptTreeSelectOutput> BuildDeptTree(List<SysDeptTreeSelectOutput> deptOutputs, long? parentId)
     {
-        List<SysDeptOutput> returnDeptOutputs = new List<SysDeptOutput>();
+        List<SysDeptTreeSelectOutput> returnDeptOutputs = new List<SysDeptTreeSelectOutput>();
         foreach (var deptOutput in deptOutputs)
         {
-            if (deptOutput.Id.Equals(parentId))
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (deptOutput != null && deptOutput.Id != null && deptOutput.Id.Equals(parentId))
             {
                 RecursionFn(deptOutputs, deptOutput);
                 returnDeptOutputs.Add(deptOutput);
@@ -65,12 +59,12 @@ public class DeptAppService : ApplicationService, IOrganizationService
         return returnDeptOutputs;
     }
 
-    private void RecursionFn(List<SysDeptOutput> depts, SysDeptOutput parent)
+    private void RecursionFn(List<SysDeptTreeSelectOutput> depts, SysDeptTreeSelectOutput parent)
     {
         // 得到子节点列表
-        List<SysDeptOutput> childDepts = GetChildList(depts, parent);
+        List<SysDeptTreeSelectOutput> childDepts = GetChildList(depts, parent);
         parent.Children = childDepts;
-        foreach (SysDeptOutput tChild in childDepts)
+        foreach (SysDeptTreeSelectOutput tChild in childDepts)
         {
             if (HasChild(depts, tChild))
             {
@@ -79,18 +73,18 @@ public class DeptAppService : ApplicationService, IOrganizationService
         }
     }
 
-    private bool HasChild(List<SysDeptOutput> depts, SysDeptOutput sysDept)
+    private bool HasChild(List<SysDeptTreeSelectOutput> depts, SysDeptOutput sysDept)
     {
         return GetChildList(depts, sysDept).Count > 0;
     }
 
-    private List<SysDeptOutput> GetChildList(List<SysDeptOutput> depts, SysDeptOutput sysDept)
+    private List<SysDeptTreeSelectOutput> GetChildList(List<SysDeptTreeSelectOutput> depts, SysDeptOutput sysDept)
     {
-        List<SysDeptOutput> resultMenus = new List<SysDeptOutput>();
+        List<SysDeptTreeSelectOutput> resultMenus = new List<SysDeptTreeSelectOutput>();
         IEnumerator it = depts.GetEnumerator();
         while (it.MoveNext())
         {
-            SysDeptOutput current = (SysDeptOutput)it.Current;
+            SysDeptTreeSelectOutput current = (SysDeptTreeSelectOutput)it.Current;
             if (current != null && current.ParentId == sysDept.Id)
             {
                 resultMenus.Add(current);

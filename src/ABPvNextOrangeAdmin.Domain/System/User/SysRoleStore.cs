@@ -3,84 +3,164 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.System.Roles;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Volo.Abp;
 using Volo.Abp.DependencyInjection;
-using NotImplementedException = System.NotImplementedException;
 
 namespace ABPvNextOrangeAdmin.System.User;
 
-public class SysRoleStore  :
+public class SysRoleStore :
     IRoleStore<SysRole>,
-    IRoleClaimStore<SysRole>,
+    // IRoleClaimStore<SysRole>,
     ITransientDependency
 {
-    public void Dispose()
+    public SysRoleStore(IRoleRepository roleRepository, ILogger<SysRoleStore> logger)
     {
-        throw new NotImplementedException();
+        RoleRepository = roleRepository;
+        Logger = logger;
     }
 
-    public Task<IdentityResult> CreateAsync(SysRole role, CancellationToken cancellationToken)
+    public IRoleRepository RoleRepository { get; set; }
+
+    protected ILogger<SysRoleStore> Logger { get; }
+
+    public bool AutoSaveChanges { get; set; } = true;
+
+    public IdentityErrorDescriber ErrorDescriber { get; set; }
+
+
+    public async Task<IdentityResult> CreateAsync([NotNull] SysRole role, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        cancellationToken.ThrowIfCancellationRequested();
+
+        Check.NotNull(role, nameof(role));
+
+        await RoleRepository.InsertAsync(role, AutoSaveChanges, cancellationToken);
+
+        return IdentityResult.Success;
     }
 
-    public Task<IdentityResult> UpdateAsync(SysRole role, CancellationToken cancellationToken)
+
+    public async Task<IdentityResult> UpdateAsync([NotNull] SysRole role, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        Check.NotNull(role, nameof(role));
+
+        try
+        {
+            await RoleRepository.UpdateAsync(role, AutoSaveChanges, cancellationToken);
+        }
+        catch (global::System.Exception ex)
+        {
+            Logger.LogWarning(ex.ToString()); //Trigger some AbpHandledException event
+            return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+        }
+
+        return IdentityResult.Success;
     }
 
-    public Task<IdentityResult> DeleteAsync(SysRole role, CancellationToken cancellationToken)
+    public async Task<IdentityResult> DeleteAsync([NotNull] SysRole role, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        cancellationToken.ThrowIfCancellationRequested();
+
+        Check.NotNull(role, nameof(role));
+
+        try
+        {
+            await RoleRepository.DeleteAsync(role, AutoSaveChanges, cancellationToken);
+        }
+        catch (global::System.Exception ex)
+        {
+            Logger.LogWarning(ex.ToString()); //Trigger some AbpHandledException event
+            return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+        }
+
+        return IdentityResult.Success;
     }
 
-    public Task<string> GetRoleIdAsync(SysRole role, CancellationToken cancellationToken)
+    public Task<string> GetRoleIdAsync([NotNull] SysRole role, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        cancellationToken.ThrowIfCancellationRequested();
+
+        Check.NotNull(role, nameof(role));
+
+        return Task.FromResult(role.Id.ToString());
     }
 
-    public Task<string> GetRoleNameAsync(SysRole role, CancellationToken cancellationToken)
+    public Task<string> GetRoleNameAsync([NotNull] SysRole role, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        cancellationToken.ThrowIfCancellationRequested();
+
+        Check.NotNull(role, nameof(role));
+
+        return Task.FromResult(role.RoleName);
     }
 
-    public Task SetRoleNameAsync(SysRole role, string roleName, CancellationToken cancellationToken)
+    public Task SetRoleNameAsync([NotNull] SysRole role, string roleName, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        cancellationToken.ThrowIfCancellationRequested();
+
+        Check.NotNull(role, nameof(role));
+
+        role.ChangeName(roleName);
+        return Task.CompletedTask;
     }
 
-    public Task<string> GetNormalizedRoleNameAsync(SysRole role, CancellationToken cancellationToken)
+    public Task<string> GetNormalizedRoleNameAsync([NotNull]SysRole role, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-    }
+        cancellationToken.ThrowIfCancellationRequested();
 
+        Check.NotNull(role, nameof(role));
+
+        return Task.FromResult(role.RoleName);
+    }
+    
     public Task SetNormalizedRoleNameAsync(SysRole role, string normalizedName, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        cancellationToken.ThrowIfCancellationRequested();
+
+        Check.NotNull(role, nameof(role));
+
+        role.RoleName = normalizedName;
+
+        return Task.CompletedTask;
     }
 
     public Task<SysRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        cancellationToken.ThrowIfCancellationRequested();
+
+        return RoleRepository.FindAsync(int.Parse(roleId), cancellationToken: cancellationToken);
     }
 
     public Task<SysRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        cancellationToken.ThrowIfCancellationRequested();
+
+        Check.NotNull(normalizedRoleName, nameof(normalizedRoleName));
+
+        return RoleRepository.FindByNameAsync(normalizedRoleName, cancellationToken: cancellationToken);
     }
 
-    public Task<IList<Claim>> GetClaimsAsync(SysRole role, CancellationToken cancellationToken = new CancellationToken())
+    public virtual void Dispose()
     {
-        throw new NotImplementedException();
     }
 
-    public Task AddClaimAsync(SysRole role, Claim claim, CancellationToken cancellationToken = new CancellationToken())
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task RemoveClaimAsync(SysRole role, Claim claim, CancellationToken cancellationToken = new CancellationToken())
-    {
-        throw new NotImplementedException();
-    }
+    // public Task<IList<Claim>> GetClaimsAsync(SysRole role,
+    //     CancellationToken cancellationToken = new CancellationToken())
+    // {
+    //     throw new NotImplementedException();
+    // }
+    //
+    // public Task AddClaimAsync(SysRole role, Claim claim, CancellationToken cancellationToken = new CancellationToken())
+    // {
+    //     throw new NotImplementedException();
+    // }
+    //
+    // public Task RemoveClaimAsync(SysRole role, Claim claim,
+    //     CancellationToken cancellationToken = new CancellationToken())
+    // {
+    //     throw new NotImplementedException();
+    // }
 }

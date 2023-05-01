@@ -14,7 +14,7 @@ public interface IOrganizationService
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Task<CommonResult<List<SysDeptOutput>>> GetListAsync(DeptInput input);
+    public Task<CommonResult<List<SysDeptTreeSelectOutput>>> GetListAsync(DeptInput input);
     
     
     /// <summary>
@@ -22,5 +22,5 @@ public interface IOrganizationService
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Task<CommonResult<List<SysDeptOutput>>> GetTreeAsync(DeptInput input);
+    public Task<CommonResult<List<SysDeptTreeSelectOutput>>> GetTreeAsync(DeptInput input);
 }

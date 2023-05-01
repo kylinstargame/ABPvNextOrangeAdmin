@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using ABPvNextOrangeAdmin.Common.Attribute;
 using JetBrains.Annotations;
@@ -35,7 +36,7 @@ public class CommonResult<T>
 
     public static CommonResult<T> CreateInstance(long code, string message, [CanBeNull] object data)
     {
-        return new CommonResult<T>(code, message, (T) data);
+        return new CommonResult<T>(code, message, (T)data);
     }
 
     /**
@@ -59,8 +60,7 @@ public class CommonResult<T>
     {
         return CreateInstance(ResultCode.SUCCESS, message, data);
     }
-    
-    
+
 
     /**
      * 失败返回结果
@@ -70,7 +70,7 @@ public class CommonResult<T>
     {
         return CreateInstance(errorCode.getCode(), errorCode.getMessage(), null);
     }
-    
+
     /**
      * 失败返回结果
      * @param errorCode 错误码

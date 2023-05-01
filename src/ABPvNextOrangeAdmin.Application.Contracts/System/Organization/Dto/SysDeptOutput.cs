@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ABPvNextOrangeAdmin.Common;
 using Volo.Abp.Application.Dtos;
 
 namespace ABPvNextOrangeAdmin.System.Organization.Dto;
@@ -13,5 +14,13 @@ public class SysDeptOutput : EntityDto<long>
     public string Phone { get; set; }
     public string Email { get; set; }
     
-    public List<SysDeptOutput> Children { get; set; }
+
 }
+
+
+public class SysDeptTreeSelectOutput : SysDeptOutput,  ITreeSelectNode<SysDeptTreeSelectOutput>
+{
+    public new string Id { get; set; }
+    public string Label { get; set; }
+    public List<SysDeptTreeSelectOutput> Children { get; set; }
+} 

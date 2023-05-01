@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using ABPvNextOrangeAdmin.System.Dept;
 using Microsoft.EntityFrameworkCore;
+using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.Identity;
 using Volo.Abp.MultiTenancy;
@@ -65,6 +66,34 @@ public class SysRole : FullAuditedAggregateRoot<long>, IMultiTenant
     /// 租户标识
     /// </summary>
     public Guid? TenantId { get; }
+
+    public void ChangeName(string roleName)
+    {
+        Check.NotNullOrWhiteSpace(roleName, nameof(roleName));
+
+        var oldName = RoleName;
+        RoleName = roleName;
+
+//         AddLocalEvent(
+// #pragma warning disable 618
+//             new IdentityRoleNameChangedEvent
+// #pragma warning restore 618
+//             {
+//                 IdentityRole = this,
+//                 OldName = oldName
+//             }
+//         );
+//
+//         AddDistributedEvent(
+        //     new IdentityRoleNameChangedEto
+        //     {
+        //         Id = Id,
+        //         Name = Name,
+        //         OldName = oldName,
+        //         TenantId = TenantId
+        //     }
+        // );
+    }
 }
 
 
