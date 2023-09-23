@@ -56,7 +56,7 @@ public class DictAppService : ApplicationService, IDictAppService
     public async Task<CommonResult<PagedResultDto<DictDataOutput>>> GetDictTypeAsync([FromRoute] String dictType)
     {
         var queryale = await DictRepository.GetQueryableAsync().ConfigureAwait(true);
-        var dictDatas = queryale.Where(x => x.DictType == dictType && x.Status == "0").ToList(); 
+        var dictDatas = queryale.Where(x => x.DictType == dictType ).ToList(); 
         
         var dictOutputs = ObjectMapper.Map<List<SysDictData>, List<DictDataOutput>>(dictDatas);
         return CommonResult<PagedResultDto<DictDataOutput>>.Success(

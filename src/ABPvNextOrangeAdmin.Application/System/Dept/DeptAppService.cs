@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
+using ABPvNextOrangeAdmin.ObjectMapper;
 using ABPvNextOrangeAdmin.System.Organization;
 using ABPvNextOrangeAdmin.System.Organization.Dto;
 using Microsoft.AspNetCore.Authorization;
@@ -16,10 +17,12 @@ namespace ABPvNextOrangeAdmin.System.Dept;
 public class DeptAppService : ApplicationService, IOrganizationService
 {
     private IDeptRepository DeptRepository { get; }
+    private DeptObjectMapper DeptObjectMapper { get; }
 
-    public DeptAppService(IDeptRepository deptRepository)
+    public DeptAppService(IDeptRepository deptRepository, DeptObjectMapper deptObjectMapper)
     {
         DeptRepository = deptRepository;
+        DeptObjectMapper = deptObjectMapper;
     }
 
     [HttpGet]
@@ -27,8 +30,8 @@ public class DeptAppService : ApplicationService, IOrganizationService
     public async Task<CommonResult<List<SysDeptTreeSelectOutput>>> GetListAsync(DeptInput input)
     {
         var organizations = await DeptRepository.GetListAsync();
-        var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptTreeSelectOutput>>(organizations);
-        var deptTree = BuildDeptTree(deptOutputs, null);
+        var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptTreeSelectOutput>>(organizations); 
+        var deptTree = BuildDeptTree(deptOutputs, 1);
         return CommonResult<List<SysDeptTreeSelectOutput>>.Success(deptTree, "获取部分树状结构成功");
     }
 
@@ -37,9 +40,13 @@ public class DeptAppService : ApplicationService, IOrganizationService
     public async Task<CommonResult<List<SysDeptTreeSelectOutput>>> GetTreeAsync(DeptInput input)
     {
         long count = await DeptRepository.GetCountAsync();
-        var organizations = await DeptRepository.GetListAsync();
-        var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptTreeSelectOutput>>(organizations);
+        var organizations = await DeptRepository.GetListAsync(); 
+        //deptOutputsxx=DeptObjectMapper.Map<SysDept, SysDeptTreeSelectOutput>(organizations[0]);
+         var deptOutputs=ObjectMapper.Map<List<SysDept>, List<SysDeptTreeSelectOutput>>(organizations);
+        // var deptOutputs1 = ObjectMapper.Map<List<SysDept>, List<SysDeptOutput>>(organizations);
+        // List<SysDeptTreeSelectOutput> deptOutputs = new List<SysDeptTreeSelectOutput>();
         var deptTree = BuildDeptTree(deptOutputs, 1);
+      
         return CommonResult<List<SysDeptTreeSelectOutput>>.Success(deptTree, "获取部门树状结构成功");
     }
 
@@ -49,7 +56,7 @@ public class DeptAppService : ApplicationService, IOrganizationService
         foreach (var deptOutput in deptOutputs)
         {
             // ReSharper disable once SuspiciousTypeConversion.Global
-            if (deptOutput != null && deptOutput.Id != null && deptOutput.Id.Equals(parentId))
+            if (deptOutput != null && deptOutput.Id.Equals(parentId))
             {
                 RecursionFn(deptOutputs, deptOutput);
                 returnDeptOutputs.Add(deptOutput);

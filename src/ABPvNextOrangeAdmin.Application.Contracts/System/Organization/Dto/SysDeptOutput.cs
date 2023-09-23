@@ -6,7 +6,7 @@ using Volo.Abp.Application.Dtos;
 namespace ABPvNextOrangeAdmin.System.Organization.Dto;
 
 public class SysDeptOutput : EntityDto<long>
-{
+{ 
     public long? ParentId { get; set; }
     public string Code { get; set; }
     public string DeptName { get; set; }
@@ -20,7 +20,7 @@ public class SysDeptOutput : EntityDto<long>
 
 public class SysDeptTreeSelectOutput : SysDeptOutput,  ITreeSelectNode<SysDeptTreeSelectOutput>
 {
-    public new string Id { get; set; }
+    
     public string Label { get; set; }
     public List<SysDeptTreeSelectOutput> Children { get; set; }
 } 

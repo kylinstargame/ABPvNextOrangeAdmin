@@ -175,6 +175,8 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
     public ICollection<SysUserDept> Depts { get;  set; }
 
 
+    #region 角色相关
+
     public bool IsInRole(long roleId)
     {
         Check.NotNull(roleId, nameof(roleId));
@@ -207,12 +209,17 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Roles.RemoveAll(r => r.RoleId == roleId);
     }
 
+    #endregion
+
+    #region 部门相关
+
     public bool IsInDept(long deptId)
     {
         return Depts.Any(dept=>dept.DeptId == deptId);
     }
-    
-    public void AddDept(long deptId)
+
+
+    public void JoinDept(long deptId)
     {
         if (this.IsInDept(deptId))
         {
@@ -222,7 +229,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         this.Depts.Add(new  SysUserDept(Id, deptId, TenantId));
     }
 
-    public void RemoveOrganizationUnit(long deptId)
+    public void QuitDept(long deptId)
     {
         if (this.IsInDept(deptId))
         {
@@ -230,6 +237,8 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         }
         Depts.RemoveAll<SysUserDept>((Func<SysUserDept, bool>) (userDept => userDept.DeptId == deptId));
     }
+
+    #endregion
 
 }
 

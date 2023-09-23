@@ -24,9 +24,12 @@ public class ABPvNextOrangeAdminApplicationAutoMapperProfile : Profile
          * into multiple profile classes for a better organization. */
         CreateMap<SysMenu, MenuOutput>();
         CreateMap<SysConfig, ConfigOutput>();
-        
+
         CreateMap<SysUser, SysUserOutput>();
         CreateMap<SysRole, SysRoleOutput>();
         CreateMap<SysDept, SysDeptOutput>();
+        CreateMap<SysDept, SysDeptTreeSelectOutput>().ForMember(a => a.Label,
+            b => b.MapFrom(a => a.DeptName));
+            ;
     }
 }

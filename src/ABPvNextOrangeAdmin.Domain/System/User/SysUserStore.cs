@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.User.Exstension;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -18,18 +19,21 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
     IUserRoleStore<SysUser>,ITransientDependency
 {
     
-    public SysUserStore(IUserRepository userRepository,SysUserErrorDescriber errorDescriber, IRoleRepository roleRepository, ILookupNormalizer lookupNormalizer)
+    public SysUserStore(IUserRepository userRepository,SysUserErrorDescriber errorDescriber, IRoleRepository roleRepository, ILookupNormalizer lookupNormalizer, IDeptRepository deptRepository)
     {
         UserRepository = userRepository;
         AutoSaveChanges = true;
         ErrorDescriber = errorDescriber;
         RoleRepository = roleRepository;
         LookupNormalizer = lookupNormalizer;
+        DeptRepository = deptRepository;
     }
 
     private IUserRepository UserRepository { get; }
 
     private IRoleRepository RoleRepository { get; }
+    
+    private IDeptRepository DeptRepository { get; }
 
 
     private ILookupNormalizer LookupNormalizer { get; }
@@ -258,6 +262,58 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
     }
 
     #endregion
+
+    public async Task JoinDeptAsync(SysUser user, int deptId, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        Check.NotNull(user, nameof(user));
+       // Check.NotNull(deptName, nameof(deptName));
+
+        if (await IsInDeptAsync(user, deptId, cancellationToken))
+        {
+            return;
+        }
+
+        var dept = await DeptRepository.GetDeptByIdAsync(deptId);
+        if (dept == null)
+        {
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Dept {0} does not exist!", deptId));
+        }
+
+        await UserRepository.EnsureCollectionLoadedAsync(user, u => u.Roles, cancellationToken);
+
+        user.JoinDept(dept.Id);
+    }
+
+    public async Task QuitDeptAsync(SysUser user, int deptId, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        Check.NotNull(user, nameof(user));
+      //  Check.NotNullOrWhiteSpace(roleName, nameof(roleName));
+
+        var dept = await DeptRepository.GetDeptByIdAsync(deptId);
+        if (dept == null)
+        {
+            return;
+        }
+
+        await UserRepository.EnsureCollectionLoadedAsync(user, u => u.Depts, cancellationToken);
+
+        user.QuitDept(deptId);
+    }
+    
+
+    private async Task<bool> IsInDeptAsync(SysUser user, int deptId, CancellationToken cancellationToken)
+    {
+        
+            cancellationToken.ThrowIfCancellationRequested();
+
+            Check.NotNull(user, nameof(user));
+            //Check.NotNullOrWhiteSpace(deptName, nameof(deptName));
+         return   user.IsInDept(deptId);
+    }
 
     public Task SetPasswordHashAsync(SysUser user, string passwordHash, CancellationToken cancellationToken)
     {

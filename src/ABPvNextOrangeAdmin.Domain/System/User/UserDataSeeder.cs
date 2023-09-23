@@ -85,9 +85,10 @@ class UserDataSeeder : IUserDataSeeder, ITransientDependency
             );
             (await UserStore.CreateAsync(adminUser, adminPassword, false)).CheckErrors();
             result.CreatedAdminUser = true;
-
+            
             //"admin" role
             const string adminRoleName = "admin";
+            //自动添加juesr
             var adminRole =
                 await RoleRepository.FindByNameAsync(adminRoleName);
             if (adminRole == null)

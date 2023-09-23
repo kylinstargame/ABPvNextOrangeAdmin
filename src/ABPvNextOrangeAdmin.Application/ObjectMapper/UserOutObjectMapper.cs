@@ -69,7 +69,7 @@ public class DeptObjectMapper : IObjectMapper<SysDept, SysDeptTreeSelectOutput>,
 
     public SysDeptTreeSelectOutput Map(SysDept source, SysDeptTreeSelectOutput destination)
     {
-        destination.Id = source.Id.ToString();
+        destination.Id = source.Id;
         destination.Code = source.Code;
         destination.DeptName = source.DeptName;
         destination.Label = source.DeptName;

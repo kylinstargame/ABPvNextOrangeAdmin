@@ -49,6 +49,14 @@ public class EfCoreDeptRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
             .FirstAsync();
     }
 
+    public async Task<SysDept> GetDeptByIdAsync(int Id, bool includeDetails = true)
+    {
+        return await (await GetDbSetAsync())
+            .IncludeDetails(includeDetails)
+            .Where(dept => dept.Id== Id)
+            .FirstAsync();
+    }
+
     public async Task<List<SysDept>> GetListAsync(string sorting = null, int maxResultCount = Int32.MaxValue,
         int skipCount = 0,
         bool includeDetails = false)

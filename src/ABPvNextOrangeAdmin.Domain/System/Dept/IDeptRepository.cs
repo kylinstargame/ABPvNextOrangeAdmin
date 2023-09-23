@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.System.Roles;
 using ABPvNextOrangeAdmin.System.User;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Identity.Settings;
 
@@ -35,6 +36,10 @@ public interface IDeptRepository : IBasicRepository<SysDept, long>
         bool includeDetails = true
     );
 
+    Task<SysDept> GetDeptByIdAsync(
+        int Id,
+        bool includeDetails = true
+    );
     Task<List<SysDept>> GetListAsync(
         string sorting = null,
         int maxResultCount = int.MaxValue,
