@@ -3,6 +3,7 @@ using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Organization.Dto;
 using ABPvNextOrangeAdmin.System.User;
 using ABPvNextOrangeAdmin.System.User.Dto;
+using IdentityServer4.Models;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Settings;
@@ -15,7 +16,10 @@ public class UserOutObjectMapper : IObjectMapper<SysUser, SysUserOutput>, ITrans
 {
     public SysUserOutput Map(SysUser source)
     {
-        return new SysUserOutput();
+        return SysUserOutput.CreateInstance(source.Id, source.UserName, source.Password, source.NickName, source.Avatar,
+            source.Sex, source.Email,
+            source.PhoneNumber, 0, source.IsActive?"0":"1", source.LoginIP, source.LoginTime);
+        
     }
 
     public SysUserOutput Map(SysUser source, SysUserOutput destination)
@@ -25,7 +29,7 @@ public class UserOutObjectMapper : IObjectMapper<SysUser, SysUserOutput>, ITrans
         destination.NickName = source.ExtraProperties.ContainsKey("NickName")
             ? source.ExtraProperties["NickName"].ToString()
             : "";
-        destination.Password = source.ExtraProperties.ContainsKey("Password")
+        destination.userPassword = source.ExtraProperties.ContainsKey("Password")
             ? source.ExtraProperties["Password"].ToString()
             : "";
         destination.PhoneNumber = source.PhoneNumber;

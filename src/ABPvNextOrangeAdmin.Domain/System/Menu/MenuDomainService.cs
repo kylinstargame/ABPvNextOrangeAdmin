@@ -223,7 +223,7 @@ public class MenuDomainService : DomainService
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<List<int>> GetMenuListByRoleId(long roleId)
+    public async Task<List<long>> GetMenuListByRoleId(long roleId)
     {
         SysRole sysRole = await _roleRepository.GetAsync(x => x.Id == roleId);
 
@@ -249,7 +249,7 @@ public class MenuDomainService : DomainService
         {
             SysMenu menu = (SysMenu)enumerator.Current;
             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
-            Debug.Assert(menu != null, (string?) (nameof(menu) + " != null"));
+            Debug.Assert(menu != null, (string) (nameof(menu) + " != null"));
             if (Equals(menu.ParentId, parentId))
             {
                 RecursionFn(menus, menu);
@@ -264,7 +264,7 @@ public class MenuDomainService : DomainService
     public List<SysMenu> BuildMenuTree(List<SysMenu> menus)
     {
         List<SysMenu> returnList = new List<SysMenu>();
-        List<int> tempList = new List<int>();
+        List<long> tempList = new List<long>();
         foreach (SysMenu menu in menus)
         {
             tempList.Add(menu.Id);

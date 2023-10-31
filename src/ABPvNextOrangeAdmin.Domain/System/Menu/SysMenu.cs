@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using ABPvNextOrangeAdmin.Constans;
 using ABPvNextOrangeAdmin.Utils;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.System.Menu;
 
-public sealed class SysMenu : FullAuditedEntity<int>
+public sealed class SysMenu : FullAuditedEntity<long>
 {
     /// <summary>
     /// 菜单名称
@@ -94,12 +95,12 @@ public sealed class SysMenu : FullAuditedEntity<int>
     {
     }
 
-    public SysMenu(int id)
+    public SysMenu(long id)
     {
         Id = id;
     }
 
-    public SysMenu(int id, string menuName, int parentId, int orderNum, string path,
+    public SysMenu(long id, string menuName, int parentId, int orderNum, string path,
         string component, string query, string isFrame, string isCache, string menuType, string visible, string status,
         string perms, string icon, string remark)
     {

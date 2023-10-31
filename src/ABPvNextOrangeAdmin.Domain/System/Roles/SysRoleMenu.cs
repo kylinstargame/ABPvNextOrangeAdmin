@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.System.Roles;
 
-public class SysRoleMenu : FullAuditedEntity
+public class SysRoleMenu : FullAuditedEntity, IEntity<int>
 {
     /// <summary>
     /// 角色ID
@@ -39,4 +40,6 @@ public class SysRoleMenu : FullAuditedEntity
 
         return roleMenus;
     }
+
+    public int Id { get; }
 }

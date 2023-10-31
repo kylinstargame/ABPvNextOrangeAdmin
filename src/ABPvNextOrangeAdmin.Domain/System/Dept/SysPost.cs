@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using ABPvNextOrangeAdmin.System.User;
 using Newtonsoft.Json;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
@@ -8,11 +10,17 @@ namespace ABPvNextOrangeAdmin.System.Organization;
 /// <summary>
 /// 系统岗位
 /// </summary>
-public class SysPost : FullAuditedAggregateRoot<long>, IMultiTenant
+public class SysPost : FullAuditedEntity<long>,IMultiTenant
 {
     public SysPost(Guid? tenantId)
     {
         TenantId = tenantId;
+    }
+
+    public SysPost(long id, string postCode, string postName) : base(id)
+    {
+        PostCode = postCode;
+        PostName = postName;
     }
 
     /// <summary>
@@ -39,6 +47,8 @@ public class SysPost : FullAuditedAggregateRoot<long>, IMultiTenant
     /// 租户ID
     /// </summary>
     public Guid? TenantId { get; }
+
+    public ICollection<SysUserPost> UserPosts { get; set; }
 
     public override string ToString()
     {

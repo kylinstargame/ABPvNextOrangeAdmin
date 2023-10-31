@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ABPvNextOrangeAdmin.System.Dept;
 using Microsoft.EntityFrameworkCore;
@@ -66,6 +67,8 @@ public class SysRole : FullAuditedAggregateRoot<long>, IMultiTenant
     /// 租户标识
     /// </summary>
     public Guid? TenantId { get; }
+    
+    public ICollection<SysRoleMenu> Menuss { get;  set; }
 
     public void ChangeName(string roleName)
     {

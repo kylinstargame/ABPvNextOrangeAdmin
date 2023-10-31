@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Organization;
 using ABPvNextOrangeAdmin.System.Roles;
+using AutoMapper.Configuration.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -36,6 +38,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         UserName = userName;
         TenantId = tenantId;
         Email = email;
+        Email = email;
         Password = password;
     }
 
@@ -55,6 +58,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Logins = new Collection<SysUserLogin>();
         IsActive = true;
         CreationTime = DateTime.Now;
+
     }
 
     public SysUser(Guid id, string userName, string email, string password, bool lockoutEnabled, DateTimeOffset? lockoutEnd,
@@ -71,11 +75,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         IsActive = true;
         CreationTime = DateTime.Now;
     }
-
-    /// <summary>
-    /// 部门ID
-    /// </summary>
-    public long DeptId { get; set; }
+    
 
     /// <summary>
     /// 登录名称
@@ -136,7 +136,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
     /// <summary>
     /// 最后登录时间
     /// </summary>
-    public DateTime? CreationTime { get; set; }
+    // public DateTime? CreationTime { get; set; }
 
     /// <summary>
     /// 账户解锁时间
@@ -172,9 +172,18 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
     /// <summary>
     /// 关联部门
     /// </summary>
-    public ICollection<SysUserDept> Depts { get;  set; }
+    public ICollection<SysDept> Depts { get;  set; }
+
+    /// <summary>
+    /// 关联崗位
+    /// </summary>
+    public ICollection<SysUserPost> UserPosts { get; set; } = new List<SysUserPost>();
 
 
+    public bool IsAdmin()
+    {
+        return UserName.ToLower() == "admin";
+    } 
     #region 角色相关
 
     public bool IsInRole(long roleId)
@@ -215,7 +224,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     public bool IsInDept(long deptId)
     {
-        return Depts.Any(dept=>dept.DeptId == deptId);
+        return Depts.Any(dept=>dept.Id == deptId);
     }
 
 
@@ -226,7 +235,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
             return;
         }
 
-        this.Depts.Add(new  SysUserDept(Id, deptId, TenantId));
+        this.Depts.Add(new  SysDept(deptId));
     }
 
     public void QuitDept(long deptId)
@@ -235,7 +244,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         {
             return;
         }
-        Depts.RemoveAll<SysUserDept>((Func<SysUserDept, bool>) (userDept => userDept.DeptId == deptId));
+        Depts.RemoveAll<SysDept>((Func<SysDept, bool>) (userDept => userDept.Id == deptId));
     }
 
     #endregion

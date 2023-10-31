@@ -6,11 +6,12 @@ namespace ABPvNextOrangeAdmin.System.Dict;
 
 public sealed class SysDictData : FullAuditedEntity<long>
 {
-    public SysDictData()
+    public SysDictData(string remark)
     {
+        Remark = remark;
     }
 
-    public SysDictData(long id, long dictSort, string dictLabel, string dictValue, string dictType, string cssClass, string listClass, string isDefault, string status)
+    public SysDictData(long id, long dictSort, string dictLabel, string dictValue, string dictType, string cssClass, string listClass, string isDefault, string remark, string status="0")
     {
         Id = id;
         DictSort = dictSort;
@@ -21,6 +22,7 @@ public sealed class SysDictData : FullAuditedEntity<long>
         ListClass = listClass;
         IsDefault = isDefault;
         Status = status;
+        Remark = remark;
     }
 
     [Display(Description = "字典排序")] public long DictSort { get; set; }
@@ -45,6 +47,11 @@ public sealed class SysDictData : FullAuditedEntity<long>
     /// 是否默认（Y是 N否）
     /// </summary>
     public string IsDefault { get; set; }
+    
+    /// <summary>
+    /// 注释 
+    /// </summary>
+    public string Remark { get; set; }
 
     /// <summary>
     /// 状态（0正常 1停用）

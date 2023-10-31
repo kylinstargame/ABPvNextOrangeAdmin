@@ -1,10 +1,36 @@
 using System;
+using Newtonsoft.Json.Converters;
 using Volo.Abp.Application.Dtos;
 
 namespace ABPvNextOrangeAdmin.System.Account.Dto;
 
 public class SysUserOutput : EntityDto<Guid>
 {
+    private SysUserOutput(Guid id, string userName, string Password, string nickName, string avatar, string sex, string email, string phoneNumber, long deptId,string status, string loginIP, string loginTime)
+    {
+        Id = id;
+        UserName = userName;
+        userPassword = Password;
+        NickName = nickName;
+        Avatar = avatar;
+        Sex = sex;
+        Email = email;
+        PhoneNumber = phoneNumber; 
+        DeptId = deptId;
+        Status = status;
+        LoginIP = loginIP;
+        LoginTime = loginTime;
+    }
+
+    public SysUserOutput()
+    {
+    }
+
+    public static SysUserOutput CreateInstance(Guid id, string userName, string password, string nickName, string avatar, string sex, string email, string phoneNumber, long deptId, string status, string loginIP, string loginTime)
+    {
+        return new SysUserOutput(id, userName, password, nickName, avatar, sex, email, phoneNumber, deptId, status, loginIP, loginTime);
+    }
+
     /// <summary>
     /// 部门ID
     /// </summary>
@@ -43,7 +69,7 @@ public class SysUserOutput : EntityDto<Guid>
     /// <summary>
     /// 用户密码
     /// </summary>
-    public string Password { get; set; }
+    public string userPassword { get; set; }
 
     /// <summary>
     /// 用户状态 0=正常,1=停用

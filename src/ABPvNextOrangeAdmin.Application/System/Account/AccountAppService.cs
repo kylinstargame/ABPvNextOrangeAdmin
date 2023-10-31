@@ -37,6 +37,7 @@ using Volo.Abp.PermissionManagement;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Users;
 using Volo.Abp.Validation;
+using PermissionManager = ABPvNextOrangeAdmin.System.User.PermissionManager;
 
 
 namespace ABPvNextOrangeAdmin.System.Account;
@@ -45,16 +46,15 @@ namespace ABPvNextOrangeAdmin.System.Account;
 [Route("api/sys/account/[action]")]
 public class AccountAppService : ApplicationService, IAccountAppService
 {
-    // private IGuidGenerator GuidGenerator { get; set; }
     private JwtOptions JwtOptions { get; set; }
 
     private SignInManager SignInManager { get; set; }
 
     private UserManager UserManager { get; set; }
 
-    // private IPermissionManager PermissionManager { get; set; }
+     private PermissionManager PermissionManager { get; }
 
-    private IdentitySecurityLogManager IdentitySecurityLogManager { get; set; }
+    private IdentitySecurityLogManager IdentitySecurityLogManager { get; }
 
     private IOptions<IdentityOptions> IdentityOptions { get; set; }
 
@@ -66,12 +66,14 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
     private MenuDomainService MenuDomainService { get; }
 
+    private IRoleRepository RoleRepository { get; }
+
 
     public AccountAppService(UserManager userManager,
         IOptions<IdentityOptions> identityOptions, DefaultCaptcha defaultCaptcha,
         ConfigDomainService configDomainService, IDistributedCache<String> distributedCache,
         IOptions<JwtOptions> jwtOptions,
-        SignInManager signInManager, MenuDomainService menuDomainService /*,IPermissionManager permissionManager*/)
+        SignInManager signInManager, MenuDomainService menuDomainService, PermissionManager permissionManager, IRoleRepository roleRepository)
     {
         UserManager = userManager;
         IdentityOptions = identityOptions;
@@ -80,7 +82,8 @@ public class AccountAppService : ApplicationService, IAccountAppService
         DistributedCache = distributedCache;
         SignInManager = signInManager;
         MenuDomainService = menuDomainService;
-        // PermissionManager = permissionManager;
+        PermissionManager = permissionManager;
+        RoleRepository = roleRepository;
         JwtOptions = jwtOptions.Value;
     }
 
@@ -264,36 +267,25 @@ public class AccountAppService : ApplicationService, IAccountAppService
         var sysUserOutput = ObjectMapper.Map<SysUser, SysUserOutput>(sysUser);
         //获取角色名称
         IList<string> roleNames =
-            await UserManager.GetRolesAsync(sysUser); //IdentityUserRepository.GetRoleNamesAsync((Guid)CurrentUser.Id);
+            await UserManager.GetRolesAsync(sysUser); 
 
 
-        HashSet<String> permissionNames = new HashSet<string>();
+        List<String> permissionNames = new List<string>();
         // 获取角色权限
-        // foreach (var roleName in roleNamnes)
-        // {
-        //     var withGrantedRolePermissions = await PermissionManager.GetAllAsync(PermissionConstans.Role, roleName);
-        //     foreach (var rolePermission in withGrantedRolePermissions)
-        //     {
-        //         if (rolePermission.IsGranted)
-        //         {
-        //             permissionNames.Add(rolePermission.Name);
-        //         }
-        //     }
-        // }
-        //
-        // //获取用户权限
-        // var withGrantedUserPermissions =
-        //     await PermissionManager.GetAllAsync(PermissionConstans.User, CurrentUser.Id.ToString());
-        // foreach (var userPermission in withGrantedUserPermissions)
-        // {
-        //     if (userPermission.IsGranted)
-        //     {
-        //         permissionNames.Add(userPermission.Name);
-        //     }
-        // }
-
+        foreach (var roleName in  roleNames)
+        {
+            var role = await RoleRepository.FindByNameAsync(roleName);
+            if (role != null)
+            {
+                var Permssions = await PermissionManager.GetAllRolePermssionsAysnc(role.Id);
+                permissionNames.AddRange(Permssions);
+            }
+        }
+        //获取角色权限
+             var uPermssions=  await PermissionManager.GetAllUserPermssionsAysnc(CurrentUser.Id.Value);
+                    permissionNames.AddRange(uPermssions); 
         return CommonResult<UserWithRoleAndPermissionOutput>.Success(
-            UserWithRoleAndPermissionOutput.CreateInstance(sysUserOutput, roleNames.ToArray(),
+            UserWithRoleAndPermissionOutput.CreateInstance(sysUserOutput,  roleNames.ToArray(),
                 permissionNames.ToArray()), "获取用户信息");
     }
 

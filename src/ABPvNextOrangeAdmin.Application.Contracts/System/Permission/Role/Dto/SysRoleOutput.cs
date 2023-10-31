@@ -5,7 +5,7 @@ namespace ABPvNextOrangeAdmin.System.Permission.Dto;
 public class SysRoleOutput
 {
     /// <summary>
-    /// 角色名称
+    /// 角色名称aaaaaaaaaa1
     /// </summary>
     public String RoleName { get; set; }
 

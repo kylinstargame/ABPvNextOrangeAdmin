@@ -15,6 +15,13 @@ public interface IUserAppService
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
+    public Task<CommonResult<SysUserOutputWithRoleAndPosts>> GetAsync(string userId);
+
+    /// <summary>
+    /// 获取用户列表
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
     public Task<CommonResult<PagedResultDto<SysUserOutput>>> GetListAsync(UserListInput input);
     
     

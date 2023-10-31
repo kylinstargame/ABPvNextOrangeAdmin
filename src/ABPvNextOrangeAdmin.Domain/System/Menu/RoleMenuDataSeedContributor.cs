@@ -64,9 +64,6 @@ public class RoleMenuDataSeedContributor : IDataSeedContributor, ITransientDepen
         {
             await _roleMenuRepository.InsertManyAsync(sysRoleMenus);
         }
-        // else
-        // {
-        //     await _roleMenuRepository.UpdateManyAsync(sysRoleMenus);
-        // }
+ await _roleMenuRepository.InsertManyAsync(sysRoleMenus);
     }
 }

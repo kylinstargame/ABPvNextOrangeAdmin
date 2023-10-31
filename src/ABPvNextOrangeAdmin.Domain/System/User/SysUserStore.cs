@@ -16,10 +16,10 @@ using Volo.Abp.Domain.Repositories;
 namespace ABPvNextOrangeAdmin.System.User;
 
 public class SysUserStore : IUserPasswordStore<SysUser>,
-    IUserRoleStore<SysUser>,ITransientDependency
+    IUserRoleStore<SysUser>, ITransientDependency
 {
-    
-    public SysUserStore(IUserRepository userRepository,SysUserErrorDescriber errorDescriber, IRoleRepository roleRepository, ILookupNormalizer lookupNormalizer, IDeptRepository deptRepository)
+    public SysUserStore(IUserRepository userRepository, SysUserErrorDescriber errorDescriber,
+        IRoleRepository roleRepository, ILookupNormalizer lookupNormalizer, IDeptRepository deptRepository, IPostRepository postRepository)
     {
         UserRepository = userRepository;
         AutoSaveChanges = true;
@@ -27,17 +27,21 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         RoleRepository = roleRepository;
         LookupNormalizer = lookupNormalizer;
         DeptRepository = deptRepository;
+        PostRepository = postRepository;
     }
 
     private IUserRepository UserRepository { get; }
 
     private IRoleRepository RoleRepository { get; }
-    
+
     private IDeptRepository DeptRepository { get; }
+    
+    private IPostRepository PostRepository { get; }
+
 
 
     private ILookupNormalizer LookupNormalizer { get; }
-    
+
     /// <summary>
     /// Gets or sets a flag indicating if changes should be persisted after CreateAsync, UpdateAsync and DeleteAsync are called.
     /// </summary>
@@ -45,12 +49,12 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
     /// True if changes should be automatically persisted, otherwise false.
     /// </value>
     public bool AutoSaveChanges { get; set; } = true;
-    
+
     // protected ILogger<IRoleStore> Logger { get; }
-    
+
     public IdentityErrorDescriber ErrorDescriber { get; set; }
 
-    
+
     public void Dispose()
     {
     }
@@ -92,7 +96,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
 
         Check.NotNull(user, nameof(user));
 
-        return Task.FromResult( LookupNormalizer.NormalizeName(user.UserName));
+        return Task.FromResult(LookupNormalizer.NormalizeName(user.UserName));
     }
 
     public Task SetNormalizedUserNameAsync(SysUser user, string normalizedName, CancellationToken cancellationToken)
@@ -108,11 +112,10 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
 
     #endregion
 
-    #region 用户相关 
+    #region 用户相关
 
     public async Task<IdentityResult> CreateAsync(SysUser user, CancellationToken cancellationToken)
     {
-        
         Check.NotNull(user, nameof(user));
 
         await UserRepository.InsertAsync(user, AutoSaveChanges, cancellationToken);
@@ -132,7 +135,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         }
         catch (AbpDbConcurrencyException ex)
         {
-            // Logger.LogWarning(ex.ToString()); //Trigger some AbpHandledException event
+            //Logger.LogWarning(ex.ToString()); //Trigger some AbpHandledException event
             return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
         }
 
@@ -158,7 +161,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         return IdentityResult.Success;
     }
 
-    public Task<SysUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+    public Task<SysUser> FindByIdAsync(string userId, CancellationToken cancellationToken=default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -171,8 +174,8 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
 
         Check.NotNull(normalizedUserName, nameof(normalizedUserName));
 
-        return UserRepository.FindByNormalizedUserNameAsync(normalizedUserName, includeDetails: true, cancellationToken: cancellationToken);
-
+        return UserRepository.FindByNormalizedUserNameAsync(normalizedUserName, includeDetails: true,
+            cancellationToken: cancellationToken);
     }
 
     #endregion
@@ -194,7 +197,8 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         var role = await RoleRepository.FindByNameAsync(roleName, cancellationToken: cancellationToken);
         if (role == null)
         {
-            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Role {0} does not exist!", roleName));
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Role {0} does not exist!",
+                roleName));
         }
 
         await UserRepository.EnsureCollectionLoadedAsync(user, u => u.Roles, cancellationToken);
@@ -220,7 +224,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         user.RemoveRole(role.Id);
     }
 
-    public async Task<IList<string>> GetRolesAsync(SysUser user, CancellationToken cancellationToken)
+    public async Task<IList<string>> GetRolesAsync(SysUser user, CancellationToken cancellationToken=default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -263,12 +267,14 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
 
     #endregion
 
+    #region 部门相关
+ 
     public async Task JoinDeptAsync(SysUser user, int deptId, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         Check.NotNull(user, nameof(user));
-       // Check.NotNull(deptName, nameof(deptName));
+        // Check.NotNull(deptName, nameof(deptName));
 
         if (await IsInDeptAsync(user, deptId, cancellationToken))
         {
@@ -278,7 +284,8 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         var dept = await DeptRepository.GetDeptByIdAsync(deptId);
         if (dept == null)
         {
-            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Dept {0} does not exist!", deptId));
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Dept {0} does not exist!",
+                deptId));
         }
 
         await UserRepository.EnsureCollectionLoadedAsync(user, u => u.Roles, cancellationToken);
@@ -291,7 +298,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         cancellationToken.ThrowIfCancellationRequested();
 
         Check.NotNull(user, nameof(user));
-      //  Check.NotNullOrWhiteSpace(roleName, nameof(roleName));
+        //  Check.NotNullOrWhiteSpace(roleName, nameof(roleName));
 
         var dept = await DeptRepository.GetDeptByIdAsync(deptId);
         if (dept == null)
@@ -303,18 +310,28 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
 
         user.QuitDept(deptId);
     }
-    
 
-    private async Task<bool> IsInDeptAsync(SysUser user, int deptId, CancellationToken cancellationToken)
+
+    private Task<bool> IsInDeptAsync(SysUser user, int deptId, CancellationToken cancellationToken)
     {
-        
-            cancellationToken.ThrowIfCancellationRequested();
+        cancellationToken.ThrowIfCancellationRequested();
 
-            Check.NotNull(user, nameof(user));
-            //Check.NotNullOrWhiteSpace(deptName, nameof(deptName));
-         return   user.IsInDept(deptId);
+        Check.NotNull(user, nameof(user));
+        //Check.NotNullOrWhiteSpace(deptName, nameof(deptName));
+        return Task.FromResult(user.IsInDept(deptId));
+    }
+    #endregion
+
+    #region 岗位相关
+
+    public async Task<List<long>> GetPostsByUserIdAsync(Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await PostRepository.GetPostsByUserId(userId);
     }
 
+    #endregion
+    
     public Task SetPasswordHashAsync(SysUser user, string passwordHash, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -322,6 +339,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         {
             throw new ArgumentNullException(nameof(user));
         }
+
         user.PasswordHash = passwordHash;
         return Task.CompletedTask;
     }
@@ -333,6 +351,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         {
             throw new ArgumentNullException(nameof(user));
         }
+
         return Task.FromResult(user.PasswordHash);
     }
 

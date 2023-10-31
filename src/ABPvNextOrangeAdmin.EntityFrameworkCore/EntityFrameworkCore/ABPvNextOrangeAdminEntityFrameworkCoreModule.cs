@@ -44,6 +44,13 @@ public class ABPvNextOrangeAdminEntityFrameworkCoreModule : AbpModule
                 /* The main point to change your DBMS.
                  * See also ABPvNextOrangeAdminMigrationsDbContextFactory for EF Core tooling. */
             options.UseMySQL();
+            options.Configure(configureOptions =>
+            {
+                configureOptions.UseMySQL();
+                configureOptions.DbContextOptions.EnableSensitiveDataLogging();
+            });
         });
+            
+        
     }
 }

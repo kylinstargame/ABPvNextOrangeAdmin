@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Extensions;
+using ABPvNextOrangeAdmin.System.Organization;
 using ABPvNextOrangeAdmin.System.Roles;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -83,11 +84,20 @@ class UserDataSeeder : IUserDataSeeder, ITransientDependency
                 adminPassword,
                 tenantId
             );
-            (await UserStore.CreateAsync(adminUser, adminPassword, false)).CheckErrors();
+            // if (adminName== "admin")
+            // {
+            //          adminUser.Posts.Add(new SysPost(1, "CEO", "董事长"));
+            // }
+            // else
+            // {
+            //     adminUser.Posts.Add(new SysPost(11, "CE", "董事长")); 
+            // }
+       
+            await UserStore.CreateAsync(adminUser, adminPassword, false);
             result.CreatedAdminUser = true;
             
             //"admin" role
-            const string adminRoleName = "admin";
+            string adminRoleName = adminName== "admin"?"admin":"common";
             //自动添加juesr
             var adminRole =
                 await RoleRepository.FindByNameAsync(adminRoleName);

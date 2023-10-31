@@ -39,6 +39,11 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
             );
     }
 
+
+    
+    
+
+
     public async Task<List<string>> GetRoleNamesAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var dbContext = await GetDbContextAsync();
@@ -47,7 +52,9 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
             join role in dbContext.Roles on userRole.RoleId equals role.Id
             where userRole.UserId == id
             select role.RoleName;
-        var deptIds = dbContext.Set<SysUserDept>().Where(q => q.UserId == id).Select(q => q.DeptId).ToArray();
+         var user = dbContext.Set<SysUser>().Include(u=>u.Depts).ToList().First();
+         var deptIds=user.Depts.Select(d => d.Id).ToList();
+
 
         //部门角色
         var deptRoleIds = await (
@@ -56,26 +63,30 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
             where deptIds.Contains(roleDept.DeptId)
             select roleDept.RoleId
         ).ToListAsync();
-
+        
         var deptRoleNameQuery = dbContext.Roles.Where(r => deptRoleIds.Contains(r.Id)).Select(n => n.RoleName);
         var resultQuery = query.Union(deptRoleNameQuery);
-        return await resultQuery.ToListAsync(GetCancellationToken());
+        return await query.ToListAsync(GetCancellationToken());
     }
 
     public async Task<List<string>> GetRoleNamesInOrganizationUnitAsync(Guid id,
         CancellationToken cancellationToken = default)
     {
         var dbContext = await GetDbContextAsync();
-        var query = from userDept in dbContext.Set<SysUserDept>()
-            join roleDept in dbContext.Set<SysRoleDept>() on userDept.DeptId equals roleDept.DeptId
-            join dept in dbContext.Set<SysDept>() on roleDept.DeptId equals dept.Id
+        var user = dbContext.Set<SysUser>().Include(u=>u.Depts).ToList().First();
+        var deptIds=user.Depts.Select(d => d.Id).ToList();
+
+        var query  = (
+            from roleDept in dbContext.Set<SysRoleDept>()
             join roles in dbContext.Roles on roleDept.RoleId equals roles.Id
-            where userDept.UserId == id
-            select roles.RoleName;
-
+            where deptIds.Contains(roleDept.DeptId)
+            select roles.RoleName
+        );
+        
         var result = await query.ToListAsync(GetCancellationToken());
-
+        
         return result;
+
     }
 
     public async Task<List<SysUser>> GetListByNormalizedRoleNameAsync(string normalizedRoleName,
@@ -110,7 +121,7 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
             .WhereIf(roleId >= 0, sysUser => sysUser.Roles.Any(x => x.RoleId == roleId))
             .WhereIf(deptId >= 0,
                 identityUser =>
-                    identityUser.Depts.Any(x => x.DeptId == deptId))
+                    identityUser.Depts.Any(x => x.Id == deptId))
             .WhereIf(!string.IsNullOrWhiteSpace(userName), x => x.UserName == userName)
             .WhereIf(!string.IsNullOrWhiteSpace(phoneNumber), x => x.PhoneNumber == phoneNumber)
             .WhereIf(!string.IsNullOrWhiteSpace(emailAddress), x => x.Email == emailAddress)

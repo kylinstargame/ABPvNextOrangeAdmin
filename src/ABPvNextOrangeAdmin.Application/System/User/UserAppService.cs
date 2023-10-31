@@ -4,29 +4,51 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
+using ABPvNextOrangeAdmin.ObjectMapper;
 using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.User.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Identity;
 
 namespace ABPvNextOrangeAdmin.System.User;
-
 [Authorize]
 [Route("api/sys/user/[action]")]
 public class UserAppService : ApplicationService, IUserAppService
 {
+    public SysUserStore UserStore { get; }
+
     public IRepository<SysUser> UserRepository { get; }
     // public IRepository<OrganizationUnit> OrganizationUnitRepository { get; }
-
-    public UserAppService(IRepository<SysUser> userRepository
+    private UserOutObjectMapper userObjectMapper { get; }
+    public UserAppService(IRepository<SysUser> userRepository, SysUserStore userStore, UserOutObjectMapper userObjectMapper
         /*IRepository<OrganizationUnit> organizationUnitRepository*/)
     {
         UserRepository = userRepository;
+        UserStore = userStore;
+        this.userObjectMapper = userObjectMapper;
         // OrganizationUnitRepository = organizationUnitRepository;
+    }
+    
+    [HttpGet]
+    [ActionName("get")]
+    public async Task<CommonResult<SysUserOutputWithRoleAndPosts>> GetAsync(string userId)
+    {
+        List<SysUser> users=new List<SysUser>();
+            var user=await UserStore.FindByIdAsync(userId);
+        users.Add(user);
+        var userOutputs = ObjectMapper.Map<List<SysUser>, List<SysUserOutput>>(users);
+        SysUserOutput userOutput = userObjectMapper.Map(user);
+        var sysUserOutput = ObjectMapper.Map<SysUser, SysUserOutput>(user); 
+        List<String> roleNames = await UserStore.GetRolesAsync(user) as List<string>;
+        List<long> postIds = await UserStore.GetPostsByUserIdAsync(Guid.Parse(userId)); 
+        // SysUserOutput userOutput = ObjectMapper.Map<SysUser, SysUserOutput>(user);
+        return CommonResult<SysUserOutputWithRoleAndPosts>.Success(
+             SysUserOutputWithRoleAndPosts.CreateInstance(userOutput,roleNames,postIds), "获取用户列表成功");
     }
 
     [HttpGet]
@@ -50,6 +72,13 @@ public class UserAppService : ApplicationService, IUserAppService
         return CommonResult<PagedResultDto<SysUserOutput>>.Success(
             new PagedResultDto<SysUserOutput>(sysUsers.Count(), userOutput), "获取用户列表成功");
     }
+    // [HttpGet]
+    // [ActionName("add")]
+    // public Task<CommonResult<String>> CreateAsync(string userId)
+    // {
+    //     return Task.FromResult(CommonResult<String>.Success("", ""));
+    // }
+
 
 
     [HttpGet]
@@ -60,7 +89,7 @@ public class UserAppService : ApplicationService, IUserAppService
     }
 
     [HttpGet]
-    [ActionName("update")]
+    [ActionName("edit")]
     public Task<CommonResult<string>> UpdateAsync(UserListInput input)
     {
         return Task.FromResult(CommonResult<String>.Success("", "��ȡ�û��б�ɹ�"));

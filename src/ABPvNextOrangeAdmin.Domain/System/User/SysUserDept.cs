@@ -1,34 +1,39 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Roles;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.System.User;
-
-public class SysUserDept : FullAuditedEntity
+[Table("sys_user_dept")]
+public class SysUserDept : AuditedEntity
 {
     private readonly Guid? _tenantId;
 
+
+
+    public Guid UserId  { get; set; }
+    
+    
+    public long DeptId  { get; set; }
+    
     /// <summary>
     /// 用户ID
     /// </summary>
-    public Guid UserId { get; set; }
-
+    public SysUser User { get; set; }
     /// <summary>
-    /// 角色ID
-    /// </summary>
-    public long DeptId { get; set; }
+    ///部门ID
+    /// </summary>a
+    public SysDept Dept { get; set; }
 
 
     public override object[] GetKeys()
     {
         return new object[] { UserId, DeptId };
     }
-
-    private SysUserDept()
-    {
-    }
-
+    public ICollection<SysUser> Users { get;  set; }
+  
     public SysUserDept(Guid userId, long deptId, Guid? tenantId)
     {
         _tenantId = tenantId;
@@ -46,11 +51,7 @@ public class SysUserDept : FullAuditedEntity
         List<SysUserDept> userDepts = new List<SysUserDept>();
         foreach (var deptId in deptIds)
         {
-            userDepts.Add(new SysUserDept()
-            {
-                DeptId = deptId,
-                UserId = userId
-            });
+            userDepts.Add(new SysUserDept(userId,deptId));
         }
 
         return userDepts;

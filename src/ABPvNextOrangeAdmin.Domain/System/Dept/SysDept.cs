@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using ABPvNextOrangeAdmin.Constans;
 using ABPvNextOrangeAdmin.System.Organization;
@@ -16,6 +18,11 @@ namespace ABPvNextOrangeAdmin.System.Dept;
 /// </summary>
 public sealed class SysDept : FullAuditedAggregateRoot<long>, IMultiTenant
 {
+    public SysDept(long id)
+    {
+        Id = id;
+
+    }
     public SysDept(long id, string deptName)
     {
         Id = id;
@@ -35,8 +42,9 @@ public sealed class SysDept : FullAuditedAggregateRoot<long>, IMultiTenant
         DeptName = deptName;
         ParentId = parentId;
     }
+    
 
-
+    
     /// <summary>
     /// 父部门ID
     /// </summary>
@@ -91,6 +99,7 @@ public sealed class SysDept : FullAuditedAggregateRoot<long>, IMultiTenant
     /// 关联角色
     /// </summary>
     public ICollection<SysRoleDept> Roles { get; set; }
+    public ICollection<SysUser> Users { get; set; }
 
     #region 组织代码
 

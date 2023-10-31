@@ -218,6 +218,9 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.Property<string>("ListClass")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Remark")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Status")
                         .HasColumnType("longtext");
 
@@ -281,9 +284,9 @@ namespace ABPvNextOrangeAdmin.Migrations
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Menu.SysMenu", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Component")
                         .HasColumnType("longtext");
@@ -357,8 +360,8 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("SysMenuId")
-                        .HasColumnType("int");
+                    b.Property<long?>("SysMenuId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Visible")
                         .HasColumnType("longtext");
@@ -376,12 +379,6 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("ConcurrencyStamp");
-
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("CreationTime");
@@ -397,10 +394,6 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.Property<DateTime?>("DeletionTime")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("DeletionTime");
-
-                    b.Property<string>("ExtraProperties")
-                        .HasColumnType("longtext")
-                        .HasColumnName("ExtraProperties");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -603,7 +596,12 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("LastModifierId");
 
+                    b.Property<long?>("SysRoleId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("MenuId", "RoleId");
+
+                    b.HasIndex("SysRoleId");
 
                     b.ToTable("sys_role_menu", (string)null);
                 });
@@ -670,8 +668,7 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .HasColumnType("varchar(40)")
                         .HasColumnName("ConcurrencyStamp");
 
-                    b.Property<DateTime?>("CreationTime")
-                        .IsRequired()
+                    b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("CreationTime");
 
@@ -686,9 +683,6 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.Property<DateTime?>("DeletionTime")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("DeletionTime");
-
-                    b.Property<long>("DeptId")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("Email")
                         .HasColumnType("longtext");
@@ -754,54 +748,6 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("sys_user", (string)null);
-                });
-
-            modelBuilder.Entity("ABPvNextOrangeAdmin.System.User.SysUserDept", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<long>("DeptId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("DeleterId");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("DeletionTime");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false)
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<Guid?>("SysUserId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("UserId", "DeptId");
-
-                    b.HasIndex("SysUserId");
-
-                    b.ToTable("sys_user_dept", (string)null);
                 });
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.User.SysUserLogin", b =>
@@ -899,8 +845,8 @@ namespace ABPvNextOrangeAdmin.Migrations
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.User.SysUserPost", b =>
                 {
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
 
                     b.Property<long>("PostId")
                         .HasColumnType("bigint");
@@ -937,7 +883,24 @@ namespace ABPvNextOrangeAdmin.Migrations
 
                     b.HasKey("UserId", "PostId");
 
+                    b.HasIndex("PostId");
+
                     b.ToTable("sys_user_post", (string)null);
+                });
+
+            modelBuilder.Entity("SysUserDept", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<long>("DeptId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("UserId", "DeptId");
+
+                    b.HasIndex("DeptId");
+
+                    b.ToTable("sys_user_dept", (string)null);
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>
@@ -1382,17 +1345,17 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .HasForeignKey("SysDeptId");
                 });
 
+            modelBuilder.Entity("ABPvNextOrangeAdmin.System.Roles.SysRoleMenu", b =>
+                {
+                    b.HasOne("ABPvNextOrangeAdmin.System.Roles.SysRole", null)
+                        .WithMany("Menuss")
+                        .HasForeignKey("SysRoleId");
+                });
+
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Roles.SysUserRole", b =>
                 {
                     b.HasOne("ABPvNextOrangeAdmin.System.User.SysUser", null)
                         .WithMany("Roles")
-                        .HasForeignKey("SysUserId");
-                });
-
-            modelBuilder.Entity("ABPvNextOrangeAdmin.System.User.SysUserDept", b =>
-                {
-                    b.HasOne("ABPvNextOrangeAdmin.System.User.SysUser", null)
-                        .WithMany("Depts")
                         .HasForeignKey("SysUserId");
                 });
 
@@ -1401,6 +1364,40 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.HasOne("ABPvNextOrangeAdmin.System.User.SysUser", null)
                         .WithMany("Logins")
                         .HasForeignKey("SysUserId");
+                });
+
+            modelBuilder.Entity("ABPvNextOrangeAdmin.System.User.SysUserPost", b =>
+                {
+                    b.HasOne("ABPvNextOrangeAdmin.System.Organization.SysPost", "Post")
+                        .WithMany("UserPosts")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ABPvNextOrangeAdmin.System.User.SysUser", "User")
+                        .WithMany("UserPosts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SysUserDept", b =>
+                {
+                    b.HasOne("ABPvNextOrangeAdmin.System.Dept.SysDept", null)
+                        .WithMany()
+                        .HasForeignKey("DeptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ABPvNextOrangeAdmin.System.User.SysUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>
@@ -1449,13 +1446,23 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.Navigation("Children");
                 });
 
+            modelBuilder.Entity("ABPvNextOrangeAdmin.System.Organization.SysPost", b =>
+                {
+                    b.Navigation("UserPosts");
+                });
+
+            modelBuilder.Entity("ABPvNextOrangeAdmin.System.Roles.SysRole", b =>
+                {
+                    b.Navigation("Menuss");
+                });
+
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.User.SysUser", b =>
                 {
-                    b.Navigation("Depts");
-
                     b.Navigation("Logins");
 
                     b.Navigation("Roles");
+
+                    b.Navigation("UserPosts");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>

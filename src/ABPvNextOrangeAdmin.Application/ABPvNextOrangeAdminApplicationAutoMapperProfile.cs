@@ -3,6 +3,8 @@ using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.Config;
 using ABPvNextOrangeAdmin.System.Config.Dto;
 using ABPvNextOrangeAdmin.System.Dept;
+using ABPvNextOrangeAdmin.System.Dict;
+using ABPvNextOrangeAdmin.System.Dict.Dto;
 using ABPvNextOrangeAdmin.System.Menu;
 using ABPvNextOrangeAdmin.System.Organization;
 using ABPvNextOrangeAdmin.System.Organization.Dto;
@@ -30,6 +32,6 @@ public class ABPvNextOrangeAdminApplicationAutoMapperProfile : Profile
         CreateMap<SysDept, SysDeptOutput>();
         CreateMap<SysDept, SysDeptTreeSelectOutput>().ForMember(a => a.Label,
             b => b.MapFrom(a => a.DeptName));
-            ;
+        CreateMap<SysDictData,DictDataOutput>();
     }
 }

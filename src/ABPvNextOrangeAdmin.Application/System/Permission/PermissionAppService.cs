@@ -6,6 +6,7 @@ using Volo.Abp.Identity;
 using Volo.Abp.Identity.Settings;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.SimpleStateChecking;
+using IPermissionManager = ABPvNextOrangeAdmin.System.User.IPermissionManager;
 
 namespace ABPvNextOrangeAdmin.System.Permission;
 

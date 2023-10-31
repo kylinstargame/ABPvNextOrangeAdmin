@@ -17,6 +17,12 @@ public interface IUserRepository : IBasicRepository<SysUser, Guid>
         bool includeDetails = true,
         CancellationToken cancellationToken = default
     );
+    // Task<SysUser> FindByIdAsync(
+    //     Guid userId,
+    //     bool includeDetails = true,
+    //     CancellationToken cancellationToken = default
+
+    // );
     
     Task<List<string>> GetRoleNamesAsync(
         Guid id,

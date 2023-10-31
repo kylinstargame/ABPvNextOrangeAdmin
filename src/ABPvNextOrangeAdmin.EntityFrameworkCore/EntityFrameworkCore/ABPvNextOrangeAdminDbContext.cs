@@ -1,4 +1,7 @@
-﻿using ABPvNextOrangeAdmin.System.Config;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using ABPvNextOrangeAdmin.System.Config;
 using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Dict;
 using ABPvNextOrangeAdmin.System.Menu;
@@ -12,6 +15,7 @@ using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Modeling;
+using Volo.Abp.Identity.Settings;
 
 // using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
@@ -46,12 +50,13 @@ public class ABPvNextOrangeAdminDbContext :
     public DbSet<SysRole> Roles { get; set; }
     public DbSet<SysDept> Depts { get; set; }
     public DbSet<SysPost> Posts { get; set; }
+
     public DbSet<SysUserRole> UserRoles { get; set; }
-    public DbSet<SysUserDept> UserDepts { get; set; }
+    // public DbSet<SysUserDept> UserDepts { get; set; }
     public DbSet<SysRoleDept> RoleDepts { get; set; }
     public DbSet<SysUserPost> UserPosts { get; set; }
     public DbSet<SysUserLogin> UserLogins { get; set; }
-    
+
     // Tenant Management
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
@@ -88,78 +93,109 @@ public class ABPvNextOrangeAdminDbContext :
         // builder.ConfigureIdentityServer();
         // builder.ConfigureFeatureManagement();
         builder.ConfigureTenantManagement();
-
-        /* Configure your own tables/entities inside here */
-
-        //builder.Entity<YourEntity>(b =>
-        //{
-        //    b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "YourEntities", ABPvNextOrangeAdminConsts.DbSchema);
-        //    b.ConfigureByConvention(); //auto configure for the base class props
-        //    //...
-        //});
-        
         builder.Entity<SysUser>(b =>
         {
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user", ABPvNextOrangeAdminConsts.DbSchema);
             b.ConfigureByConvention();
         });
-        
-        builder.Entity<SysUserLogin>(b =>
-        {
-            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_login", ABPvNextOrangeAdminConsts.DbSchema);
-            b.ConfigureByConvention();
-        });
-        
-        builder.Entity<SysRole>(b =>
-        {
-            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "role", ABPvNextOrangeAdminConsts.DbSchema);
-            b.ConfigureByConvention();
-        });
-        
         builder.Entity<SysDept>(b =>
         {
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "dept", ABPvNextOrangeAdminConsts.DbSchema);
             b.ConfigureByConvention();
         });
-        
+
+
+        // /* Configure your own tables/entities inside here */
+        //
+        // //builder.Entity<YourEntity>(b =>
+        // //{
+        // //    b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "YourEntities", ABPvNextOrangeAdminConsts.DbSchema);
+        // //    b.ConfigureByConvention(); //auto configure for the base class props
+        // //    //...
+        // //});
+        // builder.Entity<SysUser>()
+        //     .HasMany(e => e.Depts)
+        //     .WithMany(e => e.Users)
+        //     .UsingEntity(
+        //         "SysUserDept",
+        //         l => l.HasOne(typeof(SysDept)).WithMany().HasForeignKey("DeptId").HasPrincipalKey(nameof(SysDept.Id)),
+        //         r => r.HasOne(typeof(SysUser)).WithMany().HasForeignKey("UserId").HasPrincipalKey(nameof(SysUser.Id)),
+        //         j => j.ToTable("sys_user_dept").HasKey("DeptId", "UserId"));
+        builder.Entity<SysDept>()
+            .HasMany(e => e.Users)
+            .WithMany(e => e.Depts
+            )
+            .UsingEntity(
+                "SysUserDept",
+                l => l.HasOne(typeof(SysUser)).WithMany().HasForeignKey("UserId").HasPrincipalKey(nameof(SysUser.Id)),
+                r => r.HasOne(typeof(SysDept)).WithMany().HasForeignKey("DeptId").HasPrincipalKey(nameof(SysDept.Id)),
+                
+                j => j.ToTable("sys_user_dept").HasKey("UserId","DeptId"));
+      
+        // builder.Entity<SysPost>()
+        //     .HasMany(e => e.Users)
+        //     .WithMany(e => e.Posts
+        //     )
+        //     .UsingEntity(
+        //               "SysUserPost",
+        //               r => r.HasOne(typeof(SysUser)).WithMany().HasForeignKey("UserId")
+        //                   .HasPrincipalKey(nameof(SysUser.Id)),
+        //               l => l.HasOne(typeof(SysPost)).WithMany().HasForeignKey("PostId").HasPrincipalKey(nameof(SysPost.Id)),
+        //               
+        //         j => j.ToTable("sys_user_post").HasKey("UserId","PostId"));
+        // builder.Entity<SysUserDept>(b =>
+        // {
+        //     b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_dept2", ABPvNextOrangeAdminConsts.DbSchema)
+        //         .HasKey("DeptId", "UserId");
+        //
+        //
+        //     b.ConfigureByConvention();
+        // });
+        builder.Entity<SysUserLogin>(b =>
+        {
+            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_login", ABPvNextOrangeAdminConsts.DbSchema);
+            b.ConfigureByConvention();
+        });
+
+        builder.Entity<SysRole>(b =>
+        {
+            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "role", ABPvNextOrangeAdminConsts.DbSchema);
+            b.ConfigureByConvention();
+        });
+
+
         builder.Entity<SysPost>(b =>
         {
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "post", ABPvNextOrangeAdminConsts.DbSchema);
             b.ConfigureByConvention();
         });
-        
+
         builder.Entity<SysUserRole>(b =>
         {
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_role", ABPvNextOrangeAdminConsts.DbSchema);
             b.HasKey(x =>
-                new {x.UserId, x.RoleId}
+                new { x.UserId, x.RoleId }
             );
             b.ConfigureByConvention();
         });
-        
-        builder.Entity<SysUserDept>(b =>
-        {
-            b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_dept", ABPvNextOrangeAdminConsts.DbSchema);
-            b.HasKey(x =>
-                new {x.UserId, x.DeptId}
-            );
-            b.ConfigureByConvention();
-        });
-        
+
+
         builder.Entity<SysRoleDept>(b =>
         {
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "role_dept", ABPvNextOrangeAdminConsts.DbSchema);
             b.HasKey(x =>
-                new {x.RoleId, x.DeptId}
+                new { x.RoleId, x.DeptId }
             );
             b.ConfigureByConvention();
         });
-        
+
         builder.Entity<SysUserPost>(b =>
         {
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_post", ABPvNextOrangeAdminConsts.DbSchema);
+            b.HasOne(x => x.User).WithMany(x => x.UserPosts).HasForeignKey(x => x.UserId);
+            b.HasOne(x => x.Post).WithMany(x => x.UserPosts).HasForeignKey(x => x.PostId);
             b.HasKey(x =>
-                new {x.UserId, x.PostId}
+                new { x.UserId, x.PostId }
             );
             b.ConfigureByConvention();
         });
@@ -168,7 +204,7 @@ public class ABPvNextOrangeAdminDbContext :
         {
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "role_menu", ABPvNextOrangeAdminConsts.DbSchema);
             b.HasKey(x =>
-                new {x.MenuId, x.RoleId}
+                new { x.MenuId, x.RoleId }
             );
             b.ConfigureByConvention();
         });
