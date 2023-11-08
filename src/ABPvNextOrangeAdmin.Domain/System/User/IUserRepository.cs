@@ -10,8 +10,14 @@ using Volo.Abp.Domain.Repositories;
 
 namespace ABPvNextOrangeAdmin.System.User;
 
-public interface IUserRepository : IBasicRepository<SysUser, Guid>
+public interface IUserRepository : IRepository<SysUser, Guid>
 {
+    Task<SysUser> FindByIdAsync(
+        [NotNull] Guid Id,
+        bool includeDetails = true,
+        CancellationToken cancellationToken = default
+    );
+    
     Task<SysUser> FindByNormalizedUserNameAsync(
         [NotNull] string normalizedUserName,
         bool includeDetails = true,
@@ -23,16 +29,25 @@ public interface IUserRepository : IBasicRepository<SysUser, Guid>
     //     CancellationToken cancellationToken = default
 
     // );
-    
+
     Task<List<string>> GetRoleNamesAsync(
         Guid id,
         CancellationToken cancellationToken = default
     );
-    
+
+    Task<List<long>> GetRoleIdsAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    );
+
     Task<List<string>> GetRoleNamesInOrganizationUnitAsync(
         Guid id,
         CancellationToken cancellationToken = default);
-    
+
+    Task<List<long>> GetRoleIdsInOrganizationUnitAsync(
+        Guid id,
+        CancellationToken cancellationToken = default);
+
     // Task<SysUser> FindByLoginAsync(
     //     [NotNull] string loginProvider,
     //     [NotNull] string providerKey,
@@ -57,7 +72,7 @@ public interface IUserRepository : IBasicRepository<SysUser, Guid>
         bool includeDetails = false,
         CancellationToken cancellationToken = default
     );
-    
+
     // Task<List<SysUser>> GetListAsync(
     //     string sorting = null,
     //     int maxResultCount = int.MaxValue,
@@ -111,4 +126,5 @@ public interface IUserRepository : IBasicRepository<SysUser, Guid>
     //     bool? notActive = null,
     //     CancellationToken cancellationToken = default
     // );
+
 }

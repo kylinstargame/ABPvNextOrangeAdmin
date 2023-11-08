@@ -14,6 +14,12 @@ public interface IRoleRepository  : IBasicRepository<SysRole, long>
         bool includeDetails = true,
         CancellationToken cancellationToken = default
     );
+    Task<SysRole> FindByIdAsync(
+        long roleId,
+        bool includeDetails = true,
+        CancellationToken cancellationToken = default
+    );
+
 
     Task<List<SysRole>> GetListAsync(
         string sorting = null,

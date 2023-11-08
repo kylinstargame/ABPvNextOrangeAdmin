@@ -31,12 +31,13 @@ public class EfcoreUserPostRepository:EfCoreRepository<ABPvNextOrangeAdminDbCont
         return  Posts.ToList();
     }
 
-    public async Task<List<long>> GetPostsById(long postId)
+    public async Task<List<SysPost>> GetPostsById(long postId)
     {
         var dbContext = await GetDbContextAsync();
-        var Posts= from Post in dbContext.Set<SysPost>()
-            where Post.Id ==postId
-            select Post.Id;
+        var Posts = from Post in dbContext.Set<SysPost>()
+            where Post.Id == postId
+                select Post;
+            
         return Posts.ToList();
     }
     //

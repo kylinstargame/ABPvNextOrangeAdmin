@@ -7,6 +7,10 @@ namespace ABPvNextOrangeAdmin.System.Account.Dto;
 
 public class UserWithRoleAndPermissionOutput
 {
+    public UserWithRoleAndPermissionOutput()
+    {
+    }
+
     /// <summary>
     /// 用户信息
     /// </summary>
@@ -15,7 +19,7 @@ public class UserWithRoleAndPermissionOutput
     /// <summary>
     /// 角色信息
     /// </summary>
-    public String[] Roles { get; set; }
+    public long[] Roles { get; set; }
 
 
     /// <summary>
@@ -23,14 +27,14 @@ public class UserWithRoleAndPermissionOutput
     /// </summary>
     public String[] Permissions { get;}
 
-    private UserWithRoleAndPermissionOutput(SysUserOutput user, string[] roles, string[] permissions)
+    private UserWithRoleAndPermissionOutput(SysUserOutput user,long[] roles, string[] permissions)
     {
         User = user;
         Roles = roles;
         Permissions = permissions;
     }
 
-    public static UserWithRoleAndPermissionOutput CreateInstance(SysUserOutput user, string[] roles, string[] permissions)
+    public static UserWithRoleAndPermissionOutput CreateInstance(SysUserOutput user, long[] roles, string[] permissions)
     {
         return new UserWithRoleAndPermissionOutput(user, roles, permissions);
     }

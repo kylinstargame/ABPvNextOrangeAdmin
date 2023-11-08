@@ -3,8 +3,8 @@
   <Import Project="..\..\common.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>ABPvNextOrangeAdmin</RootNamespace>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +19,7 @@
     <PackageReference Include="Volo.Abp.TenantManagement.Application" Version="5.3.2" />
     <PackageReference Include="Volo.Abp.FeatureManagement.Application" Version="5.3.2" />
     <PackageReference Include="Volo.Abp.SettingManagement.Application" Version="5.3.2" />
+    <PackageReference Include="xunit.assert" Version="2.4.1" />
   </ItemGroup>
 
   <ItemGroup>

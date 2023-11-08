@@ -84,14 +84,14 @@ class UserDataSeeder : IUserDataSeeder, ITransientDependency
                 adminPassword,
                 tenantId
             );
-            // if (adminName== "admin")
-            // {
-            //          adminUser.Posts.Add(new SysPost(1, "CEO", "董事长"));
-            // }
-            // else
-            // {
-            //     adminUser.Posts.Add(new SysPost(11, "CE", "董事长")); 
-            // }
+            if (adminName== "admin")
+            {
+                     adminUser.Posts.Add(new SysPost(1, "CEO", "董事长"));
+            }
+            else
+            {
+                adminUser.Posts.Add(new SysPost(11, "CE", "董事长")); 
+            }
        
             await UserStore.CreateAsync(adminUser, adminPassword, false);
             result.CreatedAdminUser = true;

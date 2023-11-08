@@ -100,7 +100,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
         await IdentityOptions.SetAsync();
 
         //创建新用户
-        var user = new SysUser(GuidGenerator.Create(),input.UserName, input.EmailAddress, input.Password, CurrentTenant.Id);
+        var user = new SysUser(GuidGenerator.Create(),input.UserName, input.EmailAddress, input.EmailAddress,input.Password, CurrentTenant.Id);
         input.MapExtraPropertiesTo(user);
 
         (await UserManager.CreateAsync(user, input.Password)).CheckErrors();
@@ -221,7 +221,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
     //     await IdentityOptions.SetAsync();
     //
     //     var user = await UserManager.GetByIdAsync(input.UserId);
-    //     (await UserManager.ResetPasswordAsync(user, input.ResetToken, input.Password)).CheckErrors();
+    // (await UserManager.ResetPasswordAsync(user, input.ResetToken, input.Password)).CheckErrors();
     //
     //     await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext
     //     {
@@ -266,15 +266,15 @@ public class AccountAppService : ApplicationService, IAccountAppService
 
         var sysUserOutput = ObjectMapper.Map<SysUser, SysUserOutput>(sysUser);
         //获取角色名称
-        IList<string> roleNames =
-            await UserManager.GetRolesAsync(sysUser); 
+        List<long> roleIds =
+            await UserManager.GetRoleIdsAsync(sysUser); 
 
 
         List<String> permissionNames = new List<string>();
         // 获取角色权限
-        foreach (var roleName in  roleNames)
+        foreach (var roleId in  roleIds)
         {
-            var role = await RoleRepository.FindByNameAsync(roleName);
+            var role = await RoleRepository.FindByIdAsync(roleId);
             if (role != null)
             {
                 var Permssions = await PermissionManager.GetAllRolePermssionsAysnc(role.Id);
@@ -285,7 +285,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
              var uPermssions=  await PermissionManager.GetAllUserPermssionsAysnc(CurrentUser.Id.Value);
                     permissionNames.AddRange(uPermssions); 
         return CommonResult<UserWithRoleAndPermissionOutput>.Success(
-            UserWithRoleAndPermissionOutput.CreateInstance(sysUserOutput,  roleNames.ToArray(),
+            UserWithRoleAndPermissionOutput.CreateInstance(sysUserOutput,  roleIds.ToArray(),
                 permissionNames.ToArray()), "获取用户信息");
     }
 

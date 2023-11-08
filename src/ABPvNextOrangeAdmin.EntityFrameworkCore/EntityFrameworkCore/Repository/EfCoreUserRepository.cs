@@ -27,7 +27,18 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
     }
 
     public ILookupNormalizer LookNormalizer { get; set; }
+
+    public async Task<SysUser> FindByIdAsync(Guid Id, bool includeDetails = true, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return await (await GetDbSetAsync()).Include(x=>x.Roles).Include(x=>x.Posts)
+            .OrderBy(x => x.CreationTime)
+            .FirstOrDefaultAsync(
+                u => u.Id ==Id
+            );
+    }
     
+
     public async Task<SysUser> FindByNormalizedUserNameAsync(string userName, bool includeDetails = true,
         CancellationToken cancellationToken = default)
     {
@@ -38,11 +49,7 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
                 u => u.UserName == userName
             );
     }
-
-
     
-    
-
 
     public async Task<List<string>> GetRoleNamesAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -69,6 +76,51 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
         return await query.ToListAsync(GetCancellationToken());
     }
 
+    public async Task<List<long>> GetRoleIdsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var dbContext = await GetDbContextAsync();
+        // 用户角色
+        var query = from userRole in dbContext.Set<SysUserRole>()
+            join role in dbContext.Roles on userRole.RoleId equals role.Id
+            where userRole.UserId == id
+            select role.Id;
+        var user = dbContext.Set<SysUser>().Include(u=>u.Depts).ToList().First();
+        var deptIds=user.Depts.Select(d => d.Id).ToList();
+
+
+        //部门角色
+        var deptRoleIds = await (
+            from roleDept in dbContext.Set<SysRoleDept>()
+            join dept in dbContext.Set<SysDept>() on roleDept.DeptId equals dept.Id
+            where deptIds.Contains(roleDept.DeptId)
+            select roleDept.RoleId
+        ).ToListAsync();
+        
+        var deptRoleIdQuery = dbContext.Roles.Where(r => deptRoleIds.Contains(r.Id)).Select(n => n.Id);
+        var resultQuery = query.Union(deptRoleIdQuery);
+        return await query.ToListAsync(GetCancellationToken());
+    }
+
+
+
+    public async Task<List<long>> GetRoleIdsInOrganizationUnitAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var dbContext = await GetDbContextAsync();
+        var user = dbContext.Set<SysUser>().Include(u=>u.Depts).ToList().First();
+        var deptIds=user.Depts.Select(d => d.Id).ToList();
+
+        var query  = (
+            from roleDept in dbContext.Set<SysRoleDept>()
+            join role in dbContext.Roles on roleDept.RoleId equals role.Id
+            where deptIds.Contains(roleDept.DeptId)
+            select role.Id
+        );
+        
+        var result = await query.ToListAsync(GetCancellationToken());
+        
+        return result;
+    }
+
     public async Task<List<string>> GetRoleNamesInOrganizationUnitAsync(Guid id,
         CancellationToken cancellationToken = default)
     {
@@ -78,9 +130,9 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
 
         var query  = (
             from roleDept in dbContext.Set<SysRoleDept>()
-            join roles in dbContext.Roles on roleDept.RoleId equals roles.Id
+            join role in dbContext.Roles on roleDept.RoleId equals role.Id
             where deptIds.Contains(roleDept.DeptId)
-            select roles.RoleName
+            select role.RoleName
         );
         
         var result = await query.ToListAsync(GetCancellationToken());
@@ -98,6 +150,8 @@ public class EfCoreUserRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
             u=>LookNormalizer.NormalizeName(u.UserName) == normalizedRoleName
         ).ToList();
     }
+
+
 
     public Task<SysUser> FindByLoginAsync(string loginProvider, string providerKey, bool includeDetails = true,
         CancellationToken cancellationToken = default)

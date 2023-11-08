@@ -9,5 +9,5 @@ namespace ABPvNextOrangeAdmin.System.User;
 public interface IPostRepository: IBasicRepository<SysPost>
 {
    Task<List<long>> GetPostsByUserId(Guid userId);
-   Task<List<long>> GetPostsById(long  postId);
+   Task<List<SysPost>> GetPostsById(long postId);
 }

@@ -30,6 +30,7 @@ public class ABPvNextOrangeAdminApplicationAutoMapperProfile : Profile
         CreateMap<SysUser, SysUserOutput>();
         CreateMap<SysRole, SysRoleOutput>();
         CreateMap<SysDept, SysDeptOutput>();
+        CreateMap<SysPost, SysPostOutput>();
         CreateMap<SysDept, SysDeptTreeSelectOutput>().ForMember(a => a.Label,
             b => b.MapFrom(a => a.DeptName));
         CreateMap<SysDictData,DictDataOutput>();

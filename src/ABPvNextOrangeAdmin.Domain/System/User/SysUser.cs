@@ -21,8 +21,8 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
 {
     public SysUser()
     {
-        
     }
+
     public SysUser(Guid id, string userName, string email, Guid? tenantId = null)
     {
         Id = id;
@@ -31,8 +31,8 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Email = email;
         // Password = password;
     }
-    
-    public SysUser(Guid id, string userName, string email, string password, Guid? tenantId = null)
+
+    public SysUser(Guid id, string userName, string phoneNumber, string email, string password, Guid? tenantId = null)
     {
         Id = id;
         UserName = userName;
@@ -40,6 +40,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Email = email;
         Email = email;
         Password = password;
+        PhoneNumber = phoneNumber;
     }
 
     public SysUser(Guid id, string userName, string email, string nickName, string phoneNumber, string password,
@@ -58,10 +59,10 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Logins = new Collection<SysUserLogin>();
         IsActive = true;
         CreationTime = DateTime.Now;
-
     }
 
-    public SysUser(Guid id, string userName, string email, string password, bool lockoutEnabled, DateTimeOffset? lockoutEnd,
+    public SysUser(Guid id, string userName, string email, string password, bool lockoutEnabled,
+        DateTimeOffset? lockoutEnd,
         Guid? tenantId = null)
     {
         Id = id;
@@ -75,7 +76,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         IsActive = true;
         CreationTime = DateTime.Now;
     }
-    
+
 
     /// <summary>
     /// 登录名称
@@ -111,7 +112,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
     /// 用户密码
     /// </summary>
     public string Password { get; set; }
-    
+
     /// <summary>
     /// 用户密码哈希值
     /// </summary>
@@ -131,8 +132,8 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
     /// 最后登录时间
     /// </summary>
     public string LoginTime { get; set; }
-    
-    
+
+
     /// <summary>
     /// 最后登录时间
     /// </summary>
@@ -167,23 +168,24 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
     /// <summary>
     /// 关联角色
     /// </summary>
-    public ICollection<SysUserRole> Roles { get;  set; }
+    public ICollection<SysUserRole> Roles { get; set; } = new List<SysUserRole>();
 
     /// <summary>
     /// 关联部门
     /// </summary>
-    public ICollection<SysDept> Depts { get;  set; }
+    public ICollection<SysDept> Depts { get; set; }
 
     /// <summary>
     /// 关联崗位
     /// </summary>
-    public ICollection<SysUserPost> UserPosts { get; set; } = new List<SysUserPost>();
+    public ICollection<SysPost> Posts { get; set; } = new List<SysPost>();
 
 
     public bool IsAdmin()
     {
         return UserName.ToLower() == "admin";
-    } 
+    }
+
     #region 角色相关
 
     public bool IsInRole(long roleId)
@@ -193,29 +195,38 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         return Roles.Any(r => r.RoleId == roleId);
     }
 
-
-    public void AddRole(long roleId)
+    public void ResetRoles(long[] roleIds)
     {
-        Check.NotNull(roleId, nameof(roleId));
-
-        if (IsInRole(roleId))
-        {
-            return;
-        }
-
-        Roles.Add(new SysUserRole(Id, roleId, TenantId));
+        Roles.Clear();
+        Check.NotNull(roleIds, nameof(roleIds));
+        // foreach (var roleId in roleIds)
+        // {
+        //     Roles.Add(new SysUserRole(Id, roleId, TenantId));
+        // }
     }
 
-    public void RemoveRole(long roleId)
+    public void AddRole(long postId)
     {
-        Check.NotNull(roleId, nameof(roleId));
+        Check.NotNull(postId, nameof(postId));
 
-        if (!IsInRole(roleId))
+        if (IsInRole(postId))
         {
             return;
         }
 
-        Roles.RemoveAll(r => r.RoleId == roleId);
+        Roles.Add(new SysUserRole(Id, postId, TenantId));
+    }
+
+    public void RemoveRole(long postId)
+    {
+        Check.NotNull(postId, nameof(postId));
+
+        if (!IsInRole(postId))
+        {
+            return;
+        }
+
+        Roles.RemoveAll(r => r.RoleId == postId);
     }
 
     #endregion
@@ -224,7 +235,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     public bool IsInDept(long deptId)
     {
-        return Depts.Any(dept=>dept.Id == deptId);
+        return Depts.Any(dept => dept.Id == deptId);
     }
 
 
@@ -235,7 +246,7 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
             return;
         }
 
-        this.Depts.Add(new  SysDept(deptId));
+        this.Depts.Add(new SysDept(deptId));
     }
 
     public void QuitDept(long deptId)
@@ -244,7 +255,58 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         {
             return;
         }
-        Depts.RemoveAll<SysDept>((Func<SysDept, bool>) (userDept => userDept.Id == deptId));
+
+        Depts.RemoveAll<SysDept>((Func<SysDept, bool>)(userDept => userDept.Id == deptId));
+    }
+
+    #endregion
+    
+    #region 岗位相关
+
+    public bool IsInPost(long postId)
+    {
+        Check.NotNull(postId, nameof(postId));
+
+        return Posts.Any(up => up.Id== postId);
+    }
+
+    public void ResetPosts(long[] postIds)
+    {
+        Posts.Clear();
+        Check.NotNull(postIds, nameof(postIds));
+        foreach (var postId in postIds)
+        {
+            if (postId==1)
+            {
+                continue;
+            }
+            
+            // Posts.Add(new SysPost(Id, postId));
+        }
+    }
+
+    public void AddPost(long postId)
+    {
+        Check.NotNull(postId, nameof(postId));
+
+        if (IsInRole(postId))
+        {
+            return;
+        }
+
+        // Posts.Add(new SysUserPost(Id, postId));
+    }
+
+    public void RemovePost(long postId)
+    {
+        Check.NotNull(postId, nameof(postId));
+
+        if (!IsInRole(postId))
+        {
+            return;
+        }
+
+        Posts.RemoveAll(r => r.Id == postId);
     }
 
     #endregion
@@ -263,8 +325,6 @@ public static class UserEfCoreQueryableExtensions
         return queryable
             .Include(x => x.Roles)
             .Include(x => x.Logins)
-            // .Include(x => x.Claims)
-            // .Include(x => x.Tokens)
             .Include(x => x.Depts);
     }
 }

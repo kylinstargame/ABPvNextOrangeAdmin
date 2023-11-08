@@ -7,7 +7,7 @@ namespace ABPvNextOrangeAdmin.System.User;
 
 public class SysUserPost : FullAuditedEntity
 {
-    private SysUserPost(Guid userId, long postId)
+    public SysUserPost(Guid userId, long postId)
     {
         UserId = userId;
         PostId = postId;

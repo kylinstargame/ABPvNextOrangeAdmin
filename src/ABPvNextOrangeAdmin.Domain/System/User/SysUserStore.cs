@@ -19,7 +19,8 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
     IUserRoleStore<SysUser>, ITransientDependency
 {
     public SysUserStore(IUserRepository userRepository, SysUserErrorDescriber errorDescriber,
-        IRoleRepository roleRepository, ILookupNormalizer lookupNormalizer, IDeptRepository deptRepository, IPostRepository postRepository)
+        IRoleRepository roleRepository, ILookupNormalizer lookupNormalizer, IDeptRepository deptRepository,
+        IPostRepository postRepository)
     {
         UserRepository = userRepository;
         AutoSaveChanges = true;
@@ -35,9 +36,8 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
     private IRoleRepository RoleRepository { get; }
 
     private IDeptRepository DeptRepository { get; }
-    
-    private IPostRepository PostRepository { get; }
 
+    private IPostRepository PostRepository { get; }
 
 
     private ILookupNormalizer LookupNormalizer { get; }
@@ -123,7 +123,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         return IdentityResult.Success;
     }
 
-    public async Task<IdentityResult> UpdateAsync(SysUser user, CancellationToken cancellationToken)
+    public async Task<IdentityResult> UpdateAsync(SysUser user, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -142,7 +142,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         return IdentityResult.Success;
     }
 
-    public async Task<IdentityResult> DeleteAsync(SysUser user, CancellationToken cancellationToken)
+    public async Task<IdentityResult> DeleteAsync(SysUser user, CancellationToken cancellationToken=default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -161,11 +161,11 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         return IdentityResult.Success;
     }
 
-    public Task<SysUser> FindByIdAsync(string userId, CancellationToken cancellationToken=default)
+    public Task<SysUser> FindByIdAsync(string userId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        return UserRepository.FindAsync(Guid.Parse(userId), cancellationToken: cancellationToken);
+        return UserRepository.FindByIdAsync(Guid.Parse(userId), cancellationToken: cancellationToken);
     }
 
     public Task<SysUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
@@ -176,6 +176,23 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
 
         return UserRepository.FindByNormalizedUserNameAsync(normalizedUserName, includeDetails: true,
             cancellationToken: cancellationToken);
+    }
+
+    public async Task<List<SysUser>> FindByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var queryale = await UserRepository.GetQueryableAsync();
+        var users = queryale.WhereIf(!string.IsNullOrEmpty(phoneNumber), u => u.PhoneNumber == phoneNumber).ToList();
+        return users;
+    }
+
+    public async Task<List<SysUser>> FindByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        cancellationToken.ThrowIfCancellationRequested();
+        var queryale = await UserRepository.GetQueryableAsync();
+        var users = queryale.WhereIf(!string.IsNullOrEmpty(email), u => u.Email == email).ToList();
+        return users;
     }
 
     #endregion
@@ -224,7 +241,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         user.RemoveRole(role.Id);
     }
 
-    public async Task<IList<string>> GetRolesAsync(SysUser user, CancellationToken cancellationToken=default)
+    public async Task<IList<string>> GetRolesAsync(SysUser user, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -237,6 +254,21 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
             .GetRoleNamesInOrganizationUnitAsync(user.Id, cancellationToken: cancellationToken);
 
         return userRoles.Union(userOrganizationUnitRoles).ToList();
+    }
+    
+    public async Task<List<long>> GetRoleIdsAsync(SysUser user, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        Check.NotNull(user, nameof(user));
+
+        var userRoles = await UserRepository
+            .GetRoleIdsAsync(user.Id, cancellationToken: cancellationToken);
+
+        var userOrganizationUnitRoleIds = await UserRepository
+            .GetRoleIdsInOrganizationUnitAsync(user.Id, cancellationToken: cancellationToken);
+
+        return userRoles.Union(userOrganizationUnitRoleIds).ToList();
     }
 
     public async Task<bool> IsInRoleAsync(SysUser user, string roleName, CancellationToken cancellationToken)
@@ -268,7 +300,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
     #endregion
 
     #region 部门相关
- 
+
     public async Task JoinDeptAsync(SysUser user, int deptId, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -320,6 +352,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         //Check.NotNullOrWhiteSpace(deptName, nameof(deptName));
         return Task.FromResult(user.IsInDept(deptId));
     }
+
     #endregion
 
     #region 岗位相关
@@ -331,7 +364,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
     }
 
     #endregion
-    
+
     public Task SetPasswordHashAsync(SysUser user, string passwordHash, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

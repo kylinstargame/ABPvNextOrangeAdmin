@@ -28,6 +28,18 @@ public class EfCoreIdentityRoleRepository: EfCoreRepository<ABPvNextOrangeAdminD
 
     }
 
+
+
+    public async Task<SysRole> FindByIdAsync(long roleId, bool includeDetails = true,
+        CancellationToken cancellationToken = default)
+    {
+        return await (await GetDbSetAsync())
+            // .IncludeDetails(includeDetails)
+            .OrderBy(x => x.Id)
+            .FirstOrDefaultAsync(r => r.Id== roleId, GetCancellationToken(cancellationToken));
+
+    }
+
     public async Task<List<SysRole>> GetListAsync(string sorting = null, int maxResultCount = Int32.MaxValue,
         int skipCount = 0, string filter = null,
         bool includeDetails = false, CancellationToken cancellationToken = default)

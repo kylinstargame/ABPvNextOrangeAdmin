@@ -37,7 +37,9 @@ public interface IUserAppService
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Task<CommonResult<String>> UpdateAsync(UserListInput input);
+    public Task<CommonResult<String>> UpdateAsync(SysUserUpdateInput input);
+
+    public Task<CommonResult<string>> ResetPasswordAsync(UseResetPasswordInput password);
 
 
     /// <summary>
@@ -46,5 +48,5 @@ public interface IUserAppService
     /// <param name="input"></param>
     /// <param name="userIds"></param>
     /// <returns></returns>
-    public Task<CommonResult<String>>  DeleteAsync(long[] userIds);
+    public Task<CommonResult<String>>  DeleteAsync(string userId);
 }

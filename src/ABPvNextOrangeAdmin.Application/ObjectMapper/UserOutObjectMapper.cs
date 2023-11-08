@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Organization.Dto;
@@ -8,6 +12,7 @@ using Volo.Abp.DependencyInjection;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Settings;
 using Volo.Abp.ObjectMapping;
+using Xunit;
 using NotImplementedException = System.NotImplementedException;
 
 namespace ABPvNextOrangeAdmin.ObjectMapper;
@@ -18,8 +23,7 @@ public class UserOutObjectMapper : IObjectMapper<SysUser, SysUserOutput>, ITrans
     {
         return SysUserOutput.CreateInstance(source.Id, source.UserName, source.Password, source.NickName, source.Avatar,
             source.Sex, source.Email,
-            source.PhoneNumber, 0, source.IsActive?"0":"1", source.LoginIP, source.LoginTime);
-        
+            source.PhoneNumber, 0, source.IsActive ? "0" : "1", source.LoginIP, source.LoginTime);
     }
 
     public SysUserOutput Map(SysUser source, SysUserOutput destination)
@@ -29,12 +33,68 @@ public class UserOutObjectMapper : IObjectMapper<SysUser, SysUserOutput>, ITrans
         destination.NickName = source.ExtraProperties.ContainsKey("NickName")
             ? source.ExtraProperties["NickName"].ToString()
             : "";
-        destination.userPassword = source.ExtraProperties.ContainsKey("Password")
+        destination.Password = source.ExtraProperties.ContainsKey("Password")
             ? source.ExtraProperties["Password"].ToString()
             : "";
         destination.PhoneNumber = source.PhoneNumber;
         destination.Email = source.Email;
         destination.Sex = source.ExtraProperties.ContainsKey("Sex") ? source.ExtraProperties["Sex"].ToString() : "";
+        return destination;
+    }
+}
+
+public class UserUpdateObjectMapper : IObjectMapper<SysUserUpdateInput, SysUser>, ITransientDependency
+{
+    private IPostRepository _postRepository;
+
+    public UserUpdateObjectMapper(IPostRepository postRepository)
+    {
+        _postRepository = postRepository;
+    }
+
+    public SysUser Map(SysUserUpdateInput source)
+    {
+        SysUser user = new SysUser(Guid.Parse(source.id), source.id, source.userName, source.phoneNumber, source.email,
+            source.password);
+        user.ResetRoles(source.roleIds.ToArray());
+        foreach (var PostId in source.postIds)
+        {
+            var posts = _postRepository.GetPostsById(PostId).Result;
+            user.Posts.ToList().AddRange(posts);
+        }
+
+        //user.ResetPosts(source.postIds.ToArray());
+        return user;
+    }
+
+    public SysUser Map(SysUserUpdateInput source, SysUser destination)
+    {
+        Assert.Equal(destination.Id, Guid.Parse(source.id));
+        destination.UserName = source.userName;
+        destination.NickName = source.nickName;
+        destination.Password = source.password;
+
+        destination.PhoneNumber = source.phoneNumber;
+        destination.Avatar = source.avatar;
+        destination.Sex = source.sex;
+        destination.Email = source.email;
+        destination.Posts.Clear();
+        destination.ResetRoles(source.roleIds.ToArray());
+        foreach (var PostId in source.postIds)
+        {
+            var post = destination.Posts.ToList().Find(x => x.Id == PostId);
+            if (post == null)
+            {
+                var posts = _postRepository.GetPostsById(PostId).Result;
+                if (posts.Count>0)
+                {
+                    destination.Posts.Add(posts.First());
+                }
+         
+            }
+        }
+
+        // destination.ResetPosts(source.postIds.ToArray());
         return destination;
     }
 }

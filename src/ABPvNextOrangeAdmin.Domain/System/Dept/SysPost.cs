@@ -48,7 +48,7 @@ public class SysPost : FullAuditedEntity<long>,IMultiTenant
     /// </summary>
     public Guid? TenantId { get; }
 
-    public ICollection<SysUserPost> UserPosts { get; set; }
+    public ICollection<SysUser> Users { get; set; }
 
     public override string ToString()
     {

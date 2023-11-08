@@ -10,7 +10,7 @@ public class SysUserOutput : EntityDto<Guid>
     {
         Id = id;
         UserName = userName;
-        userPassword = Password;
+        this.Password = Password;
         NickName = nickName;
         Avatar = avatar;
         Sex = sex;
@@ -69,7 +69,7 @@ public class SysUserOutput : EntityDto<Guid>
     /// <summary>
     /// 用户密码
     /// </summary>
-    public string userPassword { get; set; }
+    public string Password { get; set; }
 
     /// <summary>
     /// 用户状态 0=正常,1=停用

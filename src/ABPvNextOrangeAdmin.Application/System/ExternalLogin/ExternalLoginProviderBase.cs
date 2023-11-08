@@ -41,10 +41,10 @@ public abstract class ExternalLoginProviderBase : IExternalLoginProvider
 
         var externalUser = await GetUserInfoAsync(userName);
 
-        return await CreateUserAsync(externalUser, userName, providerName);
+        return await CreateUserAsync(externalUser, userName,"","", providerName);
     }
 
-    protected virtual async Task<SysUser> CreateUserAsync(ExternalLoginUserInfo externalUser, string userName,
+    protected virtual async Task<SysUser> CreateUserAsync(ExternalLoginUserInfo externalUser, string userName,string email,string password,
         string providerName)
     {
         NormalizeExternalLoginUserInfo(externalUser, userName);
@@ -53,7 +53,7 @@ public abstract class ExternalLoginProviderBase : IExternalLoginProvider
             GuidGenerator.Create(),
             userName,
             externalUser.Email,
-            "",
+            email,password,
             tenantId: CurrentTenant.Id
         );
 

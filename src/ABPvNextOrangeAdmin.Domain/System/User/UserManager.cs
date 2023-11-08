@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Services;
+using Volo.Abp.Identity.Settings;
 
 
 namespace ABPvNextOrangeAdmin.System.User;
@@ -103,5 +104,26 @@ public class UserManager : Microsoft.AspNetCore.Identity.UserManager<SysUser>, I
             }
         }
         return await UpdateUserAsync(user);
+    }
+
+    public async Task<List<long>> GetRoleIdsAsync(SysUser user)
+    {
+        ThrowIfDisposed();
+        var userRoleStore = GetSysUserRoleStore();
+        if (user == null)
+        {
+            throw new ArgumentNullException(nameof(user));
+        }
+        return await userRoleStore.GetRoleIdsAsync(user, CancellationToken);
+    }
+
+    private SysUserStore GetSysUserRoleStore()
+    {
+        var cast = Store as SysUserStore;
+        if (cast == null)
+        {
+            throw new NotSupportedException("StoreNotSysUserRoleStore");
+        }
+        return cast;
     }
 }
