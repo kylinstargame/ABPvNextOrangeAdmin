@@ -13,14 +13,11 @@ public class SysDeptOutput : EntityDto<long>
     public string Leader { get; set; }
     public string Phone { get; set; }
     public string Email { get; set; }
-    
-
 }
 
 
 public class SysDeptTreeSelectOutput : SysDeptOutput,  ITreeSelectNode<SysDeptTreeSelectOutput>
 {
-    
     public string Label { get; set; }
     public List<SysDeptTreeSelectOutput> Children { get; set; }
 } 

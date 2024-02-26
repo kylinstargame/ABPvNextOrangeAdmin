@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ABPvNextOrangeAdmin.System;
 using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.Dept;
+using ABPvNextOrangeAdmin.System.Menu;
 using ABPvNextOrangeAdmin.System.Organization.Dto;
 using ABPvNextOrangeAdmin.System.User;
 using ABPvNextOrangeAdmin.System.User.Dto;
@@ -54,7 +56,7 @@ public class UserUpdateObjectMapper : IObjectMapper<SysUserUpdateInput, SysUser>
 
     public SysUser Map(SysUserUpdateInput source)
     {
-        SysUser user = new SysUser(Guid.Parse(source.id), source.id, source.userName, source.phoneNumber, source.email,
+        SysUser user = new SysUser(source.userName,  source.email,source.nickName,source.phoneNumber,
             source.password);
         user.ResetRoles(source.roleIds.ToArray());
         foreach (var PostId in source.postIds)
@@ -146,6 +148,22 @@ public class DeptObjectMapper : IObjectMapper<SysDept, SysDeptTreeSelectOutput>,
         destination.Email = source.ExtraProperties.ContainsKey("Email")
             ? source.ExtraProperties["Email"].ToString()
             : "";
+        return destination;
+    }
+}
+
+public class MenuObjectMapper : IObjectMapper<SysMenu, SysMenuTreeSelectOutput>, ITransientDependency
+{
+    public SysMenuTreeSelectOutput Map(SysMenu source)
+    {
+        return new SysMenuTreeSelectOutput();
+    }
+
+    public SysMenuTreeSelectOutput Map(SysMenu  source, SysMenuTreeSelectOutput destination)
+    {
+        destination.Id = source.Id;
+        destination.MenuName= source.MenuName;
+
         return destination;
     }
 }

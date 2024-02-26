@@ -26,10 +26,10 @@ public class UserDataSeedContributor : IDataSeedContributor, ITransientDependenc
     {
         List<SysUser> sysUsers = new List<SysUser>();
         await UserDataSeeder.SeedAsync("admin", context?[AdminEmailPropertyName] as string ?? AdminEmailDefaultValue,
-            "橙卡软件科技", "15803843236", context?[AdminPasswordPropertyName] as string ?? AdminPasswordDefaultValue);
+            "橙卡软件科技", "15803843236", /*context?[AdminPasswordPropertyName] as string ?? */AdminPasswordDefaultValue);
         
         await UserDataSeeder.SeedAsync("liliang", context?[AdminEmailPropertyName] as string ?? AdminEmailDefaultValue1,
-            "橙卡李亮", "15890048221", context?[AdminPasswordPropertyName] as string ?? AdminPasswordDefaultValue);
+            "橙卡李亮", "15890048221", /*context?[AdminPasswordPropertyName] as string ??*/ AdminPasswordDefaultValue);
 
 
     }

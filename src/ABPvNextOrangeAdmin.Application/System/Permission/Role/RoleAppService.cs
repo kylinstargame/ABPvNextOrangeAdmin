@@ -32,6 +32,6 @@ public class RoleAppService : ApplicationService, IRoleAppService
         return CommonResult<PagedResultDto<SysRoleOutput>>.Success(
             new PagedResultDto<SysRoleOutput>((long) roleOutputs.Count, roleOutputs), "");
     }
-    
-    
+
+
 }

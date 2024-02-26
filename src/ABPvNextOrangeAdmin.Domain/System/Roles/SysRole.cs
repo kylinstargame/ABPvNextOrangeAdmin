@@ -76,26 +76,6 @@ public class SysRole : FullAuditedAggregateRoot<long>, IMultiTenant
 
         var oldName = RoleName;
         RoleName = roleName;
-
-//         AddLocalEvent(
-// #pragma warning disable 618
-//             new IdentityRoleNameChangedEvent
-// #pragma warning restore 618
-//             {
-//                 IdentityRole = this,
-//                 OldName = oldName
-//             }
-//         );
-//
-//         AddDistributedEvent(
-        //     new IdentityRoleNameChangedEto
-        //     {
-        //         Id = Id,
-        //         Name = Name,
-        //         OldName = oldName,
-        //         TenantId = TenantId
-        //     }
-        // );
     }
 }
 

@@ -22,9 +22,6 @@ public class SysUserOutputWithRoleAndPosts
         return new SysUserOutputWithRoleAndPosts(userOutput, roleIds, postIds, posts, roles);
     }
 
-
-
-
     public SysUserOutput UserOutput{ get; set; }
 
     /// <summary>

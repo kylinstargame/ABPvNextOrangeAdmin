@@ -165,7 +165,12 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        return UserRepository.FindByIdAsync(Guid.Parse(userId), cancellationToken: cancellationToken);
+        if (!String.IsNullOrEmpty(userId))
+        {
+            return UserRepository.FindByIdAsync(Guid.Parse(userId), cancellationToken: cancellationToken);
+        }
+
+        return Task.FromResult<SysUser>(null);
     }
 
     public Task<SysUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
@@ -377,7 +382,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         return Task.CompletedTask;
     }
 
-    public Task<string> GetPasswordHashAsync(SysUser user, CancellationToken cancellationToken)
+    public async Task<string> GetPasswordHashAsync(SysUser user, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (user == null)
@@ -385,7 +390,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
             throw new ArgumentNullException(nameof(user));
         }
 
-        return Task.FromResult(user.PasswordHash);
+        return user.PasswordHash;
     }
 
     public Task<bool> HasPasswordAsync(SysUser user, CancellationToken cancellationToken)

@@ -10,25 +10,25 @@ public class SysRoleOutput:EntityDto<long>
     /// </summary>
     public String RoleName { get; set; }
 
-    // /// <summary>
-    // /// 权限字符 
-    // /// </summary>
-    // public String RoleKey { get; set; }
-    //
-    // /// <summary>
-    // /// 显示顺序
-    // /// </summary>
-    // public int Order { get; set; }
-    //
-    // /// <summary>
-    // /// 角色状态（0-正常 1-锁定）
-    // /// </summary>
-    // public string Status { get; set; }
+    /// <summary>
+    /// 权限字符 
+    /// </summary>
+    public String RoleKey { get; set; }
+    
+    /// <summary>
+    /// 显示顺序
+    /// </summary>
+    public int Order { get; set; }
+    
+    /// <summary>
+    /// 角色状态（0-正常 1-锁定）
+    /// </summary>
+    public string Status { get; set; }
     
 
-    // /// <summary>
-    // /// 创建事件
-    // /// </summary>
-    // public DateTime? CreationTime { get; set; }
+    /// <summary>
+    /// 创建时间
+    /// </summary>
+    public DateTime? CreationTime { get; set; }
 
 }   

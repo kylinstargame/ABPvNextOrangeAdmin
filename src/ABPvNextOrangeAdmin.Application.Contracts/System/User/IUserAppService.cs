@@ -30,7 +30,7 @@ public interface IUserAppService
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Task<CommonResult<String>> CreateAsync(UserListInput input);
+    public Task<CommonResult<String>> CreateAsync(SysUserUpdateInput input);
     
     /// <summary>
     /// 更新用户
@@ -48,5 +48,5 @@ public interface IUserAppService
     /// <param name="input"></param>
     /// <param name="userIds"></param>
     /// <returns></returns>
-    public Task<CommonResult<String>>  DeleteAsync(string userId);
+    public Task<CommonResult<String>>  DeleteAsync(string userIds);
 }

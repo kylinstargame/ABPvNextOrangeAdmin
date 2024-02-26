@@ -93,7 +93,7 @@ class UserDataSeeder : IUserDataSeeder, ITransientDependency
                 adminUser.Posts.Add(new SysPost(11, "CE", "董事长")); 
             }
        
-            await UserStore.CreateAsync(adminUser, adminPassword, false);
+            await UserStore.CreateAsync(adminUser, adminPassword, true);
             result.CreatedAdminUser = true;
             
             //"admin" role

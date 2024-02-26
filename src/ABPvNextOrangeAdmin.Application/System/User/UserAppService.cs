@@ -59,23 +59,30 @@ public class UserAppService : ApplicationService, IUserAppService
     {
         List<SysUser> users = new List<SysUser>();
         var user = await UserStore.FindByIdAsync(userId);
-        users.Add(user);
-        var userOutputs = ObjectMapper.Map<List<SysUser>, List<SysUserOutput>>(users);
-        // SysUserOutput userOutput = userObjectMapper.Map(user);
-        var userOutput = ObjectMapper.Map<SysUser, SysUserOutput>(user);
         List<SysRole> roles = await RoleRepository.GetListAsync();
         List<SysPost> posts = await PostRepository.GetListAsync();
         var rolerOutputs = ObjectMapper.Map<List<SysRole>, List<SysRoleOutput>>(roles);
         var postOutputs = ObjectMapper.Map<List<SysPost>, List<SysPostOutput>>(posts);
+        if (user != null)
+        {
+            var userOutput = ObjectMapper.Map<SysUser, SysUserOutput>(user);
 
 
-        List<long> roleIds = await UserStore.GetRoleIdsAsync(user);
+            List<long> roleIds = await UserStore.GetRoleIdsAsync(user);
 
-        List<long> postIds = user.Posts.Select(x => x.Id).ToList();
-        // SysUserOutput userOutput = ObjectMapper.Map<SysUser, SysUserOutput>(user);
-        return CommonResult<SysUserOutputWithRoleAndPosts>.Success(
-            SysUserOutputWithRoleAndPosts.CreateInstance(userOutput, roleIds, postIds, postOutputs, rolerOutputs),
-            "获取用户列表成功");
+            List<long> postIds = user.Posts.Select(x => x.Id).ToList();
+            // SysUserOutput userOutput = ObjectMapper.Map<SysUser, SysUserOutput>(user);
+            return CommonResult<SysUserOutputWithRoleAndPosts>.Success(
+                SysUserOutputWithRoleAndPosts.CreateInstance(userOutput, roleIds, postIds, postOutputs, rolerOutputs),
+                "获取用户列表成功");
+        }
+        else
+        {
+            // SysUserOutput userOutput = ObjectMapper.Map<SysUser, SysUserOutput>(user);
+            return CommonResult<SysUserOutputWithRoleAndPosts>.Success(
+                SysUserOutputWithRoleAndPosts.CreateInstance(null, null, null, postOutputs, rolerOutputs),
+                "获取用成功");
+        }
     }
 
     [HttpGet]
@@ -101,26 +108,27 @@ public class UserAppService : ApplicationService, IUserAppService
     }
 
 
-    // [HttpGet]
-
-    // [ActionName("add")]
-
-    // public Task<CommonResult<String>> CreateAsync(string userId)
-
-    // {
-
-    //     return Task.FromResult(CommonResult<String>.Success("", ""));
-
-    // }
-
-    [HttpGet]
+    [HttpPost]
     [ActionName("add")]
-    public Task<CommonResult<String>> CreateAsync(UserListInput input)
+    public async Task<CommonResult<String>> CreateAsync(SysUserUpdateInput input)
     {
-        return Task.FromResult(CommonResult<String>.Success("", "��ȡ�û��б�ɹ�"));
+        if (!await CheckPhoneUnique(input.phoneNumber))
+        {
+            return CommonResult<String>.Failed(string.Format("电话{0}已被使用", input.phoneNumber));
+        }
+
+        if (!await CheckEmailUnique(input.email))
+        {
+            return CommonResult<String>.Failed(string.Format("邮箱{0}已被使用", input.email));
+        }
+
+        var user = ObjectMapper.Map<SysUserUpdateInput, SysUser>(input);
+        await userManager.CreateAsync(user, input.password, false);
+        return CommonResult<String>.Success("", "添加用户完成");
+        
     }
 
-
+    [HttpGet]
     [HttpPut]
     [ActionName("edit")]
     public async Task<CommonResult<string>> UpdateAsync(SysUserUpdateInput input)
@@ -150,8 +158,8 @@ public class UserAppService : ApplicationService, IUserAppService
         return CommonResult<String>.Success("", "无效更新");
     }
 
-    [HttpGet]
-    [ActionName("remove")]
+    [HttpPost]
+    [ActionName("delete")]
     public async Task<CommonResult<string>> DeleteAsync(string userId)
     {
         // foreach (var userId in userIds)
@@ -159,7 +167,6 @@ public class UserAppService : ApplicationService, IUserAppService
             SysUser user;
             user = await UserStore.FindByIdAsync(userId.ToString());
             await UserStore.DeleteAsync(user);
-            
         }
 
         return CommonResult<String>.Success("", "刪除用戶成功");
@@ -181,10 +188,13 @@ public class UserAppService : ApplicationService, IUserAppService
             return CommonResult<String>.Failed("不允许操作超级管理员用户");
         }
 
+        // user.Password = input.Password;
         var IdentityResult = await userManager.ChangePasswordAsync(user, user.Password, input.Password);
         if (IdentityResult.Succeeded)
 
         {
+            user.Password = input.Password;
+            await userManager.UpdateAsync(user);
             return CommonResult<string>.Success("", "用戶密碼更新成功");
         }
         else

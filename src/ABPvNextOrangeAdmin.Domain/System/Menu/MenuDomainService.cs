@@ -42,6 +42,15 @@ public class MenuDomainService : DomainService
     /// <summary>
     /// 查询系统菜单列表
     /// </summary>
+    public async Task<List<SysMenu>> GetMenuList()
+    {
+        var menus = await _menuRepository.WithDetailsAsync();
+        return menus.ToList();
+    }
+
+    /// <summary>
+    /// 查询系统菜单列表
+    /// </summary>
     /// <param name="userId"></param>
     /// <param name="menu"></param>
     /// <returns></returns>

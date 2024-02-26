@@ -42,6 +42,23 @@ public sealed class SysUser : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Password = password;
         PhoneNumber = phoneNumber;
     }
+    public SysUser(string userName, string email, string nickName, string phoneNumber, string password,
+        Guid? tenantId = null)
+    {
+        UserName = userName;
+        NickName = nickName;
+        Password = password;
+        TenantId = tenantId;
+        PhoneNumber = phoneNumber;
+        Sex = "男";
+        Email = email;
+        LockoutEnabled = false;
+        LockoutEnd = DateTimeOffset.MaxValue;
+        Logins = new Collection<SysUserLogin>();
+        IsActive = true;
+        CreationTime = DateTime.Now;
+    }
+
 
     public SysUser(Guid id, string userName, string email, string nickName, string phoneNumber, string password,
         Guid? tenantId = null)

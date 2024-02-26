@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ABPvNextOrangeAdmin.System;
 using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.Config;
 using ABPvNextOrangeAdmin.System.Config.Dto;
@@ -24,7 +25,7 @@ public class ABPvNextOrangeAdminApplicationAutoMapperProfile : Profile
         /* You can configure your AutoMapper mapping configuration here.
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
-        CreateMap<SysMenu, MenuOutput>();
+        CreateMap<SysMenu, SysMenuOutput>();
         CreateMap<SysConfig, ConfigOutput>();
 
         CreateMap<SysUser, SysUserOutput>();
@@ -33,6 +34,10 @@ public class ABPvNextOrangeAdminApplicationAutoMapperProfile : Profile
         CreateMap<SysPost, SysPostOutput>();
         CreateMap<SysDept, SysDeptTreeSelectOutput>().ForMember(a => a.Label,
             b => b.MapFrom(a => a.DeptName));
+        CreateMap<SysMenu, SysMenuTreeSelectOutput>().ForMember(a => a.Label,
+            b => b.MapFrom(a => a.MenuName));
+        
+        
         CreateMap<SysDictData,DictDataOutput>();
     }
 }
