@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using ABPvNextOrangeAdmin.Constans;
+using ABPvNextOrangeAdmin.System.Roles;
 using ABPvNextOrangeAdmin.Utils;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -85,6 +86,11 @@ public sealed class SysMenu : FullAuditedEntity<long>
     /// 描述信息
     /// </summary>
     public string Remark { get; set; }
+    
+    /// <summary>
+    /// 关联角色 
+    /// </summary>
+    public ICollection<SysRole> Roles { get;  set; }
 
     /// <summary>
     /// 子菜单 

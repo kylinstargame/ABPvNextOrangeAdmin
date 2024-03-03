@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ABPvNextOrangeAdmin.System.Dept;
+using ABPvNextOrangeAdmin.System.Menu;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -15,11 +16,15 @@ namespace ABPvNextOrangeAdmin.System.Roles;
 /// </summary>
 public class SysRole : FullAuditedAggregateRoot<long>, IMultiTenant
 {
+
+   
     public SysRole(string roleName, Guid? tenantId = null)
     {
+        // Permissions = permissions;
         RoleName = roleName;
         TenantId = tenantId;
     }
+
 
     /// <summary>
     /// 角色名称
@@ -29,19 +34,15 @@ public class SysRole : FullAuditedAggregateRoot<long>, IMultiTenant
     /// <summary>
     /// 角色权限字符
     /// </summary>
-    public String Permissions;
+    public string Permissions { get; set; }
     
     public virtual bool IsDefault { get; set; }
 
-    public SysRole(long roleName, Guid roleId, Guid? tenantId)
-    {
-        throw new NotImplementedException();
-    }
 
     /// <summary>
     /// 角色排序
     /// </summary>
-    public String Order { get; set; }
+    public int Order { get; set; }
 
     /// <summary>
     /// 数据范围（1：所有数据权限；2：自定义数据权限；3：本部门数据权限；4：本部门及以下数据权限；5：仅本人数据权限）
@@ -64,12 +65,19 @@ public class SysRole : FullAuditedAggregateRoot<long>, IMultiTenant
     public string Status { get; set; }
     
     /// <summary>
+    /// 角色备注
+    /// </summary>
+    public string Remark { get; set; }
+    
+    /// <summary>
     /// 租户标识
     /// </summary>
     public Guid? TenantId { get; }
-    
-    public ICollection<SysRoleMenu> Menuss { get;  set; }
 
+    public ICollection<SysRoleMenu> RoleMenus { get;  set; }
+    
+    public ICollection<SysMenu> Menus { get;  set; }
+    
     public void ChangeName(string roleName)
     {
         Check.NotNullOrWhiteSpace(roleName, nameof(roleName));

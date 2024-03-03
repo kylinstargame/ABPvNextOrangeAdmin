@@ -5,7 +5,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.System.Roles;
 
-public class SysRoleMenu : FullAuditedEntity, IEntity<int>
+public class SysRoleMenu : FullAuditedEntity
 {
     /// <summary>
     /// 角色ID

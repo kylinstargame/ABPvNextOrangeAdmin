@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
 using ABPvNextOrangeAdmin.System.Permission.Dto;
@@ -13,4 +14,18 @@ public interface IRoleAppService
     /// <param name="input"></param>
     /// <returns></returns>
     public Task<CommonResult<PagedResultDto<SysRoleOutput>>> GetListAsync(RoleListInput input);
+    
+    /// <summary>
+    /// 根據Id獲取角色·
+    /// </summary>
+    /// <param name="roleId"></param>
+    /// <returns></returns>
+    public Task<CommonResult<SysRoleOutput>> GetAsync(string roleId);
+
+    /// <summary>
+    /// 添加角色
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    public Task<CommonResult<String>> CreateAsync(SysRoleUpdateInput input);
 }

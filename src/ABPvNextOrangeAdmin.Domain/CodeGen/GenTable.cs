@@ -118,4 +118,31 @@ public class GenTable
     /// 上级菜单名称字段 
     /// </summary>
     private string parentMenuName;
+
+    public GenTable(long tableId, string tableName, string tableComment, string subTableName, string subTableFkName, string className, string tplCategory, string packageName, string moduleName, string functionName, string functionAuthor, string genType, string genPath, GenTableColumn pkColumn, GenTable subTable, List<GenTableColumn> columns, string options, string treeCode, string treeParentCode, string treeName, string parentMenuId, string parentMenuName, string businessName)
+    {
+        this.tableId = tableId;
+        this.tableName = tableName;
+        this.tableComment = tableComment;
+        this.subTableName = subTableName;
+        this.subTableFkName = subTableFkName;
+        this.className = className;
+        this.tplCategory = tplCategory;
+        this.packageName = packageName;
+        this.moduleName = moduleName;
+        this.functionName = functionName;
+        this.functionAuthor = functionAuthor;
+        this.genType = genType;
+        this.genPath = genPath;
+        this.pkColumn = pkColumn;
+        this.subTable = subTable;
+        this.columns = columns;
+        this.options = options;
+        this.treeCode = treeCode;
+        this.treeParentCode = treeParentCode;
+        this.treeName = treeName;
+        this.parentMenuId = parentMenuId;
+        this.parentMenuName = parentMenuName;
+        this.businessName = businessName;
+    }
 }

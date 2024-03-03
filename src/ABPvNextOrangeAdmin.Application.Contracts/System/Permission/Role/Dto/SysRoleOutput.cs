@@ -13,12 +13,12 @@ public class SysRoleOutput:EntityDto<long>
     /// <summary>
     /// 权限字符 
     /// </summary>
-    public String RoleKey { get; set; }
+    public string RoleKey { get; set; }
     
     /// <summary>
     /// 显示顺序
     /// </summary>
-    public int Order { get; set; }
+    public int roleSort { get; set; }
     
     /// <summary>
     /// 角色状态（0-正常 1-锁定）

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ABPvNextOrangeAdmin.System;
 using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.Config;
@@ -14,7 +15,9 @@ using ABPvNextOrangeAdmin.System.Roles;
 using ABPvNextOrangeAdmin.System.User;
 using ABPvNextOrangeAdmin.System.User.Dto;
 using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
 using Volo.Abp.Identity;
+using SysRoleStore = ABPvNextOrangeAdmin.System.Roles.SysRoleStore;
 
 namespace ABPvNextOrangeAdmin;
 
@@ -29,7 +32,15 @@ public class ABPvNextOrangeAdminApplicationAutoMapperProfile : Profile
         CreateMap<SysConfig, ConfigOutput>();
 
         CreateMap<SysUser, SysUserOutput>();
-        CreateMap<SysRole, SysRoleOutput>();
+         
+        CreateMap<SysRoleUpdateInput, SysRole>().ForMember(a=>a.Permissions,
+            b=>b.MapFrom(a=>a.RoleKey));
+        CreateMap<SysRole, SysRoleOutput>().ForMember(a=>a.RoleKey,
+                b=>b.MapFrom(a=>a.Permissions))
+            .ForMember(a=>a.roleSort,
+                b=>b.MapFrom(a=>a.Order));
+       
+  
         CreateMap<SysDept, SysDeptOutput>();
         CreateMap<SysPost, SysPostOutput>();
         CreateMap<SysDept, SysDeptTreeSelectOutput>().ForMember(a => a.Label,

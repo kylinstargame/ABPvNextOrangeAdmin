@@ -91,5 +91,26 @@ public class GenTableColumn
     /// 排序 
     /// </summary>
     private int sort;
- 
+
+    public GenTableColumn(string isQuery, string javaType, string javaField, string isPk, string columnName, string columnComment, string columnType, long columnId, long tableId, string isIncrement, string isRequired, string isInsert, string isEdit, string isList, string queryType, string htmlType, string dictType, int sort)
+    {
+        this.isQuery = isQuery;
+        this.javaType = javaType;
+        this.javaField = javaField;
+        this.isPk = isPk;
+        this.columnName = columnName;
+        this.columnComment = columnComment;
+        this.columnType = columnType;
+        this.columnId = columnId;
+        this.tableId = tableId;
+        this.isIncrement = isIncrement;
+        this.isRequired = isRequired;
+        this.isInsert = isInsert;
+        this.isEdit = isEdit;
+        this.isList = isList;
+        this.queryType = queryType;
+        this.htmlType = htmlType;
+        this.dictType = dictType;
+        this.sort = sort;
+    }
 }

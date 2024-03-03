@@ -28,7 +28,7 @@ public class SysRoleStore : IRoleStore<SysRole>, ITransientDependency
 
     #region 角色相关
 
-    public async Task<IdentityResult> CreateAsync(SysRole role, CancellationToken cancellationToken)
+    public async Task<IdentityResult> CreateAsync(SysRole role, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         Check.NotNull(role, nameof(role));
@@ -52,7 +52,7 @@ public class SysRoleStore : IRoleStore<SysRole>, ITransientDependency
         return IdentityResult.Success;
     }
 
-    public async Task<SysRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
+    public async Task<SysRole> FindByIdAsync(string roleId, CancellationToken cancellationToken=default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var role = await RoleRepository.FindAsync(long.Parse(roleId), AutoSaveChanges, cancellationToken);

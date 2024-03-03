@@ -133,7 +133,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         {
             await UserRepository.UpdateAsync(user, AutoSaveChanges, cancellationToken);
         }
-        catch (AbpDbConcurrencyException ex)
+        catch (AbpDbConcurrencyException )
         {
             //Logger.LogWarning(ex.ToString()); //Trigger some AbpHandledException event
             return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
@@ -152,7 +152,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
         {
             await UserRepository.DeleteAsync(user, AutoSaveChanges, cancellationToken);
         }
-        catch (AbpDbConcurrencyException ex)
+        catch (AbpDbConcurrencyException )
         {
             // Logger.LogWarning(ex.ToString()); //Trigger some AbpHandledException event
             return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
@@ -390,7 +390,7 @@ public class SysUserStore : IUserPasswordStore<SysUser>,
             throw new ArgumentNullException(nameof(user));
         }
 
-        return user.PasswordHash;
+        return await Task.FromResult( user.PasswordHash);
     }
 
     public Task<bool> HasPasswordAsync(SysUser user, CancellationToken cancellationToken)
