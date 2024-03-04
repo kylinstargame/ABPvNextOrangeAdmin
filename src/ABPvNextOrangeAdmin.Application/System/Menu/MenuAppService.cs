@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
 using ABPvNextOrangeAdmin.CustomExtensions;
+using ABPvNextOrangeAdmin.System.Roles;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -80,5 +81,16 @@ public class MenuAppService : ApplicationService, IMenuAppService
         var menuTreeSelectOutputs=ObjectMapper.Map<List<SysMenu>, List<SysMenuTreeSelectOutput>>(menus);
         var menuTree = BuildMenuTree(menuTreeSelectOutputs,0);
         return CommonResult<List<SysMenuTreeSelectOutput>>.Success(menuTree,"获取菜单树成功");
+    }
+    [HttpGet]
+    [ActionName("treeSelectForRole")]
+    public async Task<CommonResult<SysMenuTreeSelectForRoleOutput>> GetTreeSelectByRoleIdAsync(long roleId)
+    {
+        var menus = await MenuDomainService.GetMenuList();
+        var menuTreeSelectOutputs=ObjectMapper.Map<List<SysMenu>, List<SysMenuTreeSelectOutput>>(menus);
+        var menuTree = BuildMenuTree(menuTreeSelectOutputs,0);
+        List<long> roleMenuIds = await MenuDomainService.GetMenuListByRoleId(roleId);
+        var menuTreeForRole = SysMenuTreeSelectForRoleOutput.CreateInstance(menuTree,roleMenuIds);
+        return CommonResult<SysMenuTreeSelectForRoleOutput>.Success(menuTreeForRole,"获取菜单树成功");
     }
 }

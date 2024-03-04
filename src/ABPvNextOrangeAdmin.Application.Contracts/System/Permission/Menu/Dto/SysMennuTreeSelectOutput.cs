@@ -85,3 +85,20 @@ public class SysMenuTreeSelectOutput:SysMenuOutput,  ITreeSelectNode<SysMenuTree
     public string Label { get; set; }
     public List<SysMenuTreeSelectOutput> Children { get; set; }
 }
+
+public class SysMenuTreeSelectForRoleOutput 
+{
+    private SysMenuTreeSelectForRoleOutput(List<SysMenuTreeSelectOutput> menuTree, List<long> checkedKeys)
+    {
+        MenuTree = menuTree;
+        this.checkedKeys = checkedKeys;
+    }
+
+    public static SysMenuTreeSelectForRoleOutput CreateInstance(List<SysMenuTreeSelectOutput> menuTree, List<long> checkedKeys)
+    {
+        return new SysMenuTreeSelectForRoleOutput(menuTree, checkedKeys);
+    }
+
+   public List<SysMenuTreeSelectOutput> MenuTree { get; set; }
+    public List<long> checkedKeys { get; set; }
+}
