@@ -23,7 +23,7 @@ public class SysDeptTreeSelectOutput : SysDeptOutput, ITreeSelectNode<SysDeptTre
 
 public class SysDeptTreeSelectForRoleOutput
 {
-    private List<SysDeptTreeSelectOutput> deptTree;
+    public List<SysDeptTreeSelectOutput> deptTree { get; set; }
 
     private SysDeptTreeSelectForRoleOutput(List<SysDeptTreeSelectOutput> deptTree, List<long> checkedKeys)
     {
@@ -36,5 +36,5 @@ public class SysDeptTreeSelectForRoleOutput
         return new SysDeptTreeSelectForRoleOutput(deptTree, checkedKeys);
     }
 
-    private List<long> checkedKeys;
+    public List<long> checkedKeys { get; set; }
 }

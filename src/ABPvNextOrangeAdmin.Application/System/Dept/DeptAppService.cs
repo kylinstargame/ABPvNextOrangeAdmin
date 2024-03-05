@@ -19,6 +19,7 @@ public class DeptAppService : ApplicationService, IOrganizationService
     private IDeptRepository DeptRepository { get; }
     private DeptObjectMapper DeptObjectMapper { get; }
 
+
     public DeptAppService(IDeptRepository deptRepository, DeptObjectMapper deptObjectMapper)
     {
         DeptRepository = deptRepository;
@@ -61,9 +62,9 @@ public class DeptAppService : ApplicationService, IOrganizationService
         // var deptOutputs1 = ObjectMapper.Map<List<SysDept>, List<SysDeptOutput>>(organizations);
         // List<SysDeptTreeSelectOutput> deptOutputs = new List<SysDeptTreeSelectOutput>();
         var deptTree = BuildDeptTree(deptOutputs, 1);
-
-        var deptTreeForRole = SysDeptTreeSelectForRoleOutput.CreateInstance(deptTree, new List<long>());
-        return CommonResult<SysDeptTreeSelectForRoleOutput>.Success(deptTreeForRole, "获取菜单树成功");
+        var deptIds =await DeptRepository.GetdDeptIdsForRole(roleId);
+        var deptTreeForRole = SysDeptTreeSelectForRoleOutput.CreateInstance(deptTree, deptIds);
+        return CommonResult<SysDeptTreeSelectForRoleOutput>.Success(deptTreeForRole, "获取部门树成功");
     }
 
     private List<SysDeptTreeSelectOutput> BuildDeptTree(List<SysDeptTreeSelectOutput> deptOutputs, long? parentId)

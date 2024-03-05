@@ -61,6 +61,8 @@ public interface IDeptRepository : IBasicRepository<SysDept, long>
         CancellationToken cancellationToken = default
     );
 
+    Task<List<long>> GetdDeptIdsForRole(long roleId);
+
     Task<List<SysRole>> GetUnaddedRolesAsync(
         SysDept dept,
         string sorting = null,

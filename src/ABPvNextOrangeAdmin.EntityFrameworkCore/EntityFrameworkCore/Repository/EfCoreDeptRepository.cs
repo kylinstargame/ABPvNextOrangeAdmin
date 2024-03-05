@@ -10,6 +10,7 @@ using ABPvNextOrangeAdmin.System.Roles;
 using ABPvNextOrangeAdmin.System.User;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging;
+using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -17,9 +18,13 @@ namespace ABPvNextOrangeAdmin.EntityFrameworkCore.Repository;
 
 public class EfCoreDeptRepository : EfCoreRepository<ABPvNextOrangeAdminDbContext, SysDept, long>, IDeptRepository
 {
-    public EfCoreDeptRepository(IDbContextProvider<ABPvNextOrangeAdminDbContext> dbContextProvider) : base(
+    private IRepository<SysRoleDept> roleDeptRepository;
+
+    public EfCoreDeptRepository(IDbContextProvider<ABPvNextOrangeAdminDbContext> dbContextProvider,
+        IRepository<SysRoleDept> roleDeptRepository) : base(
         dbContextProvider)
     {
+        this.roleDeptRepository = roleDeptRepository;
     }
 
     #region 通用方法
@@ -53,7 +58,7 @@ public class EfCoreDeptRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
     {
         return await (await GetDbSetAsync())
             .IncludeDetails(includeDetails)
-            .Where(dept => dept.Id== Id)
+            .Where(dept => dept.Id == Id)
             .FirstAsync();
     }
 
@@ -87,6 +92,13 @@ public class EfCoreDeptRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
             select role;
 
         return await query.CountAsync(GetCancellationToken(cancellationToken));
+    }
+
+    public async Task<List<long>> GetdDeptIdsForRole(long roleId)
+    {
+        var roleDepts = await roleDeptRepository.GetListAsync(a => a.RoleId == roleId);
+        var deptIds = roleDepts.Select(a => a.DeptId).ToList();
+        return deptIds;
     }
 
     #region 角色相关
