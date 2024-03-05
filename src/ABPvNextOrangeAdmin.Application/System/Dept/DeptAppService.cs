@@ -30,7 +30,7 @@ public class DeptAppService : ApplicationService, IOrganizationService
     public async Task<CommonResult<List<SysDeptTreeSelectOutput>>> GetListAsync(DeptInput input)
     {
         var organizations = await DeptRepository.GetListAsync();
-        var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptTreeSelectOutput>>(organizations); 
+        var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptTreeSelectOutput>>(organizations);
         var deptTree = BuildDeptTree(deptOutputs, 1);
         return CommonResult<List<SysDeptTreeSelectOutput>>.Success(deptTree, "获取部分树状结构成功");
     }
@@ -40,14 +40,30 @@ public class DeptAppService : ApplicationService, IOrganizationService
     public async Task<CommonResult<List<SysDeptTreeSelectOutput>>> GetTreeAsync(DeptInput input)
     {
         long count = await DeptRepository.GetCountAsync();
-        var organizations = await DeptRepository.GetListAsync(); 
+        var organizations = await DeptRepository.GetListAsync();
         //deptOutputsxx=DeptObjectMapper.Map<SysDept, SysDeptTreeSelectOutput>(organizations[0]);
-         var deptOutputs=ObjectMapper.Map<List<SysDept>, List<SysDeptTreeSelectOutput>>(organizations);
+        var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptTreeSelectOutput>>(organizations);
         // var deptOutputs1 = ObjectMapper.Map<List<SysDept>, List<SysDeptOutput>>(organizations);
         // List<SysDeptTreeSelectOutput> deptOutputs = new List<SysDeptTreeSelectOutput>();
         var deptTree = BuildDeptTree(deptOutputs, 1);
-      
+
         return CommonResult<List<SysDeptTreeSelectOutput>>.Success(deptTree, "获取部门树状结构成功");
+    }
+
+    [HttpGet]
+    [ActionName("treeSelectForRole")]
+    public async Task<CommonResult<SysDeptTreeSelectForRoleOutput>> GetTreeSelectByRoleIdAsync(long roleId)
+    {
+        long count = await DeptRepository.GetCountAsync();
+        var organizations = await DeptRepository.GetListAsync();
+        //deptOutputsxx=DeptObjectMapper.Map<SysDept, SysDeptTreeSelectOutput>(organizations[0]);
+        var deptOutputs = ObjectMapper.Map<List<SysDept>, List<SysDeptTreeSelectOutput>>(organizations);
+        // var deptOutputs1 = ObjectMapper.Map<List<SysDept>, List<SysDeptOutput>>(organizations);
+        // List<SysDeptTreeSelectOutput> deptOutputs = new List<SysDeptTreeSelectOutput>();
+        var deptTree = BuildDeptTree(deptOutputs, 1);
+
+        var deptTreeForRole = SysDeptTreeSelectForRoleOutput.CreateInstance(deptTree, new List<long>());
+        return CommonResult<SysDeptTreeSelectForRoleOutput>.Success(deptTreeForRole, "获取菜单树成功");
     }
 
     private List<SysDeptTreeSelectOutput> BuildDeptTree(List<SysDeptTreeSelectOutput> deptOutputs, long? parentId)

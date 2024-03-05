@@ -44,7 +44,7 @@ public class SysRoleStore : IRoleStore<SysRole>, ITransientDependency
         return IdentityResult.Success;
     }
 
-    public async Task<IdentityResult> DeleteAsync(SysRole role, CancellationToken cancellationToken)
+    public async Task<IdentityResult> DeleteAsync(SysRole role, CancellationToken cancellationToken=default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         Check.NotNull(role, nameof(role));

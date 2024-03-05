@@ -28,4 +28,11 @@ public interface IRoleAppService
     /// <param name="input"></param>
     /// <returns></returns>
     public Task<CommonResult<String>> CreateAsync(SysRoleUpdateInput input);
+    
+    /// <summary>
+    /// 删除角色
+    /// </summary>
+    /// <param name="roleId"></param>
+    /// <returns></returns>
+    public Task<CommonResult<String>> DeleteAsync(long roleId);
 }
