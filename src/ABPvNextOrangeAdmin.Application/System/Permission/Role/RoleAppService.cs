@@ -1,10 +1,15 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
+using ABPvNextOrangeAdmin.System.Account.Dto;
+using ABPvNextOrangeAdmin.System.Organization;
 using ABPvNextOrangeAdmin.System.Permission.Dto;
+using ABPvNextOrangeAdmin.System.Permission.Role.Dto;
 using ABPvNextOrangeAdmin.System.Roles;
 using ABPvNextOrangeAdmin.System.User;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Application.Dtos;
@@ -18,23 +23,26 @@ using SysRoleStore = ABPvNextOrangeAdmin.System.Roles.SysRoleStore;
 namespace ABPvNextOrangeAdmin.System.Permission.Role;
 
 [Authorize]
-[Route("api/sys/role/[action]")]
+[Microsoft.AspNetCore.Mvc.Route("api/sys/role/[action]")]
 public class RoleAppService : ApplicationService, IRoleAppService
 {
     public RoleAppService(SysRoleStore roleStore, IRoleRepository roleRepository,
-        IRepository<SysRoleMenu> roleMenuRepository, UnitOfWorkManager unitOfWorkManage)
+        IRepository<SysRoleMenu> roleMenuRepository, UnitOfWorkManager unitOfWorkManage,
+        IRepository<SysRoleDept> roleDeptRepository)
     {
         RoleStore = roleStore;
 
         RoleRepository = roleRepository;
         RoleMenuRepository = roleMenuRepository;
         UnitOfWorkManage = unitOfWorkManage;
+        RoleDeptRepository = roleDeptRepository;
     }
 
     public UnitOfWorkManager UnitOfWorkManage { get; set; }
     public SysRoleStore RoleStore { get; set; }
 
     private IRepository<SysRoleMenu> RoleMenuRepository { get; set; }
+    private IRepository<SysRoleDept> RoleDeptRepository { get; set; }
 
     private IRoleRepository RoleRepository { get; }
 
@@ -81,10 +89,75 @@ public class RoleAppService : ApplicationService, IRoleAppService
             var result = await RoleStore.DeleteAsync(role);
             if (result == IdentityResult.Success)
             {
-               var roleMenus= await RoleMenuRepository.GetListAsync(rm => rm.RoleId == roleId);
-               await RoleMenuRepository.DeleteManyAsync(roleMenus);
+                var roleMenus = await RoleMenuRepository.GetListAsync(rm => rm.RoleId == roleId);
+                await RoleMenuRepository.DeleteManyAsync(roleMenus);
             }
         }
+
         return CommonResult<string>.Success("", "角色删除完成");
     }
+
+    [HttpPost]
+    [ActionName("dataScope")]
+    public async Task<CommonResult<string>> AssignDataScopeAsync(SysRoleUpdateInput input)
+    {
+        using (var unitOfWork = UnitOfWorkManage.Begin())
+        {
+            var newRole = await RoleRepository.FindByIdAsync(input.Id);
+            newRole.DataScope = input.DataScope;
+            newRole.DeptCheckStrictly = input.DeptCheckStrictly;
+            newRole = await RoleRepository.UpdateAsync(newRole);
+            if (newRole.DataScope == "2")
+            {
+                await RoleDeptRepository.DeleteAsync(a => a.RoleId == input.Id);
+                await RoleDeptRepository.InsertManyAsync(
+                    SysRoleDept.CreateInstances(newRole.Id, input.deptIds.ToArray(), CurrentUser.TenantId),
+                    true);
+            }
+         
+            return CommonResult<string>.Success("", String.Format("角色{0}数据权限分配完成", input.Id));
+        }
+    }
+
+    [HttpGet]
+    [ActionName("authUser/allocatedList")]
+    public async Task<CommonResult<PagedResultDto<SysUserOutput>>> GetAllocatedUserListFor(AllocatedUserListInput input)
+    {
+        var users=await RoleStore.GetAllocatedUserList(input.RoleId, input.UserName, input.Phonenumber);
+        var userOutputs =ObjectMapper.Map<List<SysUser>, List<SysUserOutput>>(users);
+        return CommonResult<PagedResultDto<SysUserOutput>>.Success( new PagedResultDto<SysUserOutput>((long)userOutputs.Count,userOutputs), "获取角色授权用户列表成功");
+    }
+    [HttpGet]
+    [ActionName("authUser/unallocatedList")]
+    public async Task<CommonResult<PagedResultDto<SysUserOutput>>> GetUnallocatedUserListFor(AllocatedUserListInput input)
+    {
+        var users=await RoleStore.GetUnallocatedUserList(input.RoleId, input.UserName, input.Phonenumber);
+        var userOutputs =ObjectMapper.Map<List<SysUser>, List<SysUserOutput>>(users);
+        return CommonResult<PagedResultDto<SysUserOutput>>.Success( new PagedResultDto<SysUserOutput>((long)userOutputs.Count,userOutputs), "获取角色授权用户列表成功");
+    }
+
+    [HttpPost]
+    [ActionName("authUser/cancelAuth")]
+    public async Task<CommonResult<string>> CancelUserAth([FromBody]string userId, [FromBody]long roleId)
+    {
+        await RoleStore.CancelUserAth(userId, roleId);
+        return CommonResult<string>.Success("", String.Format("用户{0}取消授权角色{1}数完成",userId,roleId));
+    }
+    [HttpPost]
+    [ActionName("authUser/cancelAuthMultiple")]
+    public async Task<CommonResult<string>> CancelMultipleUserAth(string[] userIds, long roleId)
+    {
+        
+        await RoleStore.CancelUserAth(userIds, roleId);
+        return CommonResult<string>.Success("", String.Format("取消授权角色{1}数完成",roleId));
+    }
+
+    [HttpPost]
+    [ActionName("authUser/confirmAuth")]
+    public async Task<CommonResult<string>> CancelUserAth(string[] userIds, long roleId)
+    {
+        await RoleStore.ComfirmUserAth(userIds, roleId);
+        return CommonResult<string>.Success("", String.Format("角色{0}授权完成",roleId));
+    }
+
 }

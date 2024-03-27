@@ -207,7 +207,7 @@ public sealed class SysDept : FullAuditedAggregateRoot<long>, IMultiTenant
             return;
         }
 
-        Roles.Add(new SysRoleDept(roleId, Id, TenantId));
+        Roles.Add(SysRoleDept.CreateInstance(roleId, Id, TenantId));
     }
 
     public void RemoveRole(long roleId)

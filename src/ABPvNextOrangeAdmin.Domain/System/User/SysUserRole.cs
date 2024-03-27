@@ -24,14 +24,14 @@ public class SysUserRole : FullAuditedEntity
 
     public override object[] GetKeys()
     {
-        return new object[] {UserId, RoleId};
+        return new object[] { UserId, RoleId };
     }
 
     private SysUserRole()
     {
     }
 
-    public SysUserRole(Guid userId, long roleId,  Guid? tenantId)
+    public SysUserRole(Guid userId, long roleId, Guid? tenantId)
     {
         _tenantId = tenantId;
         UserId = userId;
@@ -47,6 +47,21 @@ public class SysUserRole : FullAuditedEntity
             {
                 RoleId = roleId,
                 UserId = userId
+            });
+        }
+
+        return userRoles;
+    }
+
+    public static List<SysUserRole> CreateInstances(String[] userIds, long roleId)
+    {
+        List<SysUserRole> userRoles = new List<SysUserRole>();
+        foreach (var userId in userIds)
+        {
+            userRoles.Add(new SysUserRole()
+            {
+                RoleId = roleId,
+                UserId = Guid.Parse(userId)
             });
         }
 

@@ -5,6 +5,8 @@ namespace ABPvNextOrangeAdmin.System.Permission.Dto;
 
 public class SysRoleUpdateInput
 {
+    public long Id { get; set;}
+
     /// <summary>
     /// 角色名称
     /// </summary>
@@ -25,8 +27,10 @@ public class SysRoleUpdateInput
     /// </summary>
     public int roleSort { get; set; }
     
+    /// <summary>
+    /// 数据权限
+    /// </summary>
     public String DataScope { get; set; }
-    
 
     /// <summary>
     /// 角色备注
@@ -45,5 +49,5 @@ public class SysRoleUpdateInput
     
     public List<int> menuIds { get; set; }
 
-    public List<int> deptIds { get; set; }
+    public List<long> deptIds { get; set; }
 }

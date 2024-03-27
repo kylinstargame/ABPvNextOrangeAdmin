@@ -25,6 +25,16 @@ public class SysRoleOutput:EntityDto<long>
     /// </summary>
     public string Status { get; set; }
     
+    /// <summary>
+    /// 菜单树选择项是否关联显示（ 0：父子不互相关联显示 1：父子互相关联显示）
+    /// </summary>
+    public bool MenuCheckStrictly { get; set; }
+
+    /// <summary>
+    /// 部门树选择项是否关联显示（0：父子不互相关联显示 1：父子互相关联显示 ） 
+    /// </summary>
+    public bool DeptCheckStrictly { get; set; }
+    
 
     /// <summary>
     /// 创建时间
