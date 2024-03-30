@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using ABPvNextOrangeAdmin.Data.Staff;
 using ABPvNextOrangeAdmin.System.Config;
 using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Dict;
@@ -71,6 +72,7 @@ public class ABPvNextOrangeAdminDbContext :
     //Dict
     public DbSet<SysDictData> DictDatas { get; set; }
     public DbSet<SysDictType> DictTypes { get; set; }
+    public DbSet<Staff> Staffs { get; set; }
 
     #endregion
 
@@ -215,6 +217,12 @@ public class ABPvNextOrangeAdminDbContext :
         builder.Entity<SysDictType>(b =>
         {
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "dict_type", ABPvNextOrangeAdminConsts.DbSchema);
+            b.ConfigureByConvention();
+        });
+        
+        builder.Entity<Staff>(b =>
+        {
+            b.ToTable(ABPvNextDataConsts.DbTablePrefix + "staff", ABPvNextOrangeAdminConsts.DbSchema);
             b.ConfigureByConvention();
         });
     }

@@ -22,16 +22,19 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
         List<SysMenu> menus = new List<SysMenu>();
         // "menu_id", "menu_name", "parent_id", "order_num", "path", "component", "query", "is_frame", "is_cache", "menu_type", "visible", "status", "perms", "icon", "create_by", "create_time", "update_by", "update_time", "remark"
 
-        #region 系统管理
+        #region 一级菜单
 
         menus.Add(new SysMenu(1, "系统管理", 0, 1, "system", "", "", "1", "0", "M", "0", "0", "", "system", "系统管理目录"));
         menus.Add(new SysMenu(2, "系统监控", 0, 2, "monitor", "", "", "1", "0", "M", "0", "0", "", "monitor", "系统监控目录"));
         menus.Add(new SysMenu(3, "系统工具", 0, 3, "tool", "", "", "1", "0", "M", "0", "0", "", "tool", "系统工具目录"));
         menus.Add(new SysMenu(4, "橙卡官网", 0, 4, "http://ruoyi.vip", "", "", "0", "0", "M", "0", "0", "", "guide",
             "橙卡官网地址"));
+        menus.Add(new SysMenu(5, "数据管理", 0, 4, "data", "", "", "1", "0", "M", "0", "0", "", "tool",
+            "数据管理"));
 
         #endregion
-
+        
+        #region 系统管理
         menus.Add(new SysMenu(100, "用户管理", 1, 1, "user", "system/user/index", "", "1", "0", "C", "0", "0",
             "system:user:list", "user", "用户管理菜单"));
         menus.Add(new SysMenu(101, "角色管理", 1, 2, "role", "system/role/index", "", "1", "0", "C", "0", "0",
@@ -53,6 +56,8 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
             "monitor:online:list", "online", "在线用户菜单"));
         menus.Add(new SysMenu(110, "定时任务", 2, 2, "job", "monitor/job/index", "", "1", "0", "C", "0", "0",
             "monitor:job:list", "job", "定时任务菜单"));
+        #endregion
+ 
 
         #region 系统监控
 
@@ -74,6 +79,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
         menus.Add(new SysMenu(116, "系统接口", 3, 3, "swagger", "tool/swagger/index", "", "1", "0", "C", "0", "0",
             "tool:swagger:list", "swagger", "系统接口菜单"));
 
+        #endregion
+        #region 数据管理
+        menus.Add(new SysMenu(117, "员工管理", 5, 2, "staff", "data/staff/index", "", "1", "0", "C", "0", "0",
+            "monitor:job:list", "job", "员工管理菜单"));
         #endregion
 
         #region 系统日志
@@ -216,12 +225,20 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
 
         #region 代码生成
 
-        menus.Add(new SysMenu(1054, "生成查询", 115, 1, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:query", "#", ""));
-        menus.Add(new SysMenu(1055, "生成修改", 115, 2, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:edit", "#", ""));
-        menus.Add(new SysMenu(1056, "生成删除", 115, 3, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:remove", "#", ""));
-        menus.Add(new SysMenu(1057, "导入代码", 115, 2, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:import", "#", ""));
-        menus.Add(new SysMenu(1058, "预览代码", 115, 4, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:preview", "#", ""));
-        menus.Add(new SysMenu(1059, "生成代码", 115, 5, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:code", "#", ""));
+        menus.Add(new SysMenu(1054, "生成修改", 115, 2, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:edit", "#", ""));
+        menus.Add(new SysMenu(1055, "生成删除", 115, 3, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:remove", "#", ""));
+        menus.Add(new SysMenu(1056, "导入代码", 115, 2, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:import", "#", ""));
+        menus.Add(new SysMenu(1057, "预览代码", 115, 4, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:preview", "#", ""));
+        menus.Add(new SysMenu(1058, "生成代码", 115, 5, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:code", "#", ""));
+
+        #endregion
+        #region 代码生成
+
+        menus.Add(new SysMenu(1059, "员工查询", 117, 1, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:query", "#", ""));
+        menus.Add(new SysMenu(1060, "员工修改", 117, 2, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:edit", "#", ""));
+        menus.Add(new SysMenu(1061, "员工删除", 117, 3, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:remove", "#", ""));
+        menus.Add(new SysMenu(1062, "员工新增", 117, 2, "#", "", "", "1", "0", "F", "0", "0", "tool:gen:import", "#", ""));
+     
 
         #endregion
 

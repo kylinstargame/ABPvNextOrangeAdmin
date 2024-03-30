@@ -8,7 +8,7 @@ public static class ABPvNextOrangeAdminConsts
 }
 
 
-public static class ABPvNextPhantomBodyAdminConsts
+public static class ABPvNextDataConsts
 {
     public const string DbTablePrefix = "data_";
 
