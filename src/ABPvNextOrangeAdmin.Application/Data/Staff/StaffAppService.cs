@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ABPvNextOrangeAdmin.Common;
@@ -37,7 +38,7 @@ public class StaffAppService : ApplicationService, IStaffAppService
 
     [HttpGet]
     [ActionName("get")]
-    public Task<CommonResult<SysRoleOutput>> GetAsync(string staffId)
+    public Task<CommonResult<SysRoleOutput>> GetAsync(string staffId,String Name,int Year)
     {
         throw new NotImplementedException();
     }

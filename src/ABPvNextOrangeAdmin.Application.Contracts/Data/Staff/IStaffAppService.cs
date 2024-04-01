@@ -22,7 +22,7 @@ public interface IStaffAppService
     /// </summary>
     /// <param name="staffId"></param>
     /// <returns></returns>
-    public Task<CommonResult<SysRoleOutput>> GetAsync(string staffId);
+    public Task<CommonResult<SysRoleOutput>> GetAsync(string staffId,String Name,int Year);
 
     /// <summary>
     /// 添加角色
