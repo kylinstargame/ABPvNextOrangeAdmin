@@ -35,6 +35,7 @@ public class StaffAppService : ApplicationService, IStaffAppService
         return CommonResult<PagedResultDto<StaffOutput>>.Success(
             new PagedResultDto<StaffOutput>(staffOutputs.Count, staffOutputs), "获取员工列表成功");
     }
+    
 
     [HttpGet]
     [ActionName("get")]
@@ -42,6 +43,17 @@ public class StaffAppService : ApplicationService, IStaffAppService
     {
         throw new NotImplementedException();
     }
+
+    Task<CommonResult<string>> IStaffAppService.CreateAsync(StaffUpdateInutput input)
+    {
+        return CreateAsync(input);
+    }
+
+    Task<CommonResult<string>> IStaffAppService.UpdateAsync(StaffUpdateInutput input)
+    {
+        return UpdateAsync(input);
+    }
+
     [HttpGet]
     [ActionName("add")]
     public Task<CommonResult<string>> CreateAsync(StaffUpdateInutput input)
