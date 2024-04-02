@@ -18,7 +18,7 @@
     "ABPvNextOrangeAdmin.HttpApi.Host": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://192.168.1.110:44342",
+      "applicationUrl": "https://192.168.0.63:44342",
 //      "applicationUrl": "https://127.0.0.1:44342",
       
       "environmentVariables": {

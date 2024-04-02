@@ -1,7 +1,8 @@
 using System;
 using Volo.Abp.Application.Dtos;
 
-namespace ABPvNextOrangeAdmin.Data.Staff;
+namespace ABPvNextOrangeAdmin.Data
+;
 
 public class SignatureRecord:EntityDto<long>
 {

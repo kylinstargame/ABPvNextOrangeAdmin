@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using ABPvNextOrangeAdmin.Data;
+
+using ABPvNextOrangeAdmin.Dto;
 using ABPvNextOrangeAdmin.System;
 using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.Config;
@@ -50,5 +53,7 @@ public class ABPvNextOrangeAdminApplicationAutoMapperProfile : Profile
         
         
         CreateMap<SysDictData,DictDataOutput>();
+        CreateMap<StaffUpdateInutput, Staff>();
+        CreateMap<Staff, StaffOutput>();
     }
 }

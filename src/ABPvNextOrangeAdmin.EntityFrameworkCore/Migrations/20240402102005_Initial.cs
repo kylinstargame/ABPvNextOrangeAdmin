@@ -477,6 +477,27 @@ namespace ABPvNextOrangeAdmin.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "data_staff_photo",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    StaffId = table.Column<long>(type: "bigint", nullable: true),
+                    PhotoUrl = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_data_staff_photo", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_data_staff_photo_data_staff_StaffId",
+                        column: x => x.StaffId,
+                        principalTable: "data_staff",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "sys_AuditLogActions",
                 columns: table => new
                 {
@@ -779,6 +800,11 @@ namespace ABPvNextOrangeAdmin.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
+                name: "IX_data_staff_photo_StaffId",
+                table: "data_staff_photo",
+                column: "StaffId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_sys_AuditLogActions_AuditLogId",
                 table: "sys_AuditLogActions",
                 column: "AuditLogId");
@@ -873,7 +899,7 @@ namespace ABPvNextOrangeAdmin.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "data_staff");
+                name: "data_staff_photo");
 
             migrationBuilder.DropTable(
                 name: "sys_AuditLogActions");
@@ -916,6 +942,9 @@ namespace ABPvNextOrangeAdmin.Migrations
 
             migrationBuilder.DropTable(
                 name: "sys_user_role");
+
+            migrationBuilder.DropTable(
+                name: "data_staff");
 
             migrationBuilder.DropTable(
                 name: "sys_EntityChanges");

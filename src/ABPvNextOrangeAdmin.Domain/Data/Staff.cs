@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-
 using Volo.Abp.Domain.Entities.Auditing;
 
-namespace ABPvNextOrangeAdmin.Data.Staff;
+namespace ABPvNextOrangeAdmin.Data;
 
 public class Staff:FullAuditedAggregateRoot<long>
 {
@@ -25,7 +24,7 @@ public class Staff:FullAuditedAggregateRoot<long>
    /// <summary>
    /// 个人风采-照片
    /// </summary>
-   public List<string> Photos;
+   public List<StaffPhotos> Photos;
    
    /// <summary>
    /// 个人风采-视频

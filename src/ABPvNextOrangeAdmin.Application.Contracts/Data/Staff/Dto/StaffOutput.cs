@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Volo.Abp.Application.Dtos;
 
 namespace ABPvNextOrangeAdmin.Dto;
 
-public class StaffOutput
+public class StaffOutput:EntityDto<long>
 {
+    
     /// <summary>
     /// 姓名
     /// </summary>

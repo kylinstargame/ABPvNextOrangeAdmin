@@ -7,6 +7,7 @@ using ABPvNextOrangeAdmin.Dto;
 using ABPvNextOrangeAdmin.System.Account.Dto;
 using ABPvNextOrangeAdmin.System.Permission.Dto;
 using ABPvNextOrangeAdmin.System.Roles;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Application.Dtos;
@@ -14,7 +15,7 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using NotImplementedException = System.NotImplementedException;
 
-namespace ABPvNextOrangeAdmin.Data.Staff;
+namespace ABPvNextOrangeAdmin.Data;
 
 [Authorize]
 [Route("api/data/staff/[action]")]
@@ -28,6 +29,7 @@ public class StaffAppService : ApplicationService, IStaffAppService
     public IRepository<Staff> StaffRepository { get; }
 
     [HttpGet]
+    [AllowAnonymous]
     [ActionName("list")]
     public async Task<CommonResult<PagedResultDto<StaffOutput>>> GetListAsync(RoleListInput input)
     {
@@ -45,21 +47,14 @@ public class StaffAppService : ApplicationService, IStaffAppService
         throw new NotImplementedException();
     }
 
-    Task<CommonResult<string>> IStaffAppService.CreateAsync(StaffUpdateInutput input)
-    {
-        return CreateAsync(input);
-    }
-
-    Task<CommonResult<string>> IStaffAppService.UpdateAsync(StaffUpdateInutput input)
-    {
-        return UpdateAsync(input);
-    }
-
-    [HttpGet]
+    [HttpPost]
     [ActionName("add")]
-    public Task<CommonResult<string>> CreateAsync(StaffUpdateInutput input)
+    public async Task<CommonResult<string>> CreateAsync(StaffUpdateInutput input)
     {
-        throw new NotImplementedException();
+        var staff = ObjectMapper.Map<StaffUpdateInutput, Staff>(input);
+       await StaffRepository.InsertAsync(staff);
+       return CommonResult<String>.Success(
+           "获取员工列表成功" ,"获取员工列表成功");
     }
 
     [HttpGet]

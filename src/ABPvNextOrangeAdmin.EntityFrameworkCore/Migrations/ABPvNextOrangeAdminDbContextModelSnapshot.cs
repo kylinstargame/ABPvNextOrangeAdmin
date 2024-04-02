@@ -21,7 +21,7 @@ namespace ABPvNextOrangeAdmin.Migrations
                 .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("ABPvNextOrangeAdmin.Data.Staff.Staff", b =>
+            modelBuilder.Entity("ABPvNextOrangeAdmin.Data.Staff", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -88,6 +88,25 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("data_staff", (string)null);
+                });
+
+            modelBuilder.Entity("ABPvNextOrangeAdmin.Data.StaffPhotos", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PhotoUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<long?>("StaffId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StaffId");
+
+                    b.ToTable("data_staff_photo", (string)null);
                 });
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Config.SysConfig", b =>
@@ -1378,6 +1397,15 @@ namespace ABPvNextOrangeAdmin.Migrations
                     b.ToTable("sys_TenantConnectionStrings", (string)null);
                 });
 
+            modelBuilder.Entity("ABPvNextOrangeAdmin.Data.StaffPhotos", b =>
+                {
+                    b.HasOne("ABPvNextOrangeAdmin.Data.Staff", "Staff")
+                        .WithMany("Photos")
+                        .HasForeignKey("StaffId");
+
+                    b.Navigation("Staff");
+                });
+
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Menu.SysMenu", b =>
                 {
                     b.HasOne("ABPvNextOrangeAdmin.System.Menu.SysMenu", null)
@@ -1489,6 +1517,11 @@ namespace ABPvNextOrangeAdmin.Migrations
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ABPvNextOrangeAdmin.Data.Staff", b =>
+                {
+                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("ABPvNextOrangeAdmin.System.Dept.SysDept", b =>

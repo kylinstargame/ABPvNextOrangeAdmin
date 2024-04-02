@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using ABPvNextOrangeAdmin.Data.Staff;
+using ABPvNextOrangeAdmin.Data;
 using ABPvNextOrangeAdmin.System.Config;
 using ABPvNextOrangeAdmin.System.Dept;
 using ABPvNextOrangeAdmin.System.Dict;
@@ -128,14 +128,7 @@ public class ABPvNextOrangeAdminDbContext :
                       l => l.HasOne(typeof(SysPost)).WithMany().HasForeignKey("PostId").HasPrincipalKey(nameof(SysPost.Id)),
                       
                 j => j.ToTable("sys_user_post").HasKey("UserId","PostId"));
-        // builder.Entity<SysUserDept>(b =>
-        // {
-        //     b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_dept", ABPvNextOrangeAdminConsts.DbSchema);
-        //         // .HasKey("DeptId", "UserId");
-        //         //
-        //
-        //     b.ConfigureByConvention();
-        // });
+        
         builder.Entity<SysUserLogin>(b =>
         {
             b.ToTable(ABPvNextOrangeAdminConsts.DbTablePrefix + "user_login", ABPvNextOrangeAdminConsts.DbSchema);
@@ -223,6 +216,13 @@ public class ABPvNextOrangeAdminDbContext :
         builder.Entity<Staff>(b =>
         {
             b.ToTable(ABPvNextDataConsts.DbTablePrefix + "staff", ABPvNextOrangeAdminConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.HasMany<StaffPhotos>(s => s.Photos).WithOne(p => p.Staff);
+        });
+        
+        builder.Entity<StaffPhotos>(b =>
+        {
+            b.ToTable(ABPvNextDataConsts.DbTablePrefix + "staff_photo", ABPvNextOrangeAdminConsts.DbSchema);
             b.ConfigureByConvention();
         });
     }
