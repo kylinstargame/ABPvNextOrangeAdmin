@@ -15,14 +15,14 @@ public interface IStaffAppService
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Task<CommonResult<PagedResultDto<StaffOutput>>> GetListAsync(RoleListInput input);
+    public Task<CommonResult<PagedResultDto<StaffOutput>>> GetListAsync(StaffListInput input);
     
     /// <summary>
     /// 根據Id獲取角色·
     /// </summary>
     /// <param name="staffId"></param>
     /// <returns></returns>
-    public Task<CommonResult<SysRoleOutput>> GetAsync(string staffId,String Name,int Year);
+    public Task<CommonResult<StaffOutput>> GetAsync(long staffId);
 
     /// <summary>
     /// 添加角色

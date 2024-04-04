@@ -217,7 +217,7 @@ public class ABPvNextOrangeAdminDbContext :
         {
             b.ToTable(ABPvNextDataConsts.DbTablePrefix + "staff", ABPvNextOrangeAdminConsts.DbSchema);
             b.ConfigureByConvention();
-            b.HasMany<StaffPhotos>(s => s.Photos).WithOne(p => p.Staff);
+            b.HasMany<StaffPhotos>(s => s.Photos).WithOne().HasForeignKey(p=>p.StaffId);
         });
         
         builder.Entity<StaffPhotos>(b =>

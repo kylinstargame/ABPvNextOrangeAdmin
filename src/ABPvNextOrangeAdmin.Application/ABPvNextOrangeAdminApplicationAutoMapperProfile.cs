@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ABPvNextOrangeAdmin.Data;
-
 using ABPvNextOrangeAdmin.Dto;
 using ABPvNextOrangeAdmin.System;
 using ABPvNextOrangeAdmin.System.Account.Dto;
@@ -35,25 +35,37 @@ public class ABPvNextOrangeAdminApplicationAutoMapperProfile : Profile
         CreateMap<SysConfig, ConfigOutput>();
 
         CreateMap<SysUser, SysUserOutput>();
-         
-        CreateMap<SysRoleUpdateInput, SysRole>().ForMember(a=>a.Permissions,
-            b=>b.MapFrom(a=>a.RoleKey));
-        CreateMap<SysRole, SysRoleOutput>().ForMember(a=>a.RoleKey,
-                b=>b.MapFrom(a=>a.Permissions))
-            .ForMember(a=>a.roleSort,
-                b=>b.MapFrom(a=>a.Order));
-       
-  
+
+        CreateMap<SysRoleUpdateInput, SysRole>().ForMember(a => a.Permissions,
+            b => b.MapFrom(a => a.RoleKey));
+        CreateMap<SysRole, SysRoleOutput>().ForMember(a => a.RoleKey,
+                b => b.MapFrom(a => a.Permissions))
+            .ForMember(a => a.roleSort,
+                b => b.MapFrom(a => a.Order));
+
+
         CreateMap<SysDept, SysDeptOutput>();
         CreateMap<SysPost, SysPostOutput>();
         CreateMap<SysDept, SysDeptTreeSelectOutput>().ForMember(a => a.Label,
             b => b.MapFrom(a => a.DeptName));
         CreateMap<SysMenu, SysMenuTreeSelectOutput>().ForMember(a => a.Label,
             b => b.MapFrom(a => a.MenuName));
+
+
+        CreateMap<SysDictData, DictDataOutput>();
         
+        // CreateMap<Staff, StaffOutput>().ForMember(a => a.Photos,
+        //     b => b.MapFrom(
+        //         a => a.Photos.Select(s=>s.PhotoUrl).ToList()));
         
-        CreateMap<SysDictData,DictDataOutput>();
-        CreateMap<StaffUpdateInutput, Staff>();
-        CreateMap<Staff, StaffOutput>();
+            
+        CreateMap<Staff, StaffOutput>().ForMember(a => a.Photos,
+            b => b.MapFrom(
+                a => a.Photos.Select(s=>s.PhotoUrl).ToList()));
+        
+        CreateMap<StaffUpdateInutput, Staff>().ForMember(a => a.Photos,
+            b => b.MapFrom(
+                a => StaffPhotos.CreateInstances(a.Id, a.Photos.ToArray())));
+
     }
 }

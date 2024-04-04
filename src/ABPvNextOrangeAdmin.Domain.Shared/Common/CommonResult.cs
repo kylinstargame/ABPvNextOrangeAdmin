@@ -80,6 +80,8 @@ public class CommonResult<T>
     {
         return CreateInstance(errorCode, message, null);
     }
+    
+
 
     /**
      * 失败返回结果

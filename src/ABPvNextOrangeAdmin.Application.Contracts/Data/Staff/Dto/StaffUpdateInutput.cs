@@ -24,7 +24,7 @@ public class StaffUpdateInutput:EntityDto<long>
     /// <summary>
     /// 个人风采-照片
     /// </summary>
-    public List<string> Photos;
+    public List<string> Photos { get; set; }
    
     /// <summary>
     /// 个人风采-视频
