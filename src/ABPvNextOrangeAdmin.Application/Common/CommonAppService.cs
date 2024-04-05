@@ -42,7 +42,7 @@ public class CommonAppService : ApplicationService
     public async Task<String> UploadToCacheAsync(IFormFile file)
     {
         var formFileName = file.FileName;
-        if (!new[] { ".png", ".jpg", ".bmp" }.Any((item) => formFileName.EndsWith(item)))
+        if (!new[] { ".png", ".jpg", ".bmp","mp4" }.Any((item) => formFileName.EndsWith(item)))
         {
             throw new AbpValidationException("您上传的文件格式必须为png、jpg、bmp中的一种");
         }

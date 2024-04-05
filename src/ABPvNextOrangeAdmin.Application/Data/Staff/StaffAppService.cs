@@ -26,20 +26,22 @@ public class StaffAppService : ApplicationService, IStaffAppService
     public StaffAppService(IRepository<Staff> staffRepository)
     {
         StaffRepository = staffRepository;
+        // StaffPhotosRepository = staffPhotosRepository;
     }
 
     public IRepository<Staff> StaffRepository { get; }
+    public IRepository<StaffPhotos> StaffPhotosRepository { get; }
 
     [HttpGet]
     [AllowAnonymous]
     [ActionName("list")]
     public async Task<CommonResult<PagedResultDto<StaffOutput>>> GetListAsync(StaffListInput input)
-    {
-        var staffs = (await StaffRepository.WithDetailsAsync(a=>a.Photos))
-            .WhereIf(!input.Name.IsNullOrEmpty(),x=>Pinyin.GetPinyin(x.Name).StartsWith(input.Name)||x.Name.Contains(input.Name))
-            .WhereIf(input.Years!=0,x=>x.Years==input.Years)
-            .WhereIf(!input.Dept.IsNullOrEmpty(),x=>x.Dept.Contains(input.Dept))
-            .ToList();
+    { var staffsQueryable = (await StaffRepository.WithDetailsAsync(a => a.Photos))
+            .WhereIf(!input.Name.IsNullOrEmpty(),
+                x => x.Name.Contains(input.Name)||Pinyin.GetPinyin(input.Name).StartsWith(input.Name))
+            .WhereIf(input.Years != 0, x => x.Years == input.Years)
+            .WhereIf(!input.Dept.IsNullOrEmpty(), x => x.Dept.Contains(input.Dept));
+        var staffs = staffsQueryable.ToList();
         var staffOutputs = ObjectMapper.Map<List<Staff>, List<StaffOutput>>(staffs);
         return CommonResult<PagedResultDto<StaffOutput>>.Success(
             new PagedResultDto<StaffOutput>(staffOutputs.Count, staffOutputs), "获取员工列表成功");
@@ -48,16 +50,18 @@ public class StaffAppService : ApplicationService, IStaffAppService
 
     [HttpPost]
     [ActionName("get")]
+    [AllowAnonymous]
     public async Task<CommonResult<StaffOutput>> GetAsync(long staffId)
     {
         var staffQueryable = await StaffRepository.WithDetailsAsync(x => x.Photos);
-       var staff =staffQueryable.ToList().Find(X=>X.Id == staffId);
+        var staff = staffQueryable.ToList().Find(X => X.Id == staffId);
         var staffOutpus = ObjectMapper.Map<Staff, StaffOutput>(staff);
         return CommonResult<StaffOutput>.Success(staffOutpus, "获取员工信息成功");
     }
 
     [HttpPost]
     [ActionName("add")]
+    [AllowAnonymous]
     public async Task<CommonResult<string>> CreateAsync(StaffUpdateInutput input)
     {
         var staff = ObjectMapper.Map<StaffUpdateInutput, Staff>(input);
@@ -75,9 +79,26 @@ public class StaffAppService : ApplicationService, IStaffAppService
 
     [HttpPost]
     [ActionName("update")]
-    public Task<CommonResult<string>> UpdateAsync(StaffUpdateInutput input)
+    [AllowAnonymous]
+    public async Task<CommonResult<String>> UpdateAsync(StaffUpdateInutput input)
     {
-        throw new NotImplementedException();
+        var staff = ObjectMapper.Map<StaffUpdateInutput, Staff>(input);
+        // var photos = await StaffPhotosRepository.GetListAsync(x => x.StaffId == input.Id);
+        // await StaffPhotosRepository.DeleteManyAsync(photos);
+        var oldstaff = await StaffRepository.FindAsync(x => x.Id == input.Id);
+        oldstaff.Name = staff.Name;
+        oldstaff.Years = staff.Years;
+        oldstaff.Dept = staff.Dept;
+        oldstaff.Photos = staff.Photos;
+        oldstaff.Video = staff.Video;
+        oldstaff.Remark = staff.Remark;
+        oldstaff.signature = staff.signature;
+
+
+        // oldstaff.LastModificationTime = null;
+        await StaffRepository.UpdateAsync(oldstaff);
+
+        return CommonResult<String>.Success(null, "获取员工信息更新成功");
     }
 
     [HttpPost]

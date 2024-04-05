@@ -12,7 +12,7 @@ using Volo.Abp.EntityFrameworkCore;
 namespace ABPvNextOrangeAdmin.Migrations
 {
     [DbContext(typeof(ABPvNextOrangeAdminDbContext))]
-    [Migration("20240403213908_Initial")]
+    [Migration("20240404021543_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
