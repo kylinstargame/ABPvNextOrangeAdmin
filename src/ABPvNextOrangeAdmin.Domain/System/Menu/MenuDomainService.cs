@@ -161,10 +161,10 @@ public class MenuDomainService : DomainService
     /// <returns></returns>
     public async Task<List<SysMenu>> GetMenuTreeByUserId(Guid userId, bool isAdmin = false)
     {
-        if (isAdmin)
-        {
-            return await GetMenuTreeAll();
-        }
+        // if (isAdmin)
+        // {
+        //     return await GetMenuTreeAll();
+        // }
         var menus = await _menuRepository.WithDetailsAsync();
         var roleMenus = await _roleMenuRepository.WithDetailsAsync();
         var userRoles = await _userRoleRepository.WithDetailsAsync();

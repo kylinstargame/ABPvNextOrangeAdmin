@@ -3,6 +3,7 @@
 using ABPvNextOrangeAdmin.System.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.Auditing;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
@@ -33,6 +34,11 @@ public class ABPvNextOrangeAdminApplicationModule : AbpModule
         {
             options.AddMaps<ABPvNextOrangeAdminApplicationModule>();
         });
+        Configure<AbpAuditingOptions>(options =>
+        {
+            options.IsEnabled = false; //Disables the auditing system
+        });
+
         context.Services.AddAssemblyOf<PasswordHasher<SysUser>>();
     }
 }

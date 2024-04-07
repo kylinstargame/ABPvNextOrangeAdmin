@@ -16,6 +16,7 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using NotImplementedException = System.NotImplementedException;
 using NPinyin;
+using Volo.Abp.Uow;
 
 namespace ABPvNextOrangeAdmin.Data;
 
@@ -23,22 +24,26 @@ namespace ABPvNextOrangeAdmin.Data;
 [Route("api/data/staff/[action]")]
 public class StaffAppService : ApplicationService, IStaffAppService
 {
-    public StaffAppService(IRepository<Staff> staffRepository)
+    public StaffAppService(IRepository<Staff> staffRepository, IRepository<StaffPhotos> staffPhotosRepository,
+        UnitOfWorkManager unitOfWorkManager)
     {
         StaffRepository = staffRepository;
-        // StaffPhotosRepository = staffPhotosRepository;
+        StaffPhotosRepository = staffPhotosRepository;
+        UnitOfWorkManager = unitOfWorkManager;
     }
 
     public IRepository<Staff> StaffRepository { get; }
     public IRepository<StaffPhotos> StaffPhotosRepository { get; }
+    public UnitOfWorkManager UnitOfWorkManager { get; }
 
     [HttpGet]
     [AllowAnonymous]
     [ActionName("list")]
     public async Task<CommonResult<PagedResultDto<StaffOutput>>> GetListAsync(StaffListInput input)
-    { var staffsQueryable = (await StaffRepository.WithDetailsAsync(a => a.Photos))
+    {
+        var staffsQueryable = (await StaffRepository.WithDetailsAsync(a => a.Photos))
             .WhereIf(!input.Name.IsNullOrEmpty(),
-                x => x.Name.Contains(input.Name)||Pinyin.GetPinyin(input.Name).StartsWith(input.Name))
+                x => x.Name.Contains(input.Name) || Pinyin.GetPinyin(input.Name).StartsWith(input.Name))
             .WhereIf(input.Years != 0, x => x.Years == input.Years)
             .WhereIf(!input.Dept.IsNullOrEmpty(), x => x.Dept.Contains(input.Dept));
         var staffs = staffsQueryable.ToList();
@@ -82,22 +87,22 @@ public class StaffAppService : ApplicationService, IStaffAppService
     [AllowAnonymous]
     public async Task<CommonResult<String>> UpdateAsync(StaffUpdateInutput input)
     {
-        var staff = ObjectMapper.Map<StaffUpdateInutput, Staff>(input);
-        // var photos = await StaffPhotosRepository.GetListAsync(x => x.StaffId == input.Id);
-        // await StaffPhotosRepository.DeleteManyAsync(photos);
-        var oldstaff = await StaffRepository.FindAsync(x => x.Id == input.Id);
-        oldstaff.Name = staff.Name;
-        oldstaff.Years = staff.Years;
-        oldstaff.Dept = staff.Dept;
-        oldstaff.Photos = staff.Photos;
-        oldstaff.Video = staff.Video;
-        oldstaff.Remark = staff.Remark;
-        oldstaff.signature = staff.signature;
+        using (var unitOfWork = UnitOfWorkManager.Begin())
+        {
+            var staff = await StaffRepository.FindAsync(x => x.Id == input.Id);
+            staff.Name = input.Name;
+            staff.Years = input.Years;
+            staff.Dept = input.Dept;
+            staff.Video = input.Video;
+            staff.Remark = input.Remark;
+            staff.signature = input.signature;
+            await StaffRepository.UpdateAsync(staff);
+            var staffPhotos = await StaffPhotosRepository.GetListAsync(x => x.StaffId == input.Id);
+            await StaffPhotosRepository.DeleteManyAsync(staffPhotos);
+            await StaffPhotosRepository.InsertManyAsync(StaffPhotos.CreateInstances(staff.Id,input.Photos.ToArray()));
+        }
 
-
-        // oldstaff.LastModificationTime = null;
-        await StaffRepository.UpdateAsync(oldstaff);
-
+      
         return CommonResult<String>.Success(null, "获取员工信息更新成功");
     }
 
@@ -105,7 +110,12 @@ public class StaffAppService : ApplicationService, IStaffAppService
     [ActionName("delete")]
     public async Task<CommonResult<string>> DeleteAsync(long staffId)
     {
-        await StaffRepository.DeleteAsync(x => x.Id == staffId);
+        using (var unitOfWork = UnitOfWorkManager.Begin())
+        {
+            await StaffRepository.DeleteAsync(x => x.Id == staffId);
+            var staffPhotos = await StaffPhotosRepository.GetListAsync(x => x.StaffId == staffId);
+            await StaffPhotosRepository.DeleteManyAsync(staffPhotos);
+        }
 
         return CommonResult<string>.Success("", "员工删除完成");
     }

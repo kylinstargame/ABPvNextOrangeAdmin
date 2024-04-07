@@ -27,7 +27,7 @@ public class RoleMenuDataSeedContributor : IDataSeedContributor, ITransientDepen
     public async Task SeedAsync(DataSeedContext context)
     {
         await _roleMenuRepository.HardDeleteAsync(await _roleMenuRepository.GetListAsync());
-        
+
         SysRole role = await _roleRepository.FindByNameAsync("common");
         if (role == null)
         {
@@ -64,6 +64,7 @@ public class RoleMenuDataSeedContributor : IDataSeedContributor, ITransientDepen
         {
             await _roleMenuRepository.InsertManyAsync(sysRoleMenus);
         }
- await _roleMenuRepository.InsertManyAsync(sysRoleMenus);
+
+        await _roleMenuRepository.InsertManyAsync(sysRoleMenus);
     }
 }

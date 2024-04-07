@@ -73,6 +73,7 @@ public class ABPvNextOrangeAdminDbContext :
     public DbSet<SysDictData> DictDatas { get; set; }
     public DbSet<SysDictType> DictTypes { get; set; }
     public DbSet<Staff> Staffs { get; set; }
+    public DbSet<StaffPhotos> StaffPhos { get; set; }
 
     #endregion
 

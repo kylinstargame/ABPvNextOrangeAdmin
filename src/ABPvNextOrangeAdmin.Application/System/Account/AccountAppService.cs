@@ -122,7 +122,7 @@ public class AccountAppService : ApplicationService, IAccountAppService
     [AllowAnonymous]
     public async Task<CommonResult<String>> LoginAsync(LoginInput input)
     {
-        Boolean captchaOnOff = await ConfigDomainService.SelectCaptchaOnOff();
+        Boolean captchaOnOff = false;// await ConfigDomainService.SelectCaptchaOnOff();
 
         // 验证码开关
         if (captchaOnOff)
@@ -277,8 +277,8 @@ public class AccountAppService : ApplicationService, IAccountAppService
             var role = await RoleRepository.FindByIdAsync(roleId);
             if (role != null)
             {
-                var Permssions = await PermissionManager.GetAllRolePermssionsAysnc(role.Id);
-                permissionNames.AddRange(Permssions);
+                var permssions = await PermissionManager.GetAllRolePermssionsAysnc(role.Id);
+                permissionNames.AddRange(permssions);
             }
         }
         //获取角色权限

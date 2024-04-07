@@ -29,11 +29,11 @@ public class PermsssionRepository : EfCoreRepository<ABPvNextOrangeAdminDbContex
     public async Task<List<string>> GetAllRolePermssionsAsync(long roleId)
     {
         var dbContext = await GetDbContextAsync();
-        var Perms = from menu in dbContext.Set<SysMenu>()
-            join RoleMenu in dbContext.Set<SysRoleMenu>() on menu.Id equals RoleMenu.MenuId
-            where RoleMenu.RoleId == roleId
+        var perms = from menu in dbContext.Set<SysMenu>()
+            join roleMenu in dbContext.Set<SysRoleMenu>() on menu.Id equals roleMenu.MenuId
+            where roleMenu.RoleId == roleId
             select menu.Perms;
-        return Perms.ToList();
+        return perms.ToList();
     }
 
 

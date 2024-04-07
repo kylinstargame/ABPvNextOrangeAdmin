@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.Data;
 
-public class StaffPhotos:Entity<long>
+public class StaffPhotos:AggregateRoot<long>
 {
     private StaffPhotos(long staffId, string photoUrl)
     {

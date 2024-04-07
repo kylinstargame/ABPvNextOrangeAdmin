@@ -214,6 +214,7 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
             });
         });
     }
+    
 
     private void ConfigureJwtOption(ServiceConfigurationContext context, IConfiguration configuration)
     {
@@ -261,4 +262,5 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
         app.UseUnitOfWork();
         app.UseConfiguredEndpoints();
     }
+
 }
