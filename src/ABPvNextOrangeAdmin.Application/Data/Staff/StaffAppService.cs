@@ -42,14 +42,15 @@ public class StaffAppService : ApplicationService, IStaffAppService
     public async Task<CommonResult<PagedResultDto<StaffOutput>>> GetListAsync(StaffListInput input)
     {
         var staffsQueryable = (await StaffRepository.WithDetailsAsync(a => a.Photos))
-            .WhereIf(!input.Name.IsNullOrEmpty(),
-                x => x.Name.Contains(input.Name) || Pinyin.GetPinyin(input.Name).StartsWith(input.Name))
+            // .WhereIf(!input.Name.IsNullOrEmpty(),
+            //     x => x.Name.Contains(input.Name) || Pinyin.GetPinyin(x.Name).StartsWith(input.Name))
             .WhereIf(input.Years != 0, x => x.Years == input.Years)
             .WhereIf(!input.Dept.IsNullOrEmpty(), x => x.Dept.Contains(input.Dept));
-        var staffs = staffsQueryable.ToList();
+        var staffs = staffsQueryable.PageBy(input).ToList().WhereIf(!input.Name.IsNullOrEmpty(),
+            x => x.Name.Contains(input.Name) || Pinyin.GetPinyin(x.Name).StartsWith(input.Name)).ToList();
         var staffOutputs = ObjectMapper.Map<List<Staff>, List<StaffOutput>>(staffs);
         return CommonResult<PagedResultDto<StaffOutput>>.Success(
-            new PagedResultDto<StaffOutput>(staffOutputs.Count, staffOutputs), "获取员工列表成功");
+            new PagedResultDto<StaffOutput>(staffsQueryable.Count(), staffOutputs), "获取员工列表成功");
     }
 
 
