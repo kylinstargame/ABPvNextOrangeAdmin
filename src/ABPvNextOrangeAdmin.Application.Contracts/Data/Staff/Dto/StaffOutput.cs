@@ -38,7 +38,12 @@ public class StaffOutput:EntityDto<long>
     public String Remark{ get; set; }
 
     /// <summary>
-    /// 签名照片
+    /// 寄语照片
     /// </summary>
-    public String signature { get; set; } 
+    public String signature { get; set; }
+    
+    /// <summary>
+    /// 审核标记
+    /// </summary>
+    public bool Approved { get; set; }
 }

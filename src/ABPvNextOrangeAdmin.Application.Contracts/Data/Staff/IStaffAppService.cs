@@ -22,7 +22,7 @@ public interface IStaffAppService
     /// </summary>
     /// <param name="staffId"></param>
     /// <returns></returns>
-    public Task<CommonResult<StaffOutput>> GetAsync(long staffId);
+    public Task<CommonResult<StaffOutput>> GetAsync(string staffId);
 
     /// <summary>
     /// 添加角色
@@ -43,5 +43,5 @@ public interface IStaffAppService
     /// </summary>
     /// <param name="staffId"></param>
     /// <returns></returns>
-    public Task<CommonResult<String>> DeleteAsync(long staffId); 
+    public Task<CommonResult<String>> DeleteAsync(string staffId); 
 }

@@ -123,7 +123,7 @@ public class ABPvNextOrangeAdminHttpApiHostModule : AbpModule
                 options.TokenValidationParameters =
                     new TokenValidationParameters()
                     {
-                        // 是否开启签名认证
+                        // 是否开启寄语认证
                         ValidateIssuerSigningKey = true,
                         ValidateIssuer = true,
                         ValidateAudience = true,

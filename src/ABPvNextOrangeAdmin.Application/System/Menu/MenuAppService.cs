@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Application.Services;
+using NotImplementedException = System.NotImplementedException;
 
 namespace ABPvNextOrangeAdmin.System.Menu;
 
@@ -21,14 +23,13 @@ public class MenuAppService : ApplicationService, IMenuAppService
     }
 
     private MenuDomainService MenuDomainService { get; }
-    
+
     private List<SysMenuTreeSelectOutput> BuildMenuTree(List<SysMenuTreeSelectOutput> menuOutputs, long? parentId)
     {
         List<SysMenuTreeSelectOutput> returnMenuOutputs = new List<SysMenuTreeSelectOutput>();
         foreach (var menuOutput in menuOutputs)
         {
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (menuOutput != null && menuOutput.ParentId==parentId.Value)
+            if (parentId != null && menuOutput != null && menuOutput.ParentId == parentId.Value)
             {
                 RecursionFn(menuOutputs, menuOutput);
                 returnMenuOutputs.Add(menuOutput);
@@ -78,19 +79,68 @@ public class MenuAppService : ApplicationService, IMenuAppService
     public async Task<CommonResult<List<SysMenuTreeSelectOutput>>> GetTreeSelectAsync()
     {
         var menus = await MenuDomainService.GetMenuList();
-        var menuTreeSelectOutputs=ObjectMapper.Map<List<SysMenu>, List<SysMenuTreeSelectOutput>>(menus);
-        var menuTree = BuildMenuTree(menuTreeSelectOutputs,0);
-        return CommonResult<List<SysMenuTreeSelectOutput>>.Success(menuTree,"获取菜单树成功");
+        var menuTreeSelectOutputs = ObjectMapper.Map<List<SysMenu>, List<SysMenuTreeSelectOutput>>(menus);
+
+        var menuTree = BuildMenuTree(menuTreeSelectOutputs, 0);
+        return CommonResult<List<SysMenuTreeSelectOutput>>.Success(menuTree, "获取菜单树成功");
     }
+
+
+    [HttpGet]
+    [ActionName("list")]
+    public async Task<CommonResult<List<SysMenuTreeSelectOutput>>> GetListAsync(MenuInput menuInput)
+    {
+        var menus = await MenuDomainService.GetMenuList();
+        var menuTreeSelectOutputs = ObjectMapper.Map<List<SysMenu>, List<SysMenuTreeSelectOutput>>(menus);
+        var menuTree = BuildMenuTree(menuTreeSelectOutputs, 0);
+        return CommonResult<List<SysMenuTreeSelectOutput>>.Success(menuTree, "获取菜单列表成功");
+    }
+    
+    [HttpGet]
+    [ActionName("get")]
+    
+    public async Task<CommonResult<SysMenuOutput>> GetAsync(int id)
+    {
+        var menu = await MenuDomainService.FindById(id);
+        var menuOutput = ObjectMapper.Map<SysMenu, SysMenuOutput>(menu);
+        return CommonResult<SysMenuOutput>.Success(menuOutput, $"获取菜单{id}成功");
+    }
+    [HttpPost]
+    [ActionName("add")]
+    public async Task<CommonResult<string>> CreateAsync(SysMenuOutput input)
+    {
+        var menu = ObjectMapper.Map<SysMenuOutput, SysMenu>(input);
+        await MenuDomainService.InsertAsync(menu);
+        return CommonResult<String>.Success(null, "新增菜单成功");
+    }
+
+    [HttpPost]
+    [ActionName("update")]
+    public async Task<CommonResult<string>> UpdateAsync(SysMenuOutput input)
+    {
+        var menu = await MenuDomainService.FindById(input.Id);
+        var newmenu = ObjectMapper.Map<SysMenuOutput, SysMenu>(input,menu);
+        await MenuDomainService.UpdateAsync(newmenu);
+        return CommonResult<String>.Success(null, "更新菜单成功");
+
+    }
+    [HttpPost]
+    [ActionName("delete")]
+    public async Task<CommonResult<string>> DeleteAsync(int id)
+    {
+        await MenuDomainService.DeleteAsync(id);
+        return CommonResult<String>.Success(null, "删除菜单成功");
+    }
+
     [HttpGet]
     [ActionName("treeSelectForRole")]
     public async Task<CommonResult<SysMenuTreeSelectForRoleOutput>> GetTreeSelectByRoleIdAsync(long roleId)
     {
         var menus = await MenuDomainService.GetMenuList();
-        var menuTreeSelectOutputs=ObjectMapper.Map<List<SysMenu>, List<SysMenuTreeSelectOutput>>(menus);
-        var menuTree = BuildMenuTree(menuTreeSelectOutputs,0);
+        var menuTreeSelectOutputs = ObjectMapper.Map<List<SysMenu>, List<SysMenuTreeSelectOutput>>(menus);
+        var menuTree = BuildMenuTree(menuTreeSelectOutputs, 0);
         List<long> roleMenuIds = await MenuDomainService.GetMenuListByRoleId(roleId);
-        var menuTreeForRole = SysMenuTreeSelectForRoleOutput.CreateInstance(menuTree,roleMenuIds);
-        return CommonResult<SysMenuTreeSelectForRoleOutput>.Success(menuTreeForRole,"获取菜单树成功");
+        var menuTreeForRole = SysMenuTreeSelectForRoleOutput.CreateInstance(menuTree, roleMenuIds);
+        return CommonResult<SysMenuTreeSelectForRoleOutput>.Success(menuTreeForRole, "获取菜单树成功");
     }
 }

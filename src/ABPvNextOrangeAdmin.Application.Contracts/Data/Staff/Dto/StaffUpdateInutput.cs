@@ -37,7 +37,7 @@ public class StaffUpdateInutput:EntityDto<long>
     public String Remark{ get; set; }
 
     /// <summary>
-    /// 签名照片
+    /// 寄语照片
     /// </summary>
     public String signature { get; set; }
 }

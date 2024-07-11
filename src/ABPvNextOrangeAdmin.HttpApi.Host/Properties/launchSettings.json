@@ -18,7 +18,9 @@
     "ABPvNextOrangeAdmin.HttpApi.Host": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://192.168.1.110:44342",
+//     "applicationUrl": "https://192.168.1.110:44342",
+//      "applicationUrl": "https://pw.dcfund.com.cn:4342",
+      "applicationUrl": "http://192.168.1.110:44342",
       
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

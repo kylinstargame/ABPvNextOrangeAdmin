@@ -32,6 +32,7 @@ public class ABPvNextOrangeAdminApplicationAutoMapperProfile : Profile
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
         CreateMap<SysMenu, SysMenuOutput>();
+        CreateMap<SysMenuOutput,SysMenu>();
         CreateMap<SysConfig, ConfigOutput>();
 
         CreateMap<SysUser, SysUserOutput>();
@@ -66,6 +67,8 @@ public class ABPvNextOrangeAdminApplicationAutoMapperProfile : Profile
         CreateMap<StaffUpdateInutput, Staff>().ForMember(a => a.Photos,
             b => b.MapFrom(
                 a => StaffPhotos.CreateInstances(a.Id, a.Photos.ToArray())));
+        CreateMap<StaffRecord, StaffBatch>();
+        CreateMap<StaffRecordOutput, StaffRecord>();
 
     }
 }

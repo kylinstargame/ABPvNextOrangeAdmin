@@ -41,11 +41,12 @@ public class CommonAppService : ApplicationService
     [ActionName("upload2redis")]
     public async Task<String> UploadToCacheAsync(IFormFile file)
     {
-        var formFileName = file.FileName;
-        if (!new[] { ".png", ".jpg", ".bmp","mp4" }.Any((item) => formFileName.EndsWith(item)))
+        
+        var formFileName = file.ContentType;
+        if (!new[] { "image/png", "video/quicktime", "image/bmp","video/mp4","image/jpeg" }.Any((item) => formFileName.ToLower().EndsWith(item)))
         {
             throw new AbpValidationException("您上传的文件格式必须为png、jpg、bmp中的一种");
-        }
+        } 
 
         byte[] bytes;
         using (var bodyStream = file.OpenReadStream())

@@ -29,6 +29,26 @@ public class MenuDomainService : DomainService
         _roleRepository = roleRepository;
     }
 
+    public async Task<SysMenu> FindById(long menuId)
+    {
+        return await _menuRepository.FindAsync(x => x.Id == menuId);
+    }
+
+    public async Task UpdateAsync(SysMenu menu)
+    {
+        await _menuRepository.UpdateAsync(menu);
+    }
+    
+    public async Task InsertAsync(SysMenu menu)
+    {
+        await _menuRepository.InsertAsync(menu);
+    }
+    public async Task DeleteAsync(long id)
+    {
+        var menu =await FindById(id);
+        await _menuRepository.DeleteAsync(menu);
+    }
+
     /// <summary>
     /// 根据用户查询系统菜单列表
     /// </summary>

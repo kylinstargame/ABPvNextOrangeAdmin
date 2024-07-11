@@ -74,6 +74,7 @@ public class ABPvNextOrangeAdminDbContext :
     public DbSet<SysDictType> DictTypes { get; set; }
     public DbSet<Staff> Staffs { get; set; }
     public DbSet<StaffPhotos> StaffPhos { get; set; }
+    public DbSet<StaffRecord> StaffRecords { get; set; }
 
     #endregion
 
@@ -224,6 +225,11 @@ public class ABPvNextOrangeAdminDbContext :
         builder.Entity<StaffPhotos>(b =>
         {
             b.ToTable(ABPvNextDataConsts.DbTablePrefix + "staff_photo", ABPvNextOrangeAdminConsts.DbSchema);
+            b.ConfigureByConvention();
+        });
+        builder.Entity<StaffRecord>(b =>
+        {
+            b.ToTable(ABPvNextDataConsts.DbTablePrefix + "staff_record", ABPvNextOrangeAdminConsts.DbSchema);
             b.ConfigureByConvention();
         });
     }

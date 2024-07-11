@@ -151,19 +151,3 @@ public class DeptObjectMapper : IObjectMapper<SysDept, SysDeptTreeSelectOutput>,
         return destination;
     }
 }
-
-public class MenuObjectMapper : IObjectMapper<SysMenu, SysMenuTreeSelectOutput>, ITransientDependency
-{
-    public SysMenuTreeSelectOutput Map(SysMenu source)
-    {
-        return new SysMenuTreeSelectOutput();
-    }
-
-    public SysMenuTreeSelectOutput Map(SysMenu  source, SysMenuTreeSelectOutput destination)
-    {
-        destination.Id = source.Id;
-        destination.MenuName= source.MenuName;
-
-        return destination;
-    }
-}

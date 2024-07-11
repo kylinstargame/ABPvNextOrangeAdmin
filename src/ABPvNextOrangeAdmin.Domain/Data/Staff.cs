@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace ABPvNextOrangeAdmin.Data;
@@ -37,8 +39,12 @@ public class Staff:FullAuditedAggregateRoot<long>
    public String Remark{ get; set; }
 
    /// <summary>
-   /// 签名照片
+   /// 寄语照片
    /// </summary>
    public String signature { get; set; }
+
+   [Comment("审核标记")]
+   [DefaultValue(true)]
+   public bool Approved { get; set; }
 }
 

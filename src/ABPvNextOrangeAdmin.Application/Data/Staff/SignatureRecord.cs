@@ -7,7 +7,7 @@ namespace ABPvNextOrangeAdmin.Data
 public class SignatureRecord:EntityDto<long>
 {
     /// <summary>
-    /// 签名照片
+    /// 寄语照片
     /// </summary>
     public String signature { get; set; }
     
